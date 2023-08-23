@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>快速理解网络协议 on Bo&#39;s Blog</title>
+    <link>https://boxtsecond.github.io/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/</link>
+    <description>Recent content in 快速理解网络协议 on Bo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 23 Aug 2023 14:52:03 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>快速理解网络协议（二）TCP/IP 协议模型</title>
+      <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/</link>
+      <pubDate>Wed, 23 Aug 2023 14:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/</guid>
+      <description>总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（一） IP 地址、MAC 地址</title>
+      <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/</link>
+      <pubDate>Wed, 23 Aug 2023 14:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/</guid>
+      <description>快速理解网络协议（一），基础知识的补充 总览 IP 地址 IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是在 IP 协议下使</description>
+    </item>
+    
+  </channel>
+</rss>
