@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Bo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 23 Aug 2023 17:16:32 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 23 Aug 2023 18:44:08 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>如何学习算法</title>
+      <link>https://boxtsecond.github.io/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 23 Aug 2023 18:44:08 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</guid>
+      <description>学习的步骤 这个东西是什么，重点是什么 为什么需要学这个东西 怎么学这个东西 数据结构与算法 是什么 数据结构：一组数据的存储结构 算法：操作数据的一组方</description>
+    </item>
+    
     <item>
       <title>快速理解网络协议（三）MAC 层</title>
       <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/</link>

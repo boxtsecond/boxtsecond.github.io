@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能'><title>快速理解网络协议（二）TCP/IP 协议模型</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='学习的步骤 这个东西是什么，重点是什么 为什么需要学这个东西 怎么学这个东西 数据结构与算法 是什么 数据结构：一组数据的存储结构 算法：操作数据的一组方'><title>如何学习算法</title>
 
-<link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/'>
+<link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/'>
 
-<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（二）TCP/IP 协议模型'>
-<meta property='og:description' content='总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能'>
-<meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/'>
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='如何学习算法'>
+<meta property='og:description' content='学习的步骤 这个东西是什么，重点是什么 为什么需要学这个东西 怎么学这个东西 数据结构与算法 是什么 数据结构：一组数据的存储结构 算法：操作数据的一组方'>
+<meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-08-23T14:52:03&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T14:52:03&#43;08:00'/>
-<meta name="twitter:title" content="快速理解网络协议（二）TCP/IP 协议模型">
-<meta name="twitter:description" content="总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='算法' /><meta property='article:tag' content='如何学习算法' /><meta property='article:published_time' content='2023-08-23T18:44:08&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T18:44:08&#43;08:00'/>
+<meta name="twitter:title" content="如何学习算法">
+<meta name="twitter:description" content="学习的步骤 这个东西是什么，重点是什么 为什么需要学这个东西 怎么学这个东西 数据结构与算法 是什么 数据结构：一组数据的存储结构 算法：操作数据的一组方">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
 <script>
 var doNotTrack = false;
@@ -315,15 +315,15 @@ if (!doNotTrack) {
     
     <header class="article-category">
         
-            <a href="/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" >
-                快速理解网络协议
+            <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" >
+                数据结构与算法
             </a>
         
     </header>
     
 
     <h2 class="article-title">
-        <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/">快速理解网络协议（二）TCP/IP 协议模型</a>
+        <a href="/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/">如何学习算法</a>
     </h2>
 
     
@@ -356,7 +356,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    2511字
+                    1681字
                 </time>
             </div>
         
@@ -368,175 +368,194 @@ if (!doNotTrack) {
     <section class="article-content">
     
     
-    <p><figure 
-	>
-	<a href="/post/network_protocol/img/ipmac.png" >
-		<img src="/post/network_protocol/img/ipmac.png"
-			
-			
-			
-			loading="lazy"
-			alt="总览"
-			width="85%">
-	</a>
-	
-	<figcaption>总览</figcaption>
-	
-</figure></p>
-<h2 id="tcpip-协议模型"><strong>TCP/IP 协议模型</strong></h2>
-<p><figure 
-	>
-	<a href="/post/network_protocol/img/tcpip.png" >
-		<img src="/post/network_protocol/img/tcpip.png"
-			
-			
-			
-			loading="lazy"
-			alt="TCP/IP 协议模型"
-			width="85%">
-	</a>
-	
-	<figcaption>TCP/IP 协议模型</figcaption>
-	
-</figure></p>
-<p>我们从下往上依次介绍这些层级，有一个很重要的原因是，<strong>在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能有下层没上层，绝不会有上层没下层（这句话要牢牢记住）。</strong></p>
-<div class="table-wrapper"><table>
-<thead>
-<tr>
-<th>层级</th>
-<th>作用</th>
-<th>在此层的协议</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>链路层</td>
-<td>负责节点之间数据的传输控制和寻址</td>
-<td>ATM, PPP 等</td>
-</tr>
-<tr>
-<td>网络层</td>
-<td>负责数据包的路由和转发</td>
-<td>IP, ICMP, OSPF 等</td>
-</tr>
-<tr>
-<td>传输层</td>
-<td>负责数据端到端之间的具体传输行为控制</td>
-<td>TCP, UDP 等</td>
-</tr>
-<tr>
-<td>应用层</td>
-<td>负责不同应用使用的通信协议的数据封装</td>
-<td>HTTP, SMTP, FTP, DNS, SSH 等</td>
-</tr>
-</tbody>
-</table></div>
-<h3 id="链路层"><strong>链路层</strong></h3>
-<p>链路层负责节点之间数据的传输控制和寻址，重点在于<strong>控制和寻址。控制，即谁先发，谁后发，发送时出现问题如何处理，寻址，即如何找到数据包的接收方。</strong></p>
-<p><strong>解决 “控制” 问题</strong></p>
-<p>网络中的链路分为两种类型，点对点链路 和 广播链路。点对点链路，由链路一端的单个发送方和链路另一端的单个接收方组成，如 点对点协议（PPP，Point-to-Point Protocol）、高级数据链路控制（HDLC，High-level Data Link Control）。广播链路，能够让多个发送和接收节点都连接到相同的、单一的、共享的广播信道上。很明显，在点对点链路中，由于只有两个节点参与通信，因此不需要进行数据传输的控制，“控制“ 主要解决的问题是如何协调多个发送和接收节点对单一共享广播信道的访问，即**多路访问问题。**为了解决多路访问问题，于是出现了多路访问控制协议，Multiple Access Control 简称 MAC。</p>
-<p>常见的多路访问协议</p>
-<ul>
-<li>信道划分协议 Channel Partitioning Protocol</li>
-<li>采用多路复用技术，将链路、网络资源（如带宽）划分为“资源片”，将“资源片”分配给各路通信，每路通信独占其分配到的资源片进行通信</li>
-<li>轮转协议 Taking-turns Protocol</li>
-<li>多个节点轮流发送数据</li>
-<li>当只有一个结点活跃时，以信道的全部发送速率 R 发送；当有M个结点活跃时，每个活跃结点的吞吐量接近 R/M</li>
-<li>随机访问协议 Random Access Protocol</li>
-<li>以信道的全部速率发送数据，检测到冲突时通过延时重传等方式恢复</li>
-<li><strong>以太网使用的方式</strong></li>
-</ul>
-<p><strong>解决 “寻址” 问题</strong></p>
-<p>这里要用到一个物理地址，叫作链路层地址，或 MAC 地址。<strong>MAC 地址用于在网络中唯一标示一个网卡（并不是设备）</strong>，一台设备若有一或多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址。</p>
-<p>在此层的头部一般被称为 MAC 头。具体格式如下图橙色部分</p>
-<p><figure 
-	>
-	<a href="/post/network_protocol/img/macheader.png" >
-		<img src="/post/network_protocol/img/macheader.png"
-			
-			
-			
-			loading="lazy"
-			alt="MAC 头"
-			width="85%">
-	</a>
-	
-	<figcaption>MAC 头</figcaption>
-	
-</figure></p>
-<ul>
-<li>目标 MAC 地址：表示数据包应该被发送到哪个网络设备，由 6 个字节组成</li>
-<li>源 MAC 地址：表示数据包是从哪个网络设备发送的，同样由 6 个字节组成</li>
-<li>类型：表示数据包类型，0800 表示 IP 数据包，0806 表示 ARP 数据包</li>
-<li>数据：实际的数据内容，长度可变</li>
-<li>CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据包在发送的过程中是否出现了错误</li>
-</ul>
-<h3 id="网络层"><strong>网络层</strong></h3>
-<p>网络层负责数据包的路由和转发，重点在于<strong>路由，即选择合适的路径转发到目标主机。</strong></p>
-<p>网络层使用 IP 协议来提供基本的数据传输服务，包括数据包的路由、分组和转发等功能。IP 协议使用 <strong>IP 地址唯一标识网络中的设备</strong>。</p>
-<p>IP 地址主要有两个作用</p>
-<ul>
-<li>定位，即提供设备网络中的“位置”信息</li>
-<li>路由，即数据包选择什么 “路径” 到达目标设备</li>
-</ul>
-<p>在此层的头部一般被称为 IP 头。IPv4 头具体格式如图所示</p>
-<p><figure 
-	>
-	<a href="/post/network_protocol/img/ipheader.png" >
-		<img src="/post/network_protocol/img/ipheader.png"
-			
-			
-			
-			loading="lazy"
-			alt="IPv4 头"
-			width="85%">
-	</a>
-	
-	<figcaption>IPv4 头</figcaption>
-	
-</figure></p>
-<p>IPv4 头</p>
-<ul>
-<li>版本：指定 IP 协议的版本，4 表示 IPv4，占用 4 bits</li>
-<li>首部长度 IHL：表示 IP 头的长度，占用 4 bits</li>
-<li>区分服务：用于标识网络中不同类型的数据流，只有在使用区分服务时，此字段才有作用，占用 6 bits</li>
-<li>显示拥塞通告：可选功能，在两端都支持且底层网络支持时可被使用，占用 2 bits</li>
-<li>全长：IP 数据报总长度，包括 IP 首部和 IP 数据部分的长度，占用 16 bits</li>
-<li>标识符：唯一标识一个 IP 数据报的所有分片，占用 16 bits</li>
-<li>标志：用于控制和识别报文的分片，占用 3 bits</li>
-<li>分片偏移：用于标识每个分片相对于原始报文开头的偏移量，占用 13 bits</li>
-<li>生存时间：用于防止 IP 数据报在网络中无限循环，作为跳数计数器，每经过一个路由都会减 1，为0时，将丢弃该数据报，占用 8 bits</li>
-<li>协议：表示 IP 数据报中使用的上层协议类型，例如 TCP、UDP 等，占用 8 bits</li>
-<li>首部校验和：用于检验 IP 首部（不包括数据部分）在传输过程中是否有错，占用 16 bits</li>
-<li>源地址：IP 数据报的源地址</li>
-<li>目的地址：IP 数据报的目的地址</li>
-<li>选项：其他附加信息，首部长度必须是 32 的倍数，若不满足则填充 EOL（0x00），直至满足</li>
-</ul>
-<h3 id="传输层"><strong>传输层</strong></h3>
-<p>传输层负责数据端到端之间的具体传输行为控制，重点在于<strong>端到端和传送控制。端到端，即将数据具体送达至哪个程序，传送控制，即如何将数据送达到目的地。</strong></p>
-<p>传输层上有两个最重要也最常见的协议，TCP 和 UDP，用于端到端的数据传输控制。这两块的内容比较复杂和重要，后面会专门拿出来单独说明，在此就先不赘述了。</p>
-<h3 id="应用层"><strong>应用层</strong></h3>
-<p>应用层负责不同应用使用的通信协议的数据封装，重点在于<strong>通信协议的数据封装，即在通信时按照哪种格式如何封装数据。</strong></p>
-<p>应用层上的协议是和我们日常开发息息相关的，比如程序使用 HTTP 协议发送一个 HTTP 请求、使用 SMTP 协议向客户发送一封邮件等等。在应用层上，每个协议的封装和解析是协议特有的，HTTP 协议的数据不能被 SMTP 协议解析。</p>
-<h2 id="分层的原因"><strong>分层的原因</strong></h2>
-<p>任何复杂、大型的工程都需要分层来实现模块化，用来降低不同模块之间耦合度，提高模块之间的可替代性和整个工程的复杂度。分层带来的优点有以下几个方面：</p>
+    <h2 id="学习的步骤">学习的步骤</h2>
 <ol>
-<li>降低不同层级、模块之间的耦合度，提高网络的灵活性。每层的功能和任务清晰且明确，可以分别设计和实现，使得单一协议或模块的开发、维护、升级变得更加容易。</li>
-<li>提高相同层级内模块的可替代性。比如 DNS 协议，既可以使用 TCP 协议又可以使用 UDP 协议作为传输层协议。</li>
-<li>更低的层级可以统一的向上提供服务，比如传输层的 TCP 协议可以为应用层的 HTTP、FTP 协议等提供服务。</li>
-<li>促进了层级和模块的标准化，使得网络在技术和商业上更加开放和透明。</li>
+<li>这个东西是什么，重点是什么</li>
+<li>为什么需要学这个东西</li>
+<li>怎么学这个东西</li>
 </ol>
-<p>在日常的开发设计中，我们也要将这种分层的思想融入到自己开发的系统中。</p>
+<h2 id="数据结构与算法">数据结构与算法</h2>
 <ol>
-<li>模块化或分层：将系统按照不同的功能和职责进行分层，使系统的各个部分职责清晰、功能单一、易于维护和扩展。</li>
-<li>标准化：遵循接口规范，对不同层之间的数据传输进行约束和规范，从而提高系统的稳定性、可靠性和可维护性。</li>
-<li>可替代性：通过定义接口和协议来约束不同层之间的数据传输，降低模块间的耦合度，提高模块的可替代性。</li>
+<li>是什么
+<ul>
+<li>数据结构：一组数据的存储结构</li>
+<li>算法：操作数据的一组方法</li>
+<li>数据结构为算法服务，算法要作用在特定的数据结构之上</li>
+</ul>
+</li>
+<li>重点是什么
+<ul>
+<li>复杂度分析</li>
+<li>10 个数据结构：数组、链表、栈、队列、散列表、二叉树、堆、跳表、图、Trie 树</li>
+<li>10 个算法：递归、排序、二分查找、搜索、哈希算法、贪心算法、分治算法、回溯算法、动态规划、字符串匹配算法</li>
+</ul>
+</li>
+<li>为什么要学
+<ul>
+<li>修炼自己的内功、锻炼自己的逻辑思维能力</li>
+<li>成为 top 程序员</li>
+</ul>
+</li>
+<li>怎么学
+<ul>
+<li>边学边练，适度刷题（python、java、c++、js）</li>
+<li>多思考、多互动</li>
+<li>坚持学会、掌握，练习</li>
+<li>反复三遍</li>
+</ul>
+</li>
 </ol>
-<h2 id="小测验"><strong>小测验</strong></h2>
+<h2 id="衡量算法的优劣----复杂度分析">衡量算法的优劣 &ndash; 复杂度分析</h2>
 <ol>
-<li>TCP/IP 协议模型有几层，它们的作用分别是什么？</li>
-<li>在网络中的数据包，有没有可能有 TCP 头，但是没有 IP 头？如果有的话，举例说明。</li>
-<li>在网络中的数据包，有没有可能有 TCP 头，但是没有 HTTP 头？如果有的话，举例说明。</li>
+<li>时间复杂度分析，衡量执行算法消耗的时间</li>
+<li>空间复杂度分析，衡量执行算法消耗的存储空间</li>
+</ol>
+<h2 id="为什么要复杂度分析">为什么要复杂度分析</h2>
+<ol>
+<li>与普通的事后统计法相比较
+<ol>
+<li>测试结果非常依赖测试环境</li>
+<li>测试结果受数据规模的影响很大</li>
+</ol>
+</li>
+<li>需要一种衡量标准来描述算法的优劣，并且跟测试数据、测试环境无关</li>
+</ol>
+<h2 id="怎么做复杂度分析">怎么做复杂度分析</h2>
+<h3 id="时间复杂度分析">时间复杂度分析</h3>
+<ul>
+<li>执行算法的时间随数据规模增长的变化趋势</li>
+<li>T(n) = O(f(n))
+<ul>
+<li>T(n) 代码的执行时间</li>
+<li>f(n) 代码的执行次数总和</li>
+</ul>
+</li>
+<li>只关注循环执行次数最多的一段代码</li>
+<li>加法法则：总复杂度等于量级最大的那段代码的复杂度
+<ul>
+<li>T(n)=T1(n)+T2(n)=max(O(f(n)), O(g(n))) =O(max(f(n), g(n)))</li>
+</ul>
+</li>
+<li>乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积
+<ul>
+<li>T(n)=T1(n)*T2(n)=O(f(n))*O(g(n))=O(f(n)*g(n))</li>
+</ul>
+</li>
+<li>常见的时间复杂度
+<ul>
+<li>多项式量级
+<ul>
+<li>O(1)，代码中不存在循环、递归语句</li>
+<li>O(logn)、O(nlogn)，对数阶时间复杂度，以步长做循环</li>
+<li>O(m+n)、O(m*n)，两个数据的规模决定时间复杂度</li>
+</ul>
+</li>
+<li>非多项式量级：O(2n) 和 O(n!)</li>
+</ul>
+</li>
+</ul>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/analysis.jpg" >
+		<img src="/post/algorithm/img/analysis.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="复杂度量级"
+			width="85%">
+	</a>
+	
+	<figcaption>复杂度量级</figcaption>
+	
+</figure></p>
+<h3 id="空间复杂度分析">空间复杂度分析</h3>
+<ul>
+<li>算法的存储空间与数据规模之间的增长关系</li>
+<li>常见的空间复杂度：O(1)、O(n)、O(n ^ 2)</li>
+<li>除了原本的数据存储空间外，算法运行需要额外的存储空间</li>
+</ul>
+<h2 id="更全面的复杂度分析">更全面的复杂度分析</h2>
+<ol>
+<li>最好情况时间复杂度（best case time complexity）➡️  最理想的情况</li>
+<li>最坏情况时间复杂度（worst case time complexity）➡️  最糟糕的情况</li>
+<li>平均情况时间复杂度（average case time complexity）
+<ul>
+<li>加权平均时间复杂度、期望时间复杂度</li>
+</ul>
+</li>
+<li>均摊时间复杂度（amortized time complexity）
+<ul>
+<li>有一定的前后时序关系</li>
+<li>大部分情况下时间复杂度都相同，个别情况不同</li>
+<li>一般情况下，均摊时间复杂度等于最好情况时间复杂度</li>
+<li>是一种特殊的平均时间复杂度</li>
+</ul>
+</li>
+</ol>
+<h2 id="解决方案的思考过程">解决方案的思考过程</h2>
+<ol>
+<li>定义清楚问题
+<ul>
+<li>调研问题</li>
+<li>对模糊的需求进行假设，限定要解决的问题的范围</li>
+</ul>
+</li>
+<li>理解隐藏需求
+<ul>
+<li>需求一般可以分为功能性需求和非功能性需求</li>
+<li>功能性需求一般来讲是和业务逻辑紧密相关的</li>
+<li>非功能性需求包括安全、性能、用户体验等</li>
+</ul>
+</li>
+<li>尝试用学过的数据结构解决这个问题
+<ul>
+<li>尝试对比多种数据结构</li>
+<li>如果不能直接使用基本数据结构解决，尝试改造数据结构，可以结合多个数据结构的不同特点，使用多个数据结构尝试解决</li>
+</ul>
+</li>
+<li>计算时间、空间复杂度，包括对内存、磁盘的访问</li>
+</ol>
+<h2 id="合理地选择数据结构和算法">合理地选择数据结构和算法</h2>
+<ol>
+<li>熟知每种数据结构和算法的功能、特点、时间空间复杂度</li>
+<li>时间、空间复杂度不能跟性能划等号
+<ul>
+<li>复杂度不是执行时间和内存消耗的精确值，会忽略低阶、常数、系数</li>
+<li>处理小规模数据时，代码的执行时间有时不跟时间复杂度成正比</li>
+<li>对于处理不同问题的不同算法，复杂度没有可比性</li>
+</ul>
+</li>
+<li>算法的选择，一定要根据数据规模来抉择。数据规模小的时候，不必选择高级算法，而是选择简单、易维护、易实现的算法</li>
+<li>解决问题的重点在于对需求的调研、理解，理清楚要处理数据的特征与访问方式</li>
+<li>区别对待 IO 密集、内存密集、计算密集
+<ul>
+<li>数据在磁盘上，代码的性能瓶颈可能在磁盘 IO，要尽可能地减少磁盘 IO 的次数</li>
+<li>数据在内存中，判断代码是内存密集型还是 CPU 密集型
+<ul>
+<li>CPU 密集型，CPU 计算耗时占大部分，在选择数据结构和算法的时候，要尽量减少逻辑计算的复杂度，如 用位运算代替加减乘除等</li>
+<li>内存密集型，内存数据的读取耗时占大部分，可以考虑是否能减少数据的读取量，数据是否在内存中连续存储，是否能利用 CPU 缓存预读</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>使用现有算法，避免重复造轮子</li>
+<li>不要漫无目的地过度优化</li>
+</ol>
+<h2 id="学习书单">学习书单</h2>
+<ol>
+<li>《大话数据结构》</li>
+<li>《算法图解》</li>
+<li>《数据结构和算法分析》</li>
+<li>《剑指 offer》</li>
+<li>《编程珠玑》</li>
+<li>《编程之美》</li>
+<li>《算法》</li>
+<li>《算法导论》</li>
+<li>《计算机程序设计艺术》</li>
+<li>《算法帝国》</li>
+<li>《数学之美》</li>
+<li>《算法之美》</li>
 </ol>
 
 </section>
@@ -546,7 +565,9 @@ if (!doNotTrack) {
     
     <section class="article-tags">
         
-            <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">网络协议</a>
+            <a href="/tags/%E7%AE%97%E6%B3%95/">算法</a>
+        
+            <a href="/tags/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/">如何学习算法</a>
         
     </section>
 
@@ -571,37 +592,6 @@ if (!doNotTrack) {
 
     <aside class="related-contents--wrapper">
     
-    
-        <h2 class="section-title">相关文章</h2>
-        <div class="related-contents">
-            <div class="flex article-list--tile">
-                
-                    
-<article class="">
-    <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">快速理解网络协议（三）MAC 层</h2>
-        </div>
-    </a>
-</article>
-                
-                    
-<article class="">
-    <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">快速理解网络协议（一） IP 地址、MAC 地址</h2>
-        </div>
-    </a>
-</article>
-                
-            </div>
-        </div>
     
 </aside>
 
@@ -788,16 +778,20 @@ document.getElementById('days').innerHTML = number_of_days;
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#tcpip-协议模型"><strong>TCP/IP 协议模型</strong></a>
+    <li><a href="#学习的步骤">学习的步骤</a></li>
+    <li><a href="#数据结构与算法">数据结构与算法</a></li>
+    <li><a href="#衡量算法的优劣----复杂度分析">衡量算法的优劣 &ndash; 复杂度分析</a></li>
+    <li><a href="#为什么要复杂度分析">为什么要复杂度分析</a></li>
+    <li><a href="#怎么做复杂度分析">怎么做复杂度分析</a>
       <ol>
-        <li><a href="#链路层"><strong>链路层</strong></a></li>
-        <li><a href="#网络层"><strong>网络层</strong></a></li>
-        <li><a href="#传输层"><strong>传输层</strong></a></li>
-        <li><a href="#应用层"><strong>应用层</strong></a></li>
+        <li><a href="#时间复杂度分析">时间复杂度分析</a></li>
+        <li><a href="#空间复杂度分析">空间复杂度分析</a></li>
       </ol>
     </li>
-    <li><a href="#分层的原因"><strong>分层的原因</strong></a></li>
-    <li><a href="#小测验"><strong>小测验</strong></a></li>
+    <li><a href="#更全面的复杂度分析">更全面的复杂度分析</a></li>
+    <li><a href="#解决方案的思考过程">解决方案的思考过程</a></li>
+    <li><a href="#合理地选择数据结构和算法">合理地选择数据结构和算法</a></li>
+    <li><a href="#学习书单">学习书单</a></li>
   </ol>
 </nav>
         </div>
