@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数'><title>数据结构（四）树 — 红黑树、堆</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='数据结构（四）树 — 红黑树、堆'>
+<meta property='og:description' content='树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数'>
+<meta property='og:url' content='https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='数据结构' /><meta property='article:tag' content='树' /><meta property='article:published_time' content='2023-08-23T22:22:42&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T22:22:42&#43;08:00'/>
+<meta name="twitter:title" content="数据结构（四）树 — 红黑树、堆">
+<meta name="twitter:description" content="树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" >
+                数据结构与算法
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/">数据结构（四）树 — 红黑树、堆</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 23, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    3968字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="树-tree-相关概念">树 Tree 相关概念</h2>
+<ol>
+<li>父节点、子节点、兄弟节点、根节点、叶子节点（叶节点）</li>
+<li>节点的高度（Height）
+<ul>
+<li>节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0</li>
+<li>树的高度 = 根节点的高度</li>
+</ul>
+</li>
+<li>节点的深度（Depth）
+<ul>
+<li>根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0</li>
+</ul>
+</li>
+<li>节点的层数（Level）
+<ul>
+<li>节点的深度 + 1</li>
+</ul>
+</li>
+</ol>
+<h2 id="平衡二叉查找树">平衡二叉查找树</h2>
+<ol>
+<li>定义：二叉树中任意一个节点的左右子树的高度相差不能大于 1。</li>
+<li>目的：解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。</li>
+<li>常见的平衡二叉查找树，AVL 树、Splay Tree（伸展树）、Treap（树堆）</li>
+</ol>
+<h2 id="红黑树-red-black-tree">红黑树 Red-Black Tree</h2>
+<ol>
+<li>简称 R-B Tree，是一种不严格的平衡二叉查找树。<strong>是为了解决普通二叉查找树在数据更新的过程中，复杂度退化的问题而产生的。</strong></li>
+<li>红黑树的高度近似 log2n，是近似平衡，插入、删除、查找操作的时间复杂度都是 O（logn）。</li>
+<li>在红黑树中的节点，一类被标记为黑色，一类被标记为红色。</li>
+<li>红黑树的要求
+<ul>
+<li>根节点是黑色的</li>
+<li>每个叶子节点都是黑色的空节点，也就是说，叶子节点不存储数据（为了简化红黑树的代码实现）</li>
+<li>任何相邻的节点都不能同时为红色，也就是说，红色节点是被黑色节点隔开的</li>
+<li>每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点</li>
+</ul>
+</li>
+<li>用红黑树的高度是否比较稳定地趋近 log2n 来证明红黑树是否是近似平衡的。</li>
+</ol>
+<h3 id="左旋rotate-left右旋rotate-right">左旋（rotate left）、右旋（rotate right）</h3>
+<ol>
+<li>左旋 rotate left，围绕某个节点的左旋</li>
+<li>右旋 rotate right，围绕某个节点的右旋</li>
+</ol>
+<h3 id="红黑树的实现">红黑树的实现</h3>
+<ol>
+<li>插入操作
+<ul>
+<li>插入的节点必须是红色的，新插入的节点都是放在叶子节点上</li>
+<li>如果插入节点的父节点是黑色的，不需要做其他操作</li>
+<li>如果插入节点是根节点，直接将节点的颜色置为黑色</li>
+<li>其他情况则需要进入红黑树的平衡调整过程
+<ul>
+<li>
+<p>CASE 1：如果关注节点是 a，它的叔叔节点 d 是红色</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_1.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_1.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 1"
+			width="85%">
+	</a>
+	
+	<figcaption>case 1</figcaption>
+	
+</figure></p>
+<ol>
+<li>将关注节点 a 的父节点 b、叔叔节点 d 的颜色都设置成黑色</li>
+<li>将关注节点 a 的祖父节点 c 的颜色设置成红色</li>
+<li>关注节点变成 a 的祖父节点 c</li>
+<li>跳到 CASE 2 或 CASE 3</li>
+</ol>
+</li>
+<li>
+<p>CASE 2：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点是其父节点 b 的右子节点</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_2.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_2.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 2"
+			width="85%">
+	</a>
+	
+	<figcaption>case 2</figcaption>
+	
+</figure></p>
+<ol>
+<li>关注节点变成节点 a 的父节点 b</li>
+<li>围绕新的关注节点 b 左旋</li>
+<li>跳到 CASE 3</li>
+</ol>
+</li>
+<li>
+<p>CASE 3：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点 a 是其父节点 b 的左子节点</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_3.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_3.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 3"
+			width="85%">
+	</a>
+	
+	<figcaption>case 3</figcaption>
+	
+</figure></p>
+<ol>
+<li>围绕关注节点 a 的祖父节点 c 右旋</li>
+<li>将关注节点 a 的父节点 b、兄弟节点 c 的颜色互换</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>删除操作
+<ul>
+<li>针对删除节点的初步调整
+<ul>
+<li>
+<p>CASE 1：如果要删除的节点是 a，它只有一个子节点 b</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_4.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_4.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 1"
+			width="85%">
+	</a>
+	
+	<figcaption>case 1</figcaption>
+	
+</figure></p>
+<ul>
+<li>删除节点 a，并且把节点 b 替换道节点 a 的位置</li>
+<li>节点 a 只能是黑色，节点 b 也只能是红色</li>
+</ul>
+</li>
+<li>
+<p>CASE 2：如果要删除的节点 a 有两个非空子节点，并且它的后继节点就是节点 a 的右子节点 c</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_5.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_5.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 2"
+			width="85%">
+	</a>
+	
+	<figcaption>case 2</figcaption>
+	
+</figure></p>
+<ul>
+<li>如果节点 a 的后继节点就是右子节点 c，那么右子节点 c 肯定没有左子树。将节点 a 删除，并且将节点 c 替换到节点 a 的位置</li>
+<li>把节点 c 的颜色设置为跟节点 a 相同的颜色</li>
+<li>如果节点 c 是黑色，将节点 c 的右子节点 d 多加一个黑色</li>
+<li>将关注节点变成节点 d</li>
+</ul>
+</li>
+<li>
+<p>CASE 3：如果要删除的是节点 a，它有两个非空子节点，并且节点 a 的后继节点不是右节点</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_6.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_6.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 3"
+			width="85%">
+	</a>
+	
+	<figcaption>case 3</figcaption>
+	
+</figure></p>
+<ul>
+<li>找到后继节点 d，并将它删除，删除后继节点 d 的过程参照 CASE 1</li>
+<li>将节点 a 替换成后继节点 d</li>
+<li>把节点 d 的颜色设置为跟节点 a 相同的颜色</li>
+<li>如果节点 d 是黑色，将节点 d 的右子节点 c 多加一个黑色</li>
+<li>关注节点变成节点 c</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>针对关注节点进行二次调整，为了让红黑树中不存在相邻的红色节点
+<ul>
+<li>
+<p>CASE 1：如果关注节点是 a，它的兄弟节点 c 是红色的</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_7.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_7.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 1"
+			width="85%">
+	</a>
+	
+	<figcaption>case 1</figcaption>
+	
+</figure></p>
+<ul>
+<li>围绕关注节点 a 的父节点 b 左旋</li>
+<li>关注节点 a 的父节点 b 和祖父节点 c 交换颜色</li>
+<li>关注节点不变</li>
+</ul>
+</li>
+<li>
+<p>CASE 2：如果关注节点是 a，它的兄弟节点 c 是黑色的，并且节点 c 的左右子节点 d、e 都是黑色的</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_8.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_8.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 2"
+			width="85%">
+	</a>
+	
+	<figcaption>case 2</figcaption>
+	
+</figure></p>
+<ul>
+<li>将关注节点 a 的兄弟节点 c 的颜色变成红色</li>
+<li>从关注节点 a 中去掉一个黑色，这个时候节点 a 就是单纯的红色或黑色</li>
+<li>给关注节点 a 的父节点 b 添加一个黑色节点</li>
+<li>关注节点从 a 变成其父节点 b</li>
+</ul>
+</li>
+<li>
+<p>CASE 3：如果关注节点是 a，它的兄弟节点 c 是黑色，c 的左子节点 d 是红色，c 的右子节点 e 是黑色</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_9.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_9.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 3"
+			width="85%">
+	</a>
+	
+	<figcaption>case 3</figcaption>
+	
+</figure></p>
+<ul>
+<li>围绕关注节点 a 的兄弟节点 c 右旋</li>
+<li>节点 c 和节点 d 交换颜色</li>
+<li>关注节点不变</li>
+<li>跳转到 CASE 4</li>
+</ul>
+</li>
+<li>
+<p>CASE 4：如果关注节点 a 的兄弟节点 c 是黑色的，并且 c 的右子节点是红色的</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/rb_tree_case_10.jpg" >
+		<img src="/post/algorithm/img/rb_tree_case_10.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="case 4"
+			width="85%">
+	</a>
+	
+	<figcaption>case 4</figcaption>
+	
+</figure></p>
+<ul>
+<li>围绕关注节点 a 的父节点 b 左旋</li>
+<li>将关注节点 a 的兄弟节点 c 的颜色，跟关注节点 a 的父节点 b 设置成相同的颜色</li>
+<li>将关注节点 a 的父节点 b 的颜色设置为黑色</li>
+<li>从关注节点 a 中去掉一个黑色，节点 a 就变成了单纯的红色或者黑色</li>
+<li>将关注节点 a 的叔叔节点 e 设置为黑色</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="参考资料">参考资料</h3>
+<ol>
+<li><a class="link" href="https://blog.csdn.net/fei33423/article/details/79132930"  target="_blank" rel="noopener"
+    >https://blog.csdn.net/fei33423/article/details/79132930</a></li>
+<li><a class="link" href="https://blog.csdn.net/abcdef314159/article/details/77193888"  target="_blank" rel="noopener"
+    >https://blog.csdn.net/abcdef314159/article/details/77193888</a></li>
+</ol>
+<h2 id="堆-heap">堆 Heap</h2>
+<ol>
+<li>堆是一种特殊的树，是一个完全二叉树</li>
+<li>堆中每一个节点的值都必须大于等于（或小于等于）其子树中每个节点的值，大顶堆、小顶堆</li>
+</ol>
+<h3 id="堆的实现">堆的实现</h3>
+<ol>
+<li>堆是一个完全二叉树，使用数组来存储，节省存储空间。直接通过数组的下标，找到对应节点的左右子节点和父节点</li>
+<li>堆的操作
+<ul>
+<li>插入元素（堆化），时间复杂度 O（logn）
+<ul>
+<li>从下往上的堆化，遇到不满足大小条件的就交换父子节点</li>
+<li>从上往下的堆化，遇到不满足大小条件的就交换父子节点</li>
+</ul>
+</li>
+<li>删除堆顶元素
+<ul>
+<li>从上往下的堆化，时间复杂度 O（logn）
+<ul>
+<li>将最后一个数字放在堆顶，遇到不满足大小条件的就交换父子节点</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="基于堆实现排序">基于堆实现排序</h3>
+<ol>
+<li>建堆，时间复杂度，O（n）
+<ul>
+<li>将数组原地建成一个堆，直接在原数组上操作</li>
+<li>方式
+<ul>
+<li>从前往后处理数组数据，从下往上的堆化。不断地在堆中插入元素，对堆进行插入操作</li>
+<li>从后往前处理数组数据，从上往下的堆化。从非叶子节点开始，依次堆化。
+<ol>
+<li>对于完全二叉树来说，下标从 n/2 + 1 到 n 的都是叶子节点</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>排序，时间复杂度，O（nlogn）
+<ul>
+<li>堆顶（数组中的第一个元素）就是最大的元素</li>
+<li>删除堆顶元素，将堆顶和最后一个元素交换，最大元素放在下标为 n 的位置</li>
+<li>将剩下的 n - 1 个元素重新构建成堆</li>
+<li>重复上述操作</li>
+</ul>
+</li>
+<li>堆排序整体的时间复杂度是O（nlogn），不是稳定的排序算法</li>
+</ol>
+<h3 id="为什么快速排序比堆排序性能好时间复杂度同样为onlogn">为什么快速排序比堆排序性能好（时间复杂度同样为O(nlogn)）</h3>
+<ol>
+<li>堆排序数据访问的方式没有快速排序友好
+<ul>
+<li>快速排序的数据是顺序访问的，而堆排序是跳着访问的，对 CPU 缓存不友好</li>
+</ul>
+</li>
+<li>对于同样的数据，在排序过程中，堆排序算法的数据交换次数要多于快速排序</li>
+</ol>
+<h3 id="堆的应用">堆的应用</h3>
+<ol>
+<li>堆排序</li>
+<li>求 topK</li>
+<li>流里面的中值</li>
+<li>流里面的中位数</li>
+<li>优先级队列</li>
+</ol>
+<h4 id="优先级队列">优先级队列</h4>
+<ol>
+<li>思路：数据的出队顺序按照优先级高的先出队</li>
+<li>实现
+<ul>
+<li>一个堆就可以看作是一个优先级队列</li>
+<li>在优先级队列中，执行入队操作，就相当于往堆中插入一个元素。执行出队操作，相当于取出堆顶元素。</li>
+</ul>
+</li>
+<li><strong>应用场景</strong>
+<ul>
+<li><strong>合并有序小文件</strong>
+<ul>
+<li>假设有 100 个小文件，每个文件的大小是 100 MB，每个文件中存储的都是有序的字符串。将这 100 个小文件合并成一个大文件</li>
+<li>使用数组的实现
+<ul>
+<li>从这 100 个文件中，各取第一个字符串，放入数组中，比较大小，把最小的字符串放入合并后的大文件中，并将它从数组中删除。</li>
+<li>假设这个最小的字符串来自 13.txt，就从这个文件中取下一个字符串，放入数组中。重新比较大小，选择最小的放入合并后的大文件，将它从数组中删除。</li>
+<li>重复上述步骤，直至所有文件中的数据都放入到大文件为止。</li>
+</ul>
+</li>
+<li>使用优先队列的实现
+<ul>
+<li>和使用数组的方法类似，只不过将从文件中取出的字符串放在小顶堆中。</li>
+<li>删除堆顶元素，即最小的元素。然后再从堆顶元素所在的文件当中取出下一个字符串，放入堆中。</li>
+<li>重复上述步骤，直至所有文件中的数据都放入到大文件为止。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>高性能定时器</strong>
+<ul>
+<li>假设定时器中维护了很多定时任务，每个任务都设定了一个要出发执行的时间点。</li>
+<li>简单粗暴的实现
+<ul>
+<li>每隔一个很小的单位时间（如 1 秒）扫描一遍任务列表，检查是否有任务达到设定的执行时间。如果达到了，就执行任务。</li>
+</ul>
+</li>
+<li>使用堆的实现
+<ul>
+<li>按照任务设定的执行时间，将这些任务存储在优先队列中，队列首部（小顶堆的堆顶）存储的是最先执行的任务。</li>
+<li>将队列首部任务的执行时间与当前时间相减，得到时间间隔 T。即从当前开始，第一个任务执行需要等待的时间。</li>
+<li>时间 T 过去后，定时器取优先级队列中队列首部的执行任务。</li>
+<li>移除队列首部任务，然后再计算新的队列首部任务的执行时间点与当前时间点的差值。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="求-top-k">求 Top K</h4>
+<ol>
+<li>静态数据集合
+<ul>
+<li>例：如何在包含 n 个数据的数组中，查找前 K 大的数据</li>
+<li>使用小顶堆，维护一个大小为 K 的小顶堆</li>
+<li>实现：顺序遍历数组，从数组中取出数据与堆顶元素比较，如果比堆顶元素大，则把堆顶元素删除，并将这个数据插入到堆中。如果比堆顶元素小，则不做任何处理，继续遍历数组。</li>
+<li>时间复杂度
+<ul>
+<li>遍历数组：O（n）</li>
+<li>堆化：O（logK）</li>
+<li>所以总共是 O（nlogK）</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>动态数据集合
+<ul>
+<li>例：数据集合有两个操作，一个是添加数据，一个是查询当前 K 大数据</li>
+<li>一直维护一个 K 大小的小顶堆</li>
+<li>实现：当有数据被添加到集合中时，与堆顶元素比较大小。如果比堆顶元素大，则把堆顶元素删除，并将这个元素插入堆中。如果比堆顶元素小，则不做处理。</li>
+</ul>
+</li>
+</ol>
+<h4 id="利用堆求中位数">利用堆求中位数</h4>
+<ol>
+<li>静态数据集合
+<ul>
+<li>先排序，取下标 n / 2 的数据</li>
+</ul>
+</li>
+<li>动态数据集合
+<ul>
+<li>维护两个堆，一个大顶堆，一个小顶堆</li>
+<li>大顶堆中存储前半部分数据，小顶堆中存储后半部分数据，且小顶堆中的数据都大于大顶堆中的数据</li>
+<li>中位数就是大顶堆的堆顶元素</li>
+<li>实现：
+<ul>
+<li>n 个数据，如果 n 是偶数，按照从小到大排序，前 n / 2 个数据存储在大顶堆中，后 n / 2 个数据存储在小顶堆中。如果 n 是奇数，大顶堆存储 n / 2 + 1 个数据，小顶堆中存储 n / 2 个数据</li>
+<li>如果新加入的数据小于等于大顶堆的堆顶元素，将这个数据插入到大顶堆，否则，将这个数据插入到小顶堆</li>
+<li>当不满足大顶堆和小顶堆的数据个数时，通过将一个堆中不停地将堆顶元素移动到另一个堆，来满足数据个数的要求</li>
+</ul>
+</li>
+<li><strong>延伸：如何快速求 n% 的数据，例：如何快速求接口的 99% 响应时间</strong>
+<ul>
+<li>使用两个堆，一个大顶堆，一个小顶堆。大顶堆中保存前 n% 的数据，小顶堆中保存 1 - n% 的数据。大顶堆堆顶的数据就是要求的数据。</li>
+<li>每次插入一个数据的时候，判断这个数据跟大顶堆堆顶数据和小顶堆堆顶数据的大小关系。如果新插入的数据比大顶堆的堆顶数据小，则插入大顶堆。如果新插入的数据比小顶堆的堆顶数据大，则插入小顶堆。</li>
+<li>每次插入数据后，需要重新计算大顶堆和小顶堆的数据格式，看看是否还满足要求。如果不满足，就将一个堆中的数据移动到另一个堆中，直到满足要求。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+        
+            <a href="/tags/%E6%A0%91/">树</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">相关文章</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据结构（五）树 — B&#43;树</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据结构（三）树 — 二叉树、递归树</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据结构（九）字符串匹配</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了27.5k字·共 13篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+         <br />
+        <br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#树-tree-相关概念">树 Tree 相关概念</a></li>
+    <li><a href="#平衡二叉查找树">平衡二叉查找树</a></li>
+    <li><a href="#红黑树-red-black-tree">红黑树 Red-Black Tree</a>
+      <ol>
+        <li><a href="#左旋rotate-left右旋rotate-right">左旋（rotate left）、右旋（rotate right）</a></li>
+        <li><a href="#红黑树的实现">红黑树的实现</a></li>
+        <li><a href="#参考资料">参考资料</a></li>
+      </ol>
+    </li>
+    <li><a href="#堆-heap">堆 Heap</a>
+      <ol>
+        <li><a href="#堆的实现">堆的实现</a></li>
+        <li><a href="#基于堆实现排序">基于堆实现排序</a></li>
+        <li><a href="#为什么快速排序比堆排序性能好时间复杂度同样为onlogn">为什么快速排序比堆排序性能好（时间复杂度同样为O(nlogn)）</a></li>
+        <li><a href="#堆的应用">堆的应用</a>
+          <ol>
+            <li><a href="#优先级队列">优先级队列</a></li>
+            <li><a href="#求-top-k">求 Top K</a></li>
+            <li><a href="#利用堆求中位数">利用堆求中位数</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">3</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">10</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">13</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_9">
+                数据结构
+            </a>
+        
+            <a href="/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_3">
+                网络协议
+            </a>
+        
+            <a href="/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" class="font_size_2">
+                线性表
+            </a>
+        
+            <a href="/tags/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/" class="font_size_1">
+                如何学习算法
+            </a>
+        
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_1">
+                字符串
+            </a>
+        
+            <a href="/tags/%E7%AE%97%E6%B3%95/" class="font_size_1">
+                算法
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>图 on Bo&#39;s Blog</title>
+    <link>https://boxtsecond.github.io/tags/%E5%9B%BE/</link>
+    <description>Recent content in 图 on Bo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 23 Aug 2023 22:45:41 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/tags/%E5%9B%BE/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>数据结构（八）基于图的其它算法</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 23 Aug 2023 22:45:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/</guid>
+      <description>拓扑排序 Topological Sorting 当一组数据间存在两两依赖关系，并且数据间不存在循环依赖的关系。如果要对这组数据进行排序，则可以使用拓扑排序 拓扑排序是基于有向无环</description>
+    </item>
+    
+    <item>
+      <title>数据结构（七）图的搜索</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/</link>
+      <pubDate>Wed, 23 Aug 2023 22:39:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/</guid>
+      <description>应用背景 广度、深度优先搜索，都是应用于图的搜索算法，是一种暴力搜索的算法。 其他应用于图的搜索算法 A* IDA* 广度优先搜索 BFS（Breadth First Se</description>
+    </item>
+    
+    <item>
+      <title>数据结构（六）图</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/</link>
+      <pubDate>Wed, 23 Aug 2023 22:33:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/</guid>
+      <description>图 Graph 相关概念 顶点 Vertex：图中的元素 边 Edge：图中的一个顶点与任意其他顶点建立的连接关系 度 Degree：与顶点相连接的边的条数 入度 In</description>
+    </item>
+    
+  </channel>
+</rss>

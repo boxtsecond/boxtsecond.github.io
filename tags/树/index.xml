@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>树 on Bo&#39;s Blog</title>
+    <link>https://boxtsecond.github.io/tags/%E6%A0%91/</link>
+    <description>Recent content in 树 on Bo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Wed, 23 Aug 2023 22:25:43 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/tags/%E6%A0%91/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>数据结构（五）树 — B&#43;树</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/</link>
+      <pubDate>Wed, 23 Aug 2023 22:25:43 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/</guid>
+      <description>树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数</description>
+    </item>
+    
+    <item>
+      <title>数据结构（四）树 — 红黑树、堆</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/</link>
+      <pubDate>Wed, 23 Aug 2023 22:22:42 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/</guid>
+      <description>树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数</description>
+    </item>
+    
+    <item>
+      <title>数据结构（三）树 — 二叉树、递归树</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/</link>
+      <pubDate>Wed, 23 Aug 2023 22:19:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/</guid>
+      <description>树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数</description>
+    </item>
+    
+  </channel>
+</rss>
