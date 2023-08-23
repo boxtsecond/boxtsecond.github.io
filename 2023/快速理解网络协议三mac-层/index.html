@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='快速理解网络协议（一），基础知识的补充 总览 IP 地址 IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是在 IP 协议下使'><title>快速理解网络协议（一） IP 地址、MAC 地址</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='快速理解网络协议（三）MAC 层 总览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际'><title>快速理解网络协议（三）MAC 层</title>
 
-<link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/'>
+<link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/'>
 
-<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（一） IP 地址、MAC 地址'>
-<meta property='og:description' content='快速理解网络协议（一），基础知识的补充 总览 IP 地址 IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是在 IP 协议下使'>
-<meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/'>
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（三）MAC 层'>
+<meta property='og:description' content='快速理解网络协议（三）MAC 层 总览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际'>
+<meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-08-23T14:52:03&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T14:52:03&#43;08:00'/>
-<meta name="twitter:title" content="快速理解网络协议（一） IP 地址、MAC 地址">
-<meta name="twitter:description" content="快速理解网络协议（一），基础知识的补充 总览 IP 地址 IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是在 IP 协议下使">
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-08-23T17:16:32&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T17:16:32&#43;08:00'/>
+<meta name="twitter:title" content="快速理解网络协议（三）MAC 层">
+<meta name="twitter:description" content="快速理解网络协议（三）MAC 层 总览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
 <script>
 var doNotTrack = false;
@@ -323,7 +323,7 @@ if (!doNotTrack) {
     
 
     <h2 class="article-title">
-        <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/">快速理解网络协议（一） IP 地址、MAC 地址</a>
+        <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/">快速理解网络协议（三）MAC 层</a>
     </h2>
 
     
@@ -356,7 +356,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    1780字
+                    2375字
                 </time>
             </div>
         
@@ -368,11 +368,11 @@ if (!doNotTrack) {
     <section class="article-content">
     
     
-    <p>快速理解网络协议（一），基础知识的补充</p>
+    <h1 id="快速理解网络协议三mac-层">快速理解网络协议（三）MAC 层</h1>
 <p><figure 
 	>
-	<a href="/post/network_protocol/img/ipmac.png" >
-		<img src="/post/network_protocol/img/ipmac.png"
+	<a href="/post/network_protocol/img/mac.png" >
+		<img src="/post/network_protocol/img/mac.png"
 			
 			
 			
@@ -384,136 +384,97 @@ if (!doNotTrack) {
 	<figcaption>总览</figcaption>
 	
 </figure></p>
-<h2 id="ip-地址"><strong>IP 地址</strong></h2>
-<p>IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是在 IP 协议下使用的地址，IP 地址有三个主要功能：<strong>标识设备或网络、定位和选择路由</strong>。由于 IPv4 是第一个架构中的主要版本，所以在没有特殊说明的时候，IP 地址一般指的是 IPv4 地址。</p>
-<h3 id="ipv4-地址"><strong>IPv4 地址</strong></h3>
-<p>一个 IPv4 地址被 “.” 分割成 4 个部分，每个部分 8 个 bit，总共 32 位，使用十进制表示。在设计之初，IPv4 地址被分成 5 类，如下图所示，我们平时接触到的基本是 ABC 三类。一个 IPv4 地址被分为两部分，网络号 + 主机号，这种地址分类的方式叫做<strong>分类网络</strong>。</p>
-<p><figure 
-	>
-	<a href="/post/network_protocol/img/ipv4.png" >
-		<img src="/post/network_protocol/img/ipv4.png"
-			
-			
-			
-			loading="lazy"
-			alt="IPv4地址分类"
-			width="85%">
-	</a>
-	
-	<figcaption>IPv4地址分类</figcaption>
-	
-</figure></p>
-<p>在分类网络中，A、B、C 三类的 IPv4 地址的数量分割一点都不合理，范围跨度太大了。随着互联网的快速发展，CIDR 取代了分类网络。</p>
-<p><strong>CIDR （Classless Inter-Domain Routing ）无类别域间路由</strong>，旨在重新划分地址空间，将地址块可以较为自由合理的分配给用户。</p>
-<ul>
-<li>CIDR（“/” 后带着数字这种表示形式，“/” 后）将 32 位的 IP 地址一分为二，网络号 + 主机号，例如 100.100.100.2/24，前 24 位是网络号，后 8 位是主机号</li>
-<li>网络号全为 1 的就是子网掩码，主机号全为 1 的就是广播地址</li>
-<li>将子网掩码和 IP 地址按位计算 AND，可以得到网络号，即<strong>可以判断一个 IP 地址是不是在当前子网内</strong></li>
-</ul>
-<p><strong>示例：</strong> 100.100.100.2/24</p>
-<ul>
-<li>子网掩码：255.255.255.0</li>
-<li>广播地址：100.100.100.255，所有 100.100.100 网络里面的机器都可以收到</li>
-<li>100.100.100.20 与子网掩码做按位与运算，得到 100.100.100.0，即为网络号</li>
-</ul>
-<p><strong>易错计算：</strong> 求 16.158.165.91/22 的网络号、第一个地址、子网掩码和广播地址</p>
-<ul>
-<li>16.158.165.91/22 → 16.158. 101001/01. 01011011</li>
-<li>网络号：16.158. 101001/00.0 → 16.158.164.0</li>
-<li>第一个地址：16.158.164.1</li>
-<li>子网掩码：255.255.252.0</li>
-<li>广播地址：16.158.167.255</li>
-</ul>
-<h3 id="常见特殊-ipv4-地址"><strong>常见特殊 IPv4 地址</strong></h3>
-<ul>
-<li>127.0.0.1 表示本机地址</li>
-<li>0.0.0.0 有两种含义，默认路由地址和通配符地址。默认路由地址我们之后再说。通配符地址指的是，若进程监听了通配符地址，那么进程监听了本机上的所有 IP 地址</li>
-</ul>
-<h3 id="ipv6-地址"><strong>IPv6 地址</strong></h3>
-<p>由于互联网的快速兴起，导致 IPv4 地址很快就不够用了，于是出现了 IPv6 地址。一个 IPv6 地址被 “:” 分为 8 个部分，每个部分以 4 位十六进制方式表示，总共 128 位。比如：2001:0db8:85a3:08d3:1319:8a2e:0370:734。</p>
-<p>IPv6 地址和 IPv4 地址相似，也使用网络号 + 主机号的形式划分。一个 IPv4 地址可以很容易的转换成一个 IPv6 地址，如果一个地址是 IPv4 地址，可以直接表示成，::ffff:IPv4地址，比如 ::ffff:192.168.89.9，这种格式叫做**IPv4映射地址。**而::1 类似于 IPv4 中的 127.0.0.1。</p>
-<h3 id="ip-地址的功能"><strong>IP 地址的功能</strong></h3>
+<h1 id="物理层-physical-layer">物理层 Physical Layer</h1>
+<p>虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>物理层，顾名思义，表示实际的物理链接。物理层利用物理传输介质为通信的两端建立链接，实现比特流的传输，如铜线、光缆或无线通道，保证比特流正确的传输到对端。常见设备包括<strong>中继器、集线器</strong>等。其中集线器 Hub，完全在物理层工作，会将自己收到的每一个字节，都复制到其他端口上去，即广播模式。</p>
+<h1 id="mac-层-link-layer"><strong>MAC 层 Link Layer</strong></h1>
+<p>链路层，又称 MAC 层。MAC 的全称为 Medium Access Control，即媒体访问控制，主要有两个功能，<strong>寻址和控制</strong>。</p>
 <ol>
-<li><strong>标识设备或网络、定位，提供设备在网络中的位置信息</strong></li>
-<li><strong>选择路由，在网络传输中，通过 IP 地址选择路由</strong></li>
+<li><strong>寻址，即如何找到数据包接收方</strong></li>
+<li><strong>控制，即谁先发、谁后发，发送出现问题如何处理</strong></li>
 </ol>
-<h2 id="mac-地址"><strong>MAC 地址</strong></h2>
-<p>和 IP 地址相似，由于此地址作用于 MAC 层，所以称之为 MAC 地址。MAC 地址是指网络设备的硬件地址，是由网络设备的制造商烧录在设备的网卡中的一个<strong>全球唯一</strong>的地址。类比现实生活的话，IP 地址更像是精确到门牌号的地址信息，而 MAC 地址则是拥有唯一身份证号的“人”。</p>
-<h2 id="ip-地址-和-mac-地址的区别"><strong>IP 地址 和 MAC 地址的区别</strong></h2>
-<div class="table-wrapper"><table>
-<thead>
-<tr>
-<th>区别</th>
-<th>IP地址</th>
-<th>MAC地址</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>地址类型</td>
-<td>逻辑地址</td>
-<td>物理地址</td>
-</tr>
-<tr>
-<td>分配方式</td>
-<td>由运营商分配</td>
-<td>由设备制造商烧录到设备的网卡中</td>
-</tr>
-<tr>
-<td>作用范围</td>
-<td>全球互联网上的通信</td>
-<td>局域网内通信</td>
-</tr>
-<tr>
-<td>主要功能</td>
-<td>标识设备和选择路由</td>
-<td>唯一标识设备</td>
-</tr>
-</tbody>
-</table></div>
-<h2 id="查看-ip-地址mac-地址"><strong>查看 IP 地址、MAC 地址</strong></h2>
-<p>Linux 下使用 ip addr 或 ifconfig，Windows 下使用 ipconfig</p>
+<h2 id="解决控制问题"><strong>解决“控制”问题</strong></h2>
+<p>在以太网中，两个节点间传输的数据最终都会转换成电信号，在物理传输介质上发送出去。物理传输介质肯定是共享的，在发送数据时需要考虑谁先发、谁后发、同时发送时怎么避免冲突、出现问题怎么处理等。**这就是多路访问问题，即如何协调多个发送和接收节点对单一共享广播信道的访问。**计算机网络使用多路访问协议来规范它们在共享的广播信道上的传输行为。</p>
+<h3 id="多路访问协议"><strong>多路访问协议</strong></h3>
+<p>我们可以先来思考一下，理想情况下在共享信道上期望怎么传输数据。</p>
+<ol>
+<li>如果只有一个节点需要发送数据，那么我们期望它可以以整个信道的速率 R 发送数据</li>
+<li>如果有 M 个节点需要同时发送数据，那么我们期望它可以以（信道的传输速率 R / M）来发送数据</li>
+</ol>
+<ul>
+<li>
+<p><strong>规划车道 ➡️ 信道划分协议 Channel Partitioning Protocol</strong></p>
+<p>采用多路复用技术，将链路、网络资源（如带宽）划分为“资源片”，将“资源片”分配给各路通信，每路通信<strong>独占</strong>其分配到的资源片进行通信。这样的划分方式，可以满足理想情况 2。</p>
+</li>
+<li>
+<p><strong>依次排队</strong> ➡️ <strong>轮转协议 Taking-turns Protocol</strong></p>
+<p>多个节点轮流发送数据。当只有一个结点活跃时，以信道的全部发送速率 R 发送；当有M个结点活跃时，每个活跃结点的吞吐量接近 R/M。完全满足理想情况 1，几乎满足理想情况 2。</p>
+</li>
+<li>
+<p><strong>随机应变</strong> ➡️ <strong>随机访问协议 Random Access Protocol</strong></p>
+<p>节点总是以信道的全部速率发送数据，传输时可能且允许出现冲突。当检测到冲突时通过延时重传等方式恢复，**这也是以太网使用的方式。**完全满足理想情况 1，几乎满足理想情况 2。</p>
+</li>
+</ul>
+<p>在轮转协议和随机访问协议中，好像都可以满足理想情况。那为什么以太网使用的说随机访问协议而不是轮转协议呢？主要有以下三个原因</p>
+<ol>
+<li><strong>网络架构更简单</strong>，所有设备都可以同时发送和接收数据，不需要等待其他设备的轮转时机</li>
+<li><strong>更加灵活和高效</strong>，随机访问协议允许多个设备同时发送数据，不需要进行时间调度或协调</li>
+<li><strong>可扩展性高</strong>，新设备可以随时连接到网络，并立即开始发送和接收数据，不需要调度或配置</li>
+</ol>
+<h2 id="解决寻址问题"><strong>解决“寻址”问题</strong></h2>
+<p>MAC 地址是指网络设备的硬件地址，是由网络设备的制造商烧录在设备的网卡中的一个全球唯一的地址，如果一台设备有多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址。MAC 地址共 48 位（6个字节），以十六进制表示。</p>
+<p>当数据传输时，源设备会根据目标设备的 MAC 地址 “寻址” ，确保数据能够被正确地传送到目标设备。当设备接收到数据后，如果发现目的地址与本地 MAC 地址不一致，则会丢弃，只有真正的目标设备才会接收并处理收到的数据。</p>
+<p>MAC 地址是一个局域网（LAN）范围内的地址，它只在局域网中起作用，不能直接进行跨网络通信。在局域网中，可以通过交换机（Switch）来完成数据的传输。交换机通过学习和记录连接到它的设备的 MAC 地址，根据 MAC 地址来决定数据的转发。而在互联网中，数据通常是通过路由器（Router）等设备进行转发，而不是根据 MAC 地址进行直接传输。</p>
+<h3 id="以太网帧---frame"><strong>以太网帧 - Frame</strong></h3>
+<p><strong>以太网帧 Ethernet frame 是 MAC 层传输数据的基本单位</strong>。其中 MAC 头部包含 目标 MAC 地址、源 MAC 地址 和 类型。类型标识了传输数据的封装协议<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>。常见的类型有，0x0800 表示 IPv4 数据报，0x0806 表示 ARP 数据报，0x86DD 表示 IPv6 数据报<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>。</p>
 <p><figure 
 	>
-	<a href="/post/network_protocol/img/ifconfig.png" >
-		<img src="/post/network_protocol/img/ifconfig.png"
+	<a href="/post/network_protocol/img/mac_frame.png" >
+		<img src="/post/network_protocol/img/mac_frame.png"
 			
 			
 			
 			loading="lazy"
-			alt="ifconfig"
+			alt="frame"
 			width="85%">
 	</a>
 	
-	<figcaption>ifconfig</figcaption>
+	<figcaption>frame</figcaption>
 	
 </figure></p>
 <ul>
-<li>“1” 表示 MAC 地址，是一个网卡的物理地址，使用十六进制，6个 byte表示</li>
-<li>“2” 表示 net_device flags，网络设备的状态标识
-<ul>
-<li>BROADCAST 表示此网卡有广播地址，可以发送广播包</li>
-<li>MULTICAST 表示此网卡可以发送多播包</li>
-<li>UP 表示此网卡处于启动状态</li>
-<li>LOWER_UP 表示 L1 启动，即网线已插入</li>
-<li>mtu 1500 表示最大传输单元 MTU 为 1500，是以太网的默认值，即正文部分不允许超过 1500 个字节</li>
-<li>qdisc，表示 queueing discipline 排队规则，内核通过网络接口发送数据包时，需要按照 qdisc 配置的规则把数据包加入队列
-<ul>
-<li>mq，是一个虚拟 qdisc，目的是为网络设备的每个硬件队列创建一个 pfifo_fast 队列</li>
-<li>pfifo，不对数据包做任何处理，先入先出</li>
-<li>pfifo_fast，数据包按照服务类型 TOS Type Of Service（ IP 头中的一个字段）分配到不同的波段中，每个波段对应的优先级不同</li>
+<li>目标 MAC 地址：表示数据包应该被发送到哪个网络设备，由 6 个字节组成</li>
+<li>源 MAC 地址：表示数据包是从哪个网络设备发送的，同样由 6 个字节组成</li>
+<li>类型：表示数据包类型，0800 表示 IP 数据包，0806 表示 ARP 数据包</li>
+<li>数据：实际的数据内容，长度可变</li>
+<li>CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据包在发送的过程中是否出现了错误</li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
+<h3 id="获取-mac-地址"><strong>获取 MAC 地址</strong></h3>
+<p>在网络通信中，使用 MAC 地址直接进行通信是不可行的，我们借助 IP 地址作为中间桥梁来实现通信。在局域网中，知道了要发送的 IP 地址，该如何获得目标设备的 MAC 地址呢？</p>
+<p>每个设备的网卡的 MAC 地址都是固定的，我们可以手动一个个添加局域网中其他设备的 MAC 地址，随着局域网中的主机越来越多，这种方式难以为继。我们需要自动获取、更新和维护各个设备的 MAC 地址，这就是 Address Resolution Protocol。</p>
+<p><strong>ARP 协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址</strong>。而手动配置 MAC 地址的方式，一般是出于安全考虑，为了防止非法用户访问，由网络管理员手动在 MAC 地址表中添加合法用户的 MAC 地址表项，当手动配置的数量比较大时，难以人工维护，可以使用端口安全功能实现 MAC 地址和接口的动态绑定。</p>
+<p>具体的 ARP 协议内容，我们下节继续～</p>
 <h2 id="小测验"><strong>小测验</strong></h2>
 <ol>
-<li>如何判断一个 IP 地址是否在子网内？</li>
-<li>IP 地址是逻辑地址还是物理地址？它在网络中的作用是什么？</li>
-<li>IP 地址和 MAC 地址的区别？</li>
-<li>MAC 地址是逻辑地址还是物理地址？它在网络中的作用是什么？</li>
+<li>在物理层工作的常见设备有哪些？</li>
+<li>在 MAC 层工作的常见设备有哪些？</li>
+<li>MAC 层传输数据的基本是什么？它的头的格式是什么？每个字段的含义和作用是什么？</li>
+<li>如何通过 IP 地址获取 MAC 地址？</li>
 </ol>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>有些文章描述 TCP/IP 模型有五层，其中包括了物理层 Physical Layer。但在 RFC 1122 中未指定物理层，我还是倾向于四层。详情可参考：https://datatracker.ietf.org/doc/html/rfc1122#page-8&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>以太网II帧：https://en.wikipedia.org/wiki/Ethernet_frame#Ethernet_II&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>更多类型含义：https://en.wikipedia.org/wiki/EtherType#Values&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
 
 </section>
 
@@ -554,12 +515,12 @@ if (!doNotTrack) {
                 
                     
 <article class="">
-    <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/">
+    <a href="/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/">
         
         
 
         <div class="article-details">
-            <h2 class="article-title">快速理解网络协议（三）MAC 层</h2>
+            <h2 class="article-title">快速理解网络协议（一） IP 地址、MAC 地址</h2>
         </div>
     </a>
 </article>
@@ -762,17 +723,17 @@ document.getElementById('days').innerHTML = number_of_days;
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
-    <li><a href="#ip-地址"><strong>IP 地址</strong></a>
+    <li><a href="#解决控制问题"><strong>解决“控制”问题</strong></a>
       <ol>
-        <li><a href="#ipv4-地址"><strong>IPv4 地址</strong></a></li>
-        <li><a href="#常见特殊-ipv4-地址"><strong>常见特殊 IPv4 地址</strong></a></li>
-        <li><a href="#ipv6-地址"><strong>IPv6 地址</strong></a></li>
-        <li><a href="#ip-地址的功能"><strong>IP 地址的功能</strong></a></li>
+        <li><a href="#多路访问协议"><strong>多路访问协议</strong></a></li>
       </ol>
     </li>
-    <li><a href="#mac-地址"><strong>MAC 地址</strong></a></li>
-    <li><a href="#ip-地址-和-mac-地址的区别"><strong>IP 地址 和 MAC 地址的区别</strong></a></li>
-    <li><a href="#查看-ip-地址mac-地址"><strong>查看 IP 地址、MAC 地址</strong></a></li>
+    <li><a href="#解决寻址问题"><strong>解决“寻址”问题</strong></a>
+      <ol>
+        <li><a href="#以太网帧---frame"><strong>以太网帧 - Frame</strong></a></li>
+        <li><a href="#获取-mac-地址"><strong>获取 MAC 地址</strong></a></li>
+      </ol>
+    </li>
     <li><a href="#小测验"><strong>小测验</strong></a></li>
   </ol>
 </nav>
