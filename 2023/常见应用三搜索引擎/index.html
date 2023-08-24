@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='搜索引擎主要构成部分 搜索 通过爬虫爬取网页 分析 将网页内容抽取、分词，构建临时索引，计算 PageRank 索引 通过分析阶段构建的临时索引，构建倒排索引 查询 根据倒'><title>常见应用（三）搜索引擎</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='常见应用（三）搜索引擎'>
+<meta property='og:description' content='搜索引擎主要构成部分 搜索 通过爬虫爬取网页 分析 将网页内容抽取、分词，构建临时索引，计算 PageRank 索引 通过分析阶段构建的临时索引，构建倒排索引 查询 根据倒'>
+<meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='常见应用' /><meta property='article:published_time' content='2023-08-24T12:58:25&#43;08:00'/><meta property='article:modified_time' content='2023-08-24T12:58:25&#43;08:00'/>
+<meta name="twitter:title" content="常见应用（三）搜索引擎">
+<meta name="twitter:description" content="搜索引擎主要构成部分 搜索 通过爬虫爬取网页 分析 将网页内容抽取、分词，构建临时索引，计算 PageRank 索引 通过分析阶段构建的临时索引，构建倒排索引 查询 根据倒">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" >
+                数据结构与算法
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/">常见应用（三）搜索引擎</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 24, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    1784字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="搜索引擎主要构成部分">搜索引擎主要构成部分</h2>
+<h3 id="搜索">搜索</h3>
+<p>通过爬虫爬取网页</p>
+<h3 id="分析">分析</h3>
+<p>将网页内容抽取、分词，构建临时索引，计算 PageRank</p>
+<h3 id="索引">索引</h3>
+<p>通过分析阶段构建的临时索引，构建倒排索引</p>
+<h3 id="查询">查询</h3>
+<p>根据倒排索引获取相关网页，计算网页排名，返回查询结果</p>
+<h2 id="搜集">搜集</h2>
+<h3 id="实现要点">实现要点</h3>
+<ol>
+<li>将整个互联网当作一个非常庞大的有向图，把每一个页面当作一个顶点，如果某个页面包含另一个页面的链接，则在这两个页面（顶点）之间，连出一条有向边</li>
+<li>利用图的遍历算法（广度、深度优先搜索算法），来遍历整个互联网中的网页
+<ul>
+<li>采用广度优先搜索算法</li>
+<li>先爬取一些知名（权重较高）的网页，作为种子网页链接，放入到队列中</li>
+</ul>
+</li>
+</ol>
+<h3 id="技术细节">技术细节</h3>
+<ol>
+<li>待爬取网页链接文件 links.bin
+<ul>
+<li>将 links.bin 作为爬虫待爬取页面的队列，即广度优先搜索中的队列</li>
+<li>每次从 links.bin 中取出网页链接爬取对应的内容</li>
+<li>将爬取网页内容中的链接存储到 links.bin 中，实现断点续爬</li>
+</ul>
+</li>
+<li>网页判重文件 bloom_filter.bin
+<ul>
+<li>使用布隆过滤器，来对已经爬取过的网页进行判重处理</li>
+<li>定时地将布隆过滤器存储在磁盘上，写入 bloom_filter.bin 中，实现断点续爬不会重复爬取</li>
+</ul>
+</li>
+<li>原始网页存储文件 doc_raw.bin
+<ul>
+<li>
+<p>将多个网页存储在一个文件中，每个网页之间用标识符分割，方便后续读取</p>
+<pre><code>  ![网页存储](post/algorithm/img/usage_search_engine_save.jpg)
+</code></pre>
+<ul>
+<li>对每个文件的大小做限制，当文件大小超过限制时，创建新的文件</li>
+</ul>
+</li>
+<li>
+<p>网页链接及其编号的对应文件 doc_id.bin</p>
+<ul>
+<li>对每个网页分配一个唯一的 ID，可以按照网页被爬取的先后顺序，从小到大依次编号</li>
+</ul>
+</li>
+<li>
+<p>links.bin、bloom_filter.bin 供爬虫使用，doc_raw.bin、doc_id.bin 为搜集阶段的成果，供后续使用</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="分析-1">分析</h2>
+<h3 id="抽取网页文本信息">抽取网页文本信息</h3>
+<ul>
+<li>根据 HTML 标签抽取网页中的文本信息
+<ul>
+<li>去掉不需要的标签，如 JavaScript 代码、<style></style>、<script></script>、<option></option> 标签中的内容</li>
+<li>去掉所有的 HTML 标签</li>
+<li>使用 AC 自动机多模式匹配算法，在整个网页的字符串中，一次性的查找多个关键词</li>
+</ul>
+</li>
+</ul>
+<h3 id="分词并创建临时索引">分词并创建临时索引</h3>
+<ul>
+<li>
+<p>确定分词的规则，如 基于字典（词库）和规则的分词方法</p>
+<ul>
+<li>字典中包含大量常用的词语（可以直接从网上 download）</li>
+<li>基于词库，采取最长匹配规则，对文本进行分词</li>
+<li>可以将词库中的单词构建成 Trie 树</li>
+</ul>
+</li>
+<li>
+<p>构建临时索引 tem_index.bin</p>
+<ul>
+<li>
+<p>分词之后，得到网页对应的一组单词列表，将网页和对应的单词列表之间的对应关系，写入到一个临时索引文件中，其中单词列表使用单词编号（为了节省存储空间）</p>
+<pre><code>  ![t.jpg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f78f3f3c-7445-4745-8348-7cab85f5c29f/t.jpg)
+</code></pre>
+</li>
+<li>
+<p>将单词编号和单词的对应关系，存储到文件 term_id.bin 中</p>
+<ul>
+<li>使用给网页编号类似的方法给单词编号</li>
+<li>使用散列表来记录已经编过号的单词</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>tmp_index.bin、term_id.bin 供后续构建索引使用</strong></p>
+</li>
+</ul>
+<h2 id="索引-1">索引</h2>
+<ol>
+<li>
+<p>使用<strong>多路归并排序</strong>的方式，将分析阶段产生的临时索引，构建成倒排索引 （Inverted Index） index.bin</p>
+<ul>
+<li>
+<p>对临时索引，按照单词编号的大小进行排序，由于临时索引的文件大小一般都很大，所以使用“归并排序”的处理思想，先把临时索引文件分割成多个小文件，在对每个小文件独立排序，最后合并在一起（实际应用中可以直接使用 MapReduce 处理）</p>
+</li>
+<li>
+<p>临时索引文件排序后，相同的单词被排列到了一起，顺序地遍历排好序的临时索引文件，将每个单词对应的网页编号列表存储在倒排索引文件中 index.bin</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/usage_search_engine_index.jpg" >
+		<img src="/post/algorithm/img/usage_search_engine_index.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="临时索引"
+			width="85%">
+	</a>
+	
+	<figcaption>临时索引</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>倒排索引中记录了每个单词以及包含它的网页列表</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/usage_search_engine_index_1.jpg" >
+		<img src="/post/algorithm/img/usage_search_engine_index_1.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="倒排索引"
+			width="85%">
+	</a>
+	
+	<figcaption>倒排索引</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+<li>
+<p>生成每个单词编号在倒排索引文件中的偏移位置 term_offset.bin，快速地查找某个单词编号在倒排索引中存储的位置</p>
+<p><figure 
+	>
+	<a href="/post/algorithm/img/usage_search_engine_offset.jpg" >
+		<img src="/post/algorithm/img/usage_search_engine_offset.jpg"
+			
+			
+			
+			loading="lazy"
+			alt="偏移位置"
+			width="85%">
+	</a>
+	
+	<figcaption>偏移位置</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>index.bin、term_offset.bin 供后续查询使用</p>
+</li>
+</ol>
+<h2 id="查询-1">查询</h2>
+<ol>
+<li>经过上面三个阶段之后，得到以下文件
+<ul>
+<li>doc_id.bin，记录网页链接和编号之间的对应关系</li>
+<li>term_id.bin，记录单词和编号之间的对应关系</li>
+<li>index.bin，倒排索引文件，记录每个单词编号及对应包含它的网页编号列表</li>
+<li>term_offset.bin，记录每个单词编号在倒排索引中的偏移位置</li>
+</ul>
+</li>
+<li>将 doc_id.bin、term_id.bin、term_offset.bin 文件中的内容，以散列表的结构加载在内存中</li>
+<li>当用户输入搜索文本时，先对用户的输入文本进行分词处理，得到 k 个单词</li>
+<li>在 term_id.bin 对应的散列表中查找这 k 个单词对应的单词编号，k_ids</li>
+<li>在 term_offset.bin 对应的散列表中查找 k_ids 对应在倒排索引文件中的偏移位置，k_offsets</li>
+<li>在 index.bin 文件中，查找 k 个单词对应的包含它们的网页编号列表，k_web_ids</li>
+<li>使用散列表统计 k_web_ids 每个网页编号出现的次数，次数越多说明包含越多的用户查询单词</li>
+<li>按照出现次数的倒序，在 doc_id.bin 中查找对应的网页链接，分页展示</li>
+</ol>
+<h2 id="相关算法">相关算法</h2>
+<ol>
+<li>计算网页权重，PageRank 算法， <a class="link" href="https://zh.wikipedia.org/wiki/PageRank"  target="_blank" rel="noopener"
+    >https://zh.wikipedia.org/wiki/PageRank</a></li>
+<li>计算查询结果排名，tf-idf 模型， <a class="link" href="https://zh.wikipedia.org/wiki/Tf-idf"  target="_blank" rel="noopener"
+    >https://zh.wikipedia.org/wiki/Tf-idf</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/">常见应用</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">相关文章</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">常见应用（六）短网址服务</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">常见应用（五）鉴权与限流</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">常见应用（四）Disruptor 内存消息队列</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了46.7k字·共 30篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+         <br />
+        <br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#搜索引擎主要构成部分">搜索引擎主要构成部分</a>
+      <ol>
+        <li><a href="#搜索">搜索</a></li>
+        <li><a href="#分析">分析</a></li>
+        <li><a href="#索引">索引</a></li>
+        <li><a href="#查询">查询</a></li>
+      </ol>
+    </li>
+    <li><a href="#搜集">搜集</a>
+      <ol>
+        <li><a href="#实现要点">实现要点</a></li>
+        <li><a href="#技术细节">技术细节</a></li>
+      </ol>
+    </li>
+    <li><a href="#分析-1">分析</a>
+      <ol>
+        <li><a href="#抽取网页文本信息">抽取网页文本信息</a></li>
+        <li><a href="#分词并创建临时索引">分词并创建临时索引</a></li>
+      </ol>
+    </li>
+    <li><a href="#索引-1">索引</a></li>
+    <li><a href="#查询-1">查询</a></li>
+    <li><a href="#相关算法">相关算法</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">3</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">30</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_3">
+                网络协议
+            </a>
+        
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+            <a href="/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/" class="font_size_2">
+                线性表
+            </a>
+        
+            <a href="/tags/%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/" class="font_size_1">
+                基本算法思想
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

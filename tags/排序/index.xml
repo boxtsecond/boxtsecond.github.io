@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>排序 on Bo&#39;s Blog</title>
+    <link>https://boxtsecond.github.io/tags/%E6%8E%92%E5%BA%8F/</link>
+    <description>Recent content in 排序 on Bo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 24 Aug 2023 12:02:21 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/tags/%E6%8E%92%E5%BA%8F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>常见算法类型（五）排序算法对比</title>
+      <link>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/</link>
+      <pubDate>Thu, 24 Aug 2023 12:02:21 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/</guid>
+      <description>各个排序算法间的比较 排序算法 如何优化快速排序 快速排序的最坏时间复杂度是 O（n^2），出现最坏时间复杂度的原因是分区点选择的不够合理 最理想的分</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（四）排序 O(n)：桶排序、计数排序、基数排序</title>
+      <link>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 11:59:04 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/</guid>
+      <description>桶排序 Bucket Sort 思想说明 桶排序只包含一种操作，元素的移动，不涉及元素之间的比较操作 将要排序的数据分到几个有序的桶里，每个桶里的数据单独进行排序 桶内</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（三）排序 O(nlogn)：归并排序、快速排序、堆排序</title>
+      <link>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 11:31:06 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/</guid>
+      <description>归并排序（Merge Sort） 归并排序 思想说明 归并排序包含两种操作，一种是元素的比较，一种是元素的移动 使用分治思想，分而治之，将一个大问题分</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（二）排序 O(n^2)：冒泡排序、插入排序、选择排序</title>
+      <link>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 11:25:44 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</guid>
+      <description>冒泡排序 Bubble Sort 冒泡排序 思想说明 冒泡排序中包含两种操作，一种是元素的比较，一种是元素的移动 冒泡排序只会操作相邻的两个数据，每次冒泡排序操作都会对</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（一）排序</title>
+      <link>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 10:25:22 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/</guid>
+      <description>如何分析一个排序算法 排序算法的执行效率 最好情况、最坏情况、平均情况时间复杂度 时间复杂度的系数、常数、低阶 比较次数交换（或移动）次数 排序算法的</description>
+    </item>
+    
+  </channel>
+</rss>

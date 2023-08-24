@@ -6,7 +6,25 @@
     <description>Recent content in 数据结构 on Bo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Wed, 23 Aug 2023 23:19:41 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 24 Aug 2023 13:28:17 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>数据结构与算法总览</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
+      <pubDate>Thu, 24 Aug 2023 13:28:17 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</guid>
+      <description>思维导图 数据结构与算法总览 文章列表 如何学习算法 数据结构 线性表 - 数组、链表 线性表 - 栈、队列 树 — 二叉树、递归树 树 — 红黑树、堆 树 — B+树 图 图的搜索</description>
+    </item>
+    
+    <item>
+      <title>数据结构（十）字符串相似度</title>
+      <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+      <pubDate>Thu, 24 Aug 2023 10:20:14 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+      <description>字符串的相似度 编辑距离（Edit Distance） 将一个字符串转化成另一个字符串，需要的最少编辑次数（增加、删除、替换 一个字符） 编辑距离越大</description>
+    </item>
+    
     <item>
       <title>数据结构（九）字符串匹配</title>
       <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/</link>

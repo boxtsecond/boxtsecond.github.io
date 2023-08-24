@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>基本算法思想 on Bo&#39;s Blog</title>
+    <link>https://boxtsecond.github.io/tags/%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</link>
+    <description>Recent content in 基本算法思想 on Bo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Thu, 24 Aug 2023 12:40:26 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/tags/%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>常见算法类型（九）基本算法思想</title>
+      <link>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</link>
+      <pubDate>Thu, 24 Aug 2023 12:40:26 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</guid>
+      <description>贪心算法 Greedy Algorithm 适用场景明确包含期望值和限制值 一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大 确定是否可以使用贪心算法 每次选择</description>
+    </item>
+    
+  </channel>
+</rss>
