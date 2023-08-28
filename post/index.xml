@@ -256,7 +256,7 @@
       <pubDate>Wed, 23 Aug 2023 17:16:32 +0800</pubDate>
       
       <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/</guid>
-      <description>快速理解网络协议（三）MAC 层 总览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际</description>
+      <description>总览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际的物理链接。物理层利用物理传输</description>
     </item>
     
     <item>
