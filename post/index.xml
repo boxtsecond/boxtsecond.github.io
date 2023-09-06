@@ -6,7 +6,7 @@
     <description>Recent content in Posts on Bo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 24 Aug 2023 13:28:17 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 05 Sep 2023 20:52:03 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>数据结构与算法总览</title>
       <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
@@ -14,6 +14,42 @@
       
       <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</guid>
       <description>BE BEST 思维导图 数据结构与算法总览 文章列表 如何学习算法 数据结构 线性表 - 数组、链表 线性表 - 栈、队列 树 — 二叉树、递归树 树 — 红黑树、堆 树 — B+树 图 图的</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用</title>
+      <link>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/</link>
+      <pubDate>Tue, 05 Sep 2023 20:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型</title>
+      <link>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/</link>
+      <pubDate>Tue, 05 Sep 2023 18:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（二）DR、TUN 模型原理</title>
+      <link>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Tue, 05 Sep 2023 16:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</title>
+      <link>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Tue, 05 Sep 2023 14:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
     </item>
     
     <item>

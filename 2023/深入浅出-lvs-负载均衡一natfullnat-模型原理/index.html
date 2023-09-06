@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地'><title>深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理'>
+<meta property='og:description' content='深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地'>
+<meta property='og:url' content='https://boxtsecond.github.io/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络' /><meta property='article:tag' content='四层负载均衡' /><meta property='article:published_time' content='2023-09-05T14:52:03&#43;08:00'/><meta property='article:modified_time' content='2023-09-05T14:52:03&#43;08:00'/>
+<meta name="twitter:title" content="深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理">
+<meta name="twitter:description" content="深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E7%BD%91%E7%BB%9C/" >
+                网络
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/">深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    3925字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>深入浅出 LVS 负载均衡系列：</p>
+<ul>
+<li>
+<p>深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</p>
+<ul>
+<li>两台计算机如何在互联网中通信</li>
+<li>LVS 负载均衡
+<ul>
+<li>通过修改数据包的「源 IP 地址」或「目标 IP 地址」
+<ul>
+<li>NAT 模式</li>
+<li>FULLNAT 模式</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>深入浅出 LVS 负载均衡（二）DR、TUN 模型原理</p>
+<ul>
+<li>LVS 负载均衡
+<ul>
+<li>通过修改数据包的「目标 MAC 地址」
+<ul>
+<li>DR 模式</li>
+</ul>
+</li>
+<li>通过二次封装数据包的「IP 报文」
+<ul>
+<li>TUN 模式</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>深入浅出 LVS 负载均衡（三）实操 NAT、DR 模型、深入浅出 LVS 负载均衡（四）实操 TUNNEL 模型、Keepalived DR 模型的高可用</p>
+<ul>
+<li>使用 UCloud 云主机实操各个模型</li>
+<li>使用 Keepalived 实现 LVS-DR 的高可用</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>LVS（Linux Virtual Server）是一个虚拟服务器集群系统。工作在 OSI 模型的传输层，即四层负载均衡。LVS 本身实现了 NAT、DR、TUN 模型，这些模型仅做数据包的转发，而不会与客户端建立连接，成本低效率高。FULLNAT 基于 NAT 实现，LVS 本身不支持，需要额外对内核打补丁后才能使用。</p>
+</blockquote>
+<aside>
+📌 本系列按照负载均衡器对数据包的处理方式分类，从计算机间通信的角度出发，浅谈 NAT、FULLNAT、DR、TUN 模型的实现原理。
+</aside>
+<h2 id="两台计算机如何在互联网中通信">两台计算机如何在互联网中通信</h2>
+<hr>
+<p>在了解 LVS 负载均衡之前，先要搞清楚两台计算机如何在互联网中通信。茫茫互联网中，两台计算机如何才能找到对方？</p>
+<p>我们先来看看，快递是如何被快递小哥完美地送到你手上的。根据你的地址，快递先送到你所在的省市区，接着在当前省市区找到你的门牌号，最后根据门牌号和姓名，再亲手把快递交给你。</p>
+<p>两台计算机在互联网中的通信也是如此。首先需要知道双方的 IP 地址，即省市区，其次需要知道双方的 MAC 地址，即门牌号。MAC 地址标志着唯一的计算机。在同一台计算机上，可能有多个不同的服务，如何能像快递小哥按照姓名找到你一样，在计算机上找到对应的服务呢？没错，就是按照端口号。</p>
+<p>这样，通信中每台计算机需要提供的信息就很清晰了，即 IP 地址、MAC 地址、端口号。总结一下，通信必需的六个要素就是，源 IP 地址、端口号、源 MAC 地址，目标 IP 地址、端口号、目标 MAC 地址。</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_1.svg" >
+		<img src="/post/networks/img/lb4_1.svg"
+			
+			
+			
+			loading="lazy"
+			alt="通信"
+			width="85%">
+	</a>
+	
+	<figcaption>通信</figcaption>
+	
+</figure></p>
+<p>假设计算机 A 和计算机 B 在上述的网络拓扑图（不在同一局域网）中。可以很清晰地看到 计算机 A 和 计算机 B 通信需要五个步骤，其中 ①② 和 ④⑤ 的原理相同。现在我们来看看具体的每个步骤在计算机的世界中是如何实现的。</p>
+<p>首先 A 和 B 的 IP 地址和端口号是已知的，即一个数据包从哪来要发往哪去。所以现在的问题是：A 如何能知道 B 的 MAC 地址？</p>
+<p>最简单的方式就是 A 保存网络中全部设备的 MAC 地址，在发送时查询一下，这样就能得到 B 的 MAC 地址。但是网络中的设备有几十亿个，还在不断地增长，显然这种方式是不可取的。如果按照快递发送过程中，在每个驿站之间进行转移，这样只需要知道该发往的下一目的地在哪里，最终也能将快递成功地交到你的手上。在实际网络中发送数据包也是这样，现在的目标就是确定 “下一个目的地” 的 MAC 地址。</p>
+<blockquote>
+<p>步骤 ①②：发送数据包至网关</p>
+</blockquote>
+<p>A 不知道 B 的 MAC 地址，且 A 和 B 也不在同一个局域网中。这时 A 会根据 ARP 协议先发出一个广播包，即目标 MAC 地址是 FF:FF:FF:FF:FF:FF 的数据包。当 交换机1 收到这个广播包之后，会将这个数据包转发给其他端口，并且记录 A 的 MAC 地址和交换机端口之间的映射关系，后续再看到这个 MAC 地址，就知道该从哪个端口转发出去。当 路由器1 收到广播包后，会将自己的 MAC 地址返回。A 接收到返回后，就知道 “下一个目的地” 的 MAC 地址了。A 重新发送数据包，将目标 MAC 地址填写为 路由器1 的 MAC 地址，并在本地的缓存表中记录返回的 MAC 地址。</p>
+<aside>
+💡 查看当前设备缓存表里已存的 MAC 地址：arp -a
+</aside>
+<aside>
+📌 ARP 协议的目的就是找到“下一个目的地”的 MAC 地址，即 IP 地址和 MAC 地址之间的映射关系。
+当两台设备同处于一个局域网时，“下一个目的地” 就是目标设备的 MAC 地址，当两台设备不处于同一个局域网时，“下一个目的地” 就是网关的 MAC 地址。
+</aside>
+<blockquote>
+<p>步骤 ③：网关间跳转</p>
+</blockquote>
+<p>经过步骤 ①②，此时 路由器1 收到的数据包为 { A_IP、PORT、A_MAC }  ➡   { B_IP、PORT、路由器1_MAC } 。收到数据包后，路由器1 查看自己的路由表，如下图所示。</p>
+<aside>
+💡 查看当前设备设置的路由表：route -n
+</aside>
+<p><figure 
+	>
+	<a href="/post/networks/img/route.png" >
+		<img src="/post/networks/img/route.png"
+			
+			
+			
+			loading="lazy"
+			alt="route -n"
+			width="85%">
+	</a>
+	
+	<figcaption>route -n</figcaption>
+	
+</figure></p>
+<p>路由器1 会将 B_IP 与 路由表中每条记录的子网掩码（Genmask）做按位与运算。如果得到的结果和目的网络（Destination）相同，那么 “下一个目的地“ 的 MAC 地址，就是配置的网关（Gateway）的 MAC 地址，这种找到相邻网络的方式叫做 “下一跳机制”。如果网关的地址为 0.0.0.0，说明可以在局域网中直接通信，不需要 “下一跳”。至此，再次找到了 “下一个目的地” 的 MAC 地址，即 路由器2 的 MAC 地址。此时 路由器2 收到的数据包为 { A_IP、PORT、路由器1_MAC }  ➡   { B_IP、PORT、路由器2_MAC } 。步骤 ④⑤ 和 ①② 的原理相同，在这里就不赘述了。</p>
+<aside>
+📌 下一跳的目的就是找到“下一个目的地”，即下一步该到达哪里，侧重 “路线” 的选择，并由此获取到对应的 MAC 地址，继续传送数据包。
+</aside>
+<ul>
+<li><strong>总结一下：</strong>
+<ol>
+<li><strong>使用 ARP 协议找到网关出口或同一局域网内设备的 MAC 地址</strong></li>
+<li><strong>按照路由表的每条规则和 目标 IP 地址做按位与运算，找到相邻网关入口的 MAC 地址</strong></li>
+<li><strong>“下一个目的地” 和当前地址都仅仅相邻一步，且每次 “跳跃” 后的源 MAC 地址 和 目标 MAC 地址都会发生对应的替换</strong></li>
+<li><strong>数据包中，IP 地址指明起点终点，MAC 地址指明跳跃的节点，端口号指明对应的应用服务</strong></li>
+</ol>
+</li>
+</ul>
+<p>当然，光是找到对方还不够，还需要一个约定的交流方式，平时我们所熟知的各种协议，都是计算机「约定的交流方式」。</p>
+<h2 id="lvs-负载均衡">LVS 负载均衡</h2>
+<hr>
+<p>随着使用互联网的设备不断增长，服务端对应接收到的 HTTP 请求更是呈指数型的增长。当一台服务器无法承载非常大的请求量时，使用多台服务器来分摊请求。将请求分摊给多台服务器的行为，就称之为负载均衡。</p>
+<p>从网络中计算机通信的角度，而非使用更上层的应用（如 Nginx）出发，搭建四层负载均衡器后，数据包的发送链路为：CIP ➡  VIP ➡  DIP ➡  RIP，即 客户端 IP ➡  虚拟 IP ➡  分发 IP ➡  真实服务器 IP。对于客户端来说，只需要知道请求到达的地址是 VIP，不需要考虑负载，即 CIP ➡  VIP 是固定的。</p>
+<p><strong>所以负载均衡器要做的事情，就是将 CIP 发送到 VIP 的数据包，经由 DIP 转发给 RIP，服务响应后再将响应的数据包返回给 CIP。</strong></p>
+<h3 id="nat-模式">NAT 模式</h3>
+<hr>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_2.svg" >
+		<img src="/post/networks/img/lb4_2.svg"
+			
+			
+			
+			loading="lazy"
+			alt="NAT"
+			width="85%">
+	</a>
+	
+	<figcaption>NAT</figcaption>
+	
+</figure></p>
+<blockquote>
+<p>红色表示发出的数据包</br>
+绿色表示返回的数据包</br>
+黄色表示负载均衡器修改的内容</br>
+虚线表示经过 N 个下一跳，即可以不在同一局域网内</br>
+实线表示只能 “跳跃一次”，即必须在同一局域网内</br></p>
+</blockquote>
+<ol>
+<li>当计算机发出一个请求的数据包到达负载均衡器后，负载均衡器将发送数据包的 { 目标 IP 地址、端口号、目标 MAC 地址 } 转换为 { 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 } ，其余信息不变。这种只转换数据包的目标设备信息，而不修改数据包的源设备信息，称之为 DNAT，即目标网络地址转换。</li>
+<li>真实服务器收到请求的数据包，返回响应的数据包：{ 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 } ➡️  { 原始请求的 IP 地址、端口号、跳跃的 MAC 地址 } 。所以此时在服务器上查看 TCP 连接为：CIP ➡️  RIP。</li>
+<li>真实服务器返回的数据包的 “下一个目的地” 必须是负载均衡器。如果返回数据包直接返回给客户端，客户端发现返回数据包的源设备信息和发出数据包的目标设备信息不一致，将会丢弃返回数据包。所以真实服务器的默认网关必须是 DIP，保证返回数据包的 “下一个目的地” 是负载均衡器。</li>
+<li>当返回的数据包到达负载均衡器后，负载均衡器将返回数据包的 { 原始请求的 IP 地址、端口号、跳跃的 MAC 地址 }  转换为原始请求的 { 目标 IP 地址、端口号、目标 MAC 地址 } 。这种只转换数据包的源设备信息，而不修改数据包的目标设备信息，称之为 SNAT，即源网络地址转换。</li>
+<li>负载均衡器返回数据包给客户端。</li>
+</ol>
+<ul>
+<li><strong>总结一下 NAT 模式的特点：</strong>
+<ol>
+<li><strong>修改数据包的「源 IP 地址」或 「目标 IP 地址」，可以对端口进行转发</strong></li>
+<li><strong>真实服务器的默认网关必须是负载均衡器，所以真实服务器和负载均衡器必须在同一个局域网内</strong></li>
+<li><strong>所有的请求数据包、响应数据包都要经过负载均衡器</strong></li>
+</ol>
+</li>
+</ul>
+<h3 id="fullnat-模式">FULLNAT 模式</h3>
+<hr>
+<p>NAT 模式中，负载均衡器和真实服务器必须在同一局域网内，但在实际的开发过程中，真实服务器可能分布在不同的网段，甚至不同的城市。如何能将 NAT 模式应用在真实服务器分布在不同网段的场景下？</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_3.svg" >
+		<img src="/post/networks/img/lb4_3.svg"
+			
+			
+			
+			loading="lazy"
+			alt="FULLNAT"
+			width="85%">
+	</a>
+	
+	<figcaption>FULLNAT</figcaption>
+	
+</figure></p>
+<blockquote>
+<p>红色表示发出的数据包</br>
+绿色表示返回的数据包</br>
+黄色表示负载均衡器修改的内容</br>
+虚线表示经过 N 个下一跳，即可以不在同一局域网内</br>
+实线表示只能 “跳跃一次”，即必须在同一局域网</br></p>
+</blockquote>
+<ol>
+<li>当计算机发出一个请求的数据包到达负载均衡器后，负载均衡器会对请求数据包同时做 SNAT 和 DNAT，将请求数据包修改为：{ 均衡出口 IP 地址、端口号、负载均衡器的 MAC 地址 } ➡️  { 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 }。</li>
+<li>这样负载均衡器就可以独立的和真实服务器进行数据包的传送</li>
+<li>真实服务器收到请求的数据包，返回响应的数据包：{ 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 } ➡️  { 负载均衡器的 IP 地址、端口号、负载均衡器的 MAC 地址 } 。此时在真实服务器上查看 TCP 连接为：DIP ➡️  RIP。</li>
+<li>当返回的数据包到达负载均衡器后，负载均衡器将返回数据包再次同时做 DNAT 和 SNAT。</li>
+<li>负载均衡器返回数据包给客户端。</li>
+</ol>
+<ul>
+<li><strong>总结一下FULL NAT 模式的特点：</strong>
+<ol>
+<li><strong>同时修改数据包的「源 IP 地址」和「目标 IP 地址」，可以对端口进行转发</strong></li>
+<li><strong>负载均衡器不需要以网关的形式存在，即负载均衡器可以和真实服务器在不同的网络中</strong></li>
+<li><strong>真实服务器最终建立的连接是 DIP ➡️  RIP，无法获取真实客户端的 IP 地址</strong></li>
+<li><strong>所有的请求数据包、响应数据包都要经过负载均衡器</strong></li>
+</ol>
+</li>
+</ul>
+<p>LVS 本身不支持 FULLNAT 模式，需要额外对内核打补丁后才能使用。</p>
+<hr>
+<p>可以看到在 NAT 和 FULLNAT 模式中，不管是请求数据包还是响应数据包，都要经过负载均衡器。但是响应数据包一般要比请求数据包大很多，这可能会成为系统的瓶颈。如果能够将请求数据包转发到真实服务器之后，响应数据包由真实服务器直接返回，这样对负载均衡器的压力就小很多。这种模式又该如何实现？</p>
+<p>下篇继续～</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E7%BD%91%E7%BB%9C/">网络</a>
+        
+            <a href="/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">四层负载均衡</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">相关文章</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">深入浅出 LVS 负载均衡（二）DR、TUN 模型原理</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了59.4k字·共 34篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+         <br />
+        <br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#两台计算机如何在互联网中通信">两台计算机如何在互联网中通信</a></li>
+    <li><a href="#lvs-负载均衡">LVS 负载均衡</a>
+      <ol>
+        <li><a href="#nat-模式">NAT 模式</a></li>
+        <li><a href="#fullnat-模式">FULLNAT 模式</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">3</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/categories/%E7%BD%91%E7%BB%9C/" class="category-list-link">网络<span class="category-list-count">4</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">34</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/tags/%E7%BD%91%E7%BB%9C/" class="font_size_4">
+                网络
+            </a>
+        
+            <a href="/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_3">
+                网络协议
+            </a>
+        
+            <a href="/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
