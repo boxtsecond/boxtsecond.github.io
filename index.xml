@@ -6,7 +6,7 @@
         <description>Recent content on Bo&#39;s Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <lastBuildDate>Tue, 05 Sep 2023 20:52:03 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 28 Sep 2023 10:22:17 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>数据结构与算法总览</title>
         <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
         <pubDate>Thu, 24 Aug 2023 13:28:17 +0800</pubDate>
@@ -92,6 +92,586 @@
         &lt;td &gt;&lt;center&gt;&lt;img src=&#34;https://boxtsecond.github.io/post/payment_img/alipay.jpg&#34; width=&#34;300&#34; height=&#34;240&#34; &gt;&lt;/center&gt;&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/table&gt;
+</description>
+        </item>
+        <item>
+        <title>快速理解网络协议（四）ARP、RARP 协议</title>
+        <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/</link>
+        <pubDate>Thu, 28 Sep 2023 10:22:17 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/</guid>
+        <description>&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/mac.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/mac.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;总览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;总览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;arp-协议&#34;&gt;ARP 协议&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;同一子网中&#34;&gt;同一子网中&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;假设 Client A 和 Client D 在&lt;strong&gt;同一个子网&lt;/strong&gt;中，Client A 要向 Client D 发送一个 IP 数据包（IP Packet）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Client A 查看自己的 ARP 缓存表，判断是否包含 Client D 对应的 ARP 表项。如果有，则直接利用 ARP 缓存表中的 MAC 地址，对 IP 数据包进行帧封装，发送数据帧给 Client D&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若 Client A 的 ARP 缓存表中，没有包含 Client D 的信息，则 Client A 先将此数据帧缓存，以&lt;strong&gt;广播&lt;/strong&gt;的形式发送 ARP 请求报文，交换机收到广播包时，会原样复制该包到除源端口外的所有端口，具体包格式如下图&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_detail.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_detail.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request Packet&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request Packet&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;dMAC 目标 MAC 地址 ff:ff:ff:ff:ff:ff ，即广播包&lt;/li&gt;
+&lt;li&gt;sMAC 源 MAC 地址，即 Client A 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;type 数据帧类型为 ARP&lt;/li&gt;
+&lt;li&gt;ARP 数据报文内容
+&lt;ul&gt;
+&lt;li&gt;HType（Hardware Type）硬件类型，标识链路层协议，当为 1 时表示以太网&lt;/li&gt;
+&lt;li&gt;PType（Protocol Type）协议类型，标识网络层协议，当为 0x0800 时表示 IPv4 协议&lt;/li&gt;
+&lt;li&gt;HLen（Hardware Length），硬件地址长度，以太网的长度为 6&lt;/li&gt;
+&lt;li&gt;PLen（Protocol Length），协议地址长度，IPv4 的长度为 4&lt;/li&gt;
+&lt;li&gt;Opcode 操作码，1 表示 ARP 请求（“Request”）&lt;/li&gt;
+&lt;li&gt;Sender MAC、Sender IP，为 Client A 的 MAC 地址 和 IP 地址&lt;/li&gt;
+&lt;li&gt;Target MAC 为 00:00:00:00:00:00，说明此时 Client A 还不知道 Client D 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;Target IP 为 Client D 的 IP 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client D 比较自己的 IP 地址和 ARP 请求报文中的 Target IP 地址，若二者相同，将 ARP 请求报文中的 Sender MAC、Sender IP 地址信息存入自己的 ARP 缓存表中，以&lt;strong&gt;单播&lt;/strong&gt;的形式返回 ARP 响应报文 &lt;strong&gt;（Client C 也会将 Client A 的 IP、MAC 地址缓存在自己的 ARP 缓存表中，但并不响应 ARP 请求）&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_detail_1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_detail_1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply Packet&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply Packet&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;dMAC 目标 MAC 地址，即 Client A 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;sMAC 源 MAC 地址，即 Client D 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;type 数据帧类型为 ARP&lt;/li&gt;
+&lt;li&gt;ARP 数据报文内容
+&lt;ul&gt;
+&lt;li&gt;HType、PType、HLen、PLen 与 ARP 包请求相似&lt;/li&gt;
+&lt;li&gt;Opcode 为 “Reply”，即 ARP 响应包&lt;/li&gt;
+&lt;li&gt;Sender MAC、Sender IP，为 Client D 的 MAC 地址 和 IP 地址&lt;/li&gt;
+&lt;li&gt;Target MAC、Target IP， 为 Client A 的 MAC 地址 和 IP 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;同一子网内-arp-抓包实践&#34;&gt;同一子网内 ARP 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;申请在同一个 VPC 下的 2 台云主机，内网地址分别为 10.23.139.22、10.23.197.59&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;登陆到 10.23.139.22，使用命令 arp -n 查看已经存在的 arp 缓存表项。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_n.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_n.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;arp -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;arp -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;如果这里发现已经有了 10.23.197.59 的缓存，使用命令 arp -d 10.23.197.59 删掉缓存，删完之后再 check 下，如果没有的话就继续下一步。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_d.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_d.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;arp -d&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;arp -d&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用 tcpdump -i eth0 arp -w arp.pcap 命令开始抓包&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;再开一个 tab，还是登陆到 10.23.139.22，执行命令 ping 10.23.197.59，对 10.23.197.59 发送一个 ICMP 报文&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;结束抓包，将 arp.pcap 下载到本地，用 wireshark 打开 arp.pcap&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Request&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_req.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_req.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可以看到 ARP 报文中的目标 MAC 地址是 00:00:00:00:00:00，而外层的目标 MAC 地址是 ff:ff:ff:ff:ff:ff，即广播&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Reply&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_rep.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_rep.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ARP Reply 报文中，由于已经知道目标 MAC 地址，直接以jj单播的形式返回&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;跨网段&#34;&gt;跨网段&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_wan.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/arp_wan.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP&lt;/figcaption&gt;
+	
+&lt;/figure&gt;
+假设 Client A 和 Client D 不在同一个子网中，Client A 要向 Client D 发送一个 IP 数据包（IP Packet），还会像在同一子网内那样发送 ARP 报文吗？答案是否定的，这里要分两种情况，Client A 本身是否存在网关。由于之前已经解析过 ARP 报文中的具体字段，之后的 ARP 报文我们就只关注于字段的值而不再赘述字段含义。&lt;/p&gt;
+&lt;h4 id=&#34;普通-arp&#34;&gt;普通 ARP&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;Client A 和 Client D 不在同一个子网中且 Client A 存在网关&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Client A 首先发现目标 IP 是跨网段的，并且 Client A 此时有网关，那么 Client A 就会发送 ARP 报文去查找网关的 MAC 地址，而不是跨网段的目标 IP 的 MAC 地址（本地无网关 MAC 地址缓存）&lt;/li&gt;
+&lt;li&gt;Client A 以&lt;strong&gt;广播&lt;/strong&gt;的形式发送 ARP 请求报文&lt;/li&gt;
+&lt;li&gt;网关以单播的形式返回 ARP 响应报文&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨子网有网关的-arp-抓包实践&#34;&gt;跨子网有网关的 ARP 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;路由器配置地址 192.168.1.1 和 10.10.10.1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_router_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_router_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Router 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Router 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;进入配置模式 configure terminal&lt;/li&gt;
+&lt;li&gt;配置接口 int e0/0
+&lt;ul&gt;
+&lt;li&gt;ip add 192.168.1.1 255.255.255.0&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;li&gt;exit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;e1/0 与 e0/0 相同&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client D-ARP 配置地址 10.10.10.20&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_d_arp_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_d_arp_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Client D-ARP 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Client D-ARP 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ip 10.10.10.20/24 10.10.10.1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client A 配置地址 192.168.1.100 和 网关地址 192.168.1.1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_a_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_a_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Client A 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Client A 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;注意这里的 Client A 是由路由器模拟的，为了方便后续的 proxy arp 实验&lt;/li&gt;
+&lt;li&gt;进入配置模式 configure terminal&lt;/li&gt;
+&lt;li&gt;配置接口 int e0/0
+&lt;ul&gt;
+&lt;li&gt;ip add 192.168.1.100 255.255.255.0&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;li&gt;exit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;关闭路由功能 no ip routing&lt;/li&gt;
+&lt;li&gt;设置默认网关 ip default-gateway 192.168.1.1&lt;/li&gt;
+&lt;li&gt;退出配置模式后，检查下是否配置成功 show ip route&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开始抓包&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 Client A 上 ping 10.10.10.20
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_arp_ping.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_arp_ping.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ping 10.10.10.20&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ping 10.10.10.20&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Request&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_arp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_arp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;仍旧是广播的形式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可以看到 Target IP 是 192.168.1.1 即网关的地址，而不是 10.10.10.20&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Reply&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_arp_rep.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_arp_rep.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;网关单播回复 ARP Reply，附上自己的 MAC 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;proxy-arp代理-arp&#34;&gt;Proxy ARP（代理 ARP）&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;Client A 和 Client D 不在同一个子网中且 Client A 不存在网关&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;先来看看什么是 Proxy ARP
+&lt;ul&gt;
+&lt;li&gt;当局域网内部主机发起跨网段的 ARP 请求，&lt;strong&gt;网关设备开启 ARP 代理功能且知道目标的路由信息时&lt;/strong&gt;，会使用自身的 MAC 地址回复该请求&lt;/li&gt;
+&lt;li&gt;这里有两个非常重要的点，一个是 Proxy ARP 需要网关设备支持且开启 ARP 代理功能，这说明 &lt;strong&gt;Proxy ARP 依赖且受限于网关设备&lt;/strong&gt;，因此必定会来可扩展性差和不可靠的缺点。另一个是&lt;strong&gt;网关设备会用自身的 MAC 地址回复 ARP 请求报文&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Proxy ARP 和普通 ARP 的请求路径类似，唯一不同的是 ARP 请求报文中的 Target IP Address 中的值是目标 IP（而不是网关 IP）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨子网无网关的-arp-抓包实践&#34;&gt;跨子网无网关的 ARP 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;路由器和上述相同&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client D-ProxyARP 类似，配置地址换为 10.10.10.10&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client A 这里要关闭路由功能（上述已关闭）且去掉默认网关&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_a_proxyarp_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_a_proxyarp_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Client A 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Client A 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;no ip default-gateway&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开始抓包&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 Client A 上 ping 10.10.10.10&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_proxyarp_ping.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_proxyarp_ping.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ping 10.10.10.10&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ping 10.10.10.10&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Request&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_proxyarp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_proxyarp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;仍旧是广播的形式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可以看到 Target IP 是 10.10.10.10 即目标地址，而不是网关地址&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Reply&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_proxyarp_rep.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/gns3_proxyarp_rep.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;仍旧是网关单播回复 ARP Reply，附上自己的 MAC 地址&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;arp-动态表项静态表项&#34;&gt;ARP 动态表项、静态表项&lt;/h2&gt;
+&lt;h3 id=&#34;arp-动态表项&#34;&gt;ARP 动态表项&lt;/h3&gt;
+&lt;p&gt;由 ARP 协议通过 ARP 报文自动生成和维护，可以被 ARP 静态表项覆盖，可以被 ARP 报文更新，可以过期&lt;/p&gt;
+&lt;h3 id=&#34;arp-静态表项&#34;&gt;ARP 静态表项&lt;/h3&gt;
+&lt;p&gt;手动配置和维护，不会被 ARP 动态表项覆盖，不会被 ARP 报文更新，不会过期&lt;/p&gt;
+&lt;h2 id=&#34;gratuitous-arp免费-arp&#34;&gt;Gratuitous ARP（免费 ARP）&lt;/h2&gt;
+&lt;p&gt;Gratuitous ARP 是一种特殊的 ARP 请求，当主机启动时，发送一个 Gratuitous ARP 请求，即请求自己的 IP 地址和 MAC 地址，即目标 IP 地址为 自己的 IP 地址。&lt;/p&gt;
+&lt;p&gt;Gratuitous ARP 的作用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;以广播的形式发送自己的 IP 地址 和 MAC 地址，在网络中宣告自己的信息，可以是宣告新添加的主机或者更新自己的 MAC 地址&lt;/li&gt;
+&lt;li&gt;检测 IP 地址冲突，若收到了 ARP 响应报文，则说明网络中已存在使用该 IP 地址的主机&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;arp-欺骗及防御&#34;&gt;ARP 欺骗及防御&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;由于 ARP 请求不会验证 ARP 响应报文，若此时有主机在收到广播 ARP 请求报文后伪造 ARP 响应报文，则可以欺骗发送方，伪造 IP 地址 - MAC 地址 的映射关系
+&lt;ul&gt;
+&lt;li&gt;劫持通信内容&lt;/li&gt;
+&lt;li&gt;广播攻击&lt;/li&gt;
+&lt;li&gt;丢弃通信，拒绝服务&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;防御措施
+&lt;ul&gt;
+&lt;li&gt;建立正确的 ARP 映射关系、检测并过滤伪造的 ARP 报文，保证经过其转发的 ARP报文正确合法&lt;/li&gt;
+&lt;li&gt;抑制短时间内大量 ARP 报文的冲击&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;arp-常见命令&#34;&gt;ARP 常见命令&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;查看 arp 表项 arp -a/ arp -e&lt;/li&gt;
+&lt;li&gt;删除 arp 表项 arp -d，例：arp -i eth1 -d 192.168.60.1&lt;/li&gt;
+&lt;li&gt;添加 arp 表项 arp -s，例：arp -s IP MAC-ADDRESS&lt;/li&gt;
+&lt;li&gt;更多：arp -h&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rarp-协议&#34;&gt;RARP 协议&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Reverse Address Resolution Protocol 反向地址转换协议，用于获得已知 MAC 地址的 IP 地址。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;一般在主机刚接入网络时，通过本地 MAC 地址来发送 RARP 请求，如果局域网内有 RARP Server 且 Server 上存在关于此 MAC 地址的映射 IP，则会返回 RARP Reply 响应，此时主机就获取了 IP 地址。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;需要 RARP 服务器，一般用于无法使用 DHCP 或没有任何输入接口的小型嵌入式设备&lt;/li&gt;
+&lt;li&gt;主机以广播的形式发送 RARP 请求包，声明自己的 MAC 地址，并请求分配一个 IP 地址&lt;/li&gt;
+&lt;li&gt;RARP 服务器收到 RARP 请求包后，检查 RARP 列表，查找该 MAC 地址对应的 IP 地址
+&lt;ul&gt;
+&lt;li&gt;若存在，则返回 RARP 响应包，成功分配 IP 地址&lt;/li&gt;
+&lt;li&gt;若不存在，则不做任何响应，分配 IP 地址失败&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 </description>
         </item>
         <item>
@@ -6341,7 +6921,7 @@ nlog10（n）和 nlog9/10（n）之间，时间复杂度仍然是 O（nlog（n�
 &lt;h1 id=&#34;mac-层-link-layer&#34;&gt;&lt;strong&gt;MAC 层 Link Layer&lt;/strong&gt;&lt;/h1&gt;
 &lt;p&gt;链路层，又称 MAC 层。MAC 的全称为 Medium Access Control，即媒体访问控制，主要有两个功能，&lt;strong&gt;寻址和控制&lt;/strong&gt;。&lt;/p&gt;
 &lt;ol&gt;
-&lt;li&gt;&lt;strong&gt;寻址，即如何找到数据包接收方&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;寻址，即如何找到数据帧接收方&lt;/strong&gt;&lt;/li&gt;
 &lt;li&gt;&lt;strong&gt;控制，即谁先发、谁后发，发送出现问题如何处理&lt;/strong&gt;&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2 id=&#34;解决控制问题&#34;&gt;&lt;strong&gt;解决“控制”问题&lt;/strong&gt;&lt;/h2&gt;
@@ -6394,11 +6974,11 @@ nlog10（n）和 nlog9/10（n）之间，时间复杂度仍然是 O（nlog（n�
 	
 &lt;/figure&gt;&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;目标 MAC 地址：表示数据包应该被发送到哪个网络设备，由 6 个字节组成&lt;/li&gt;
-&lt;li&gt;源 MAC 地址：表示数据包是从哪个网络设备发送的，同样由 6 个字节组成&lt;/li&gt;
-&lt;li&gt;类型：表示数据包类型，0800 表示 IP 数据包，0806 表示 ARP 数据包&lt;/li&gt;
+&lt;li&gt;目标 MAC 地址：表示数据帧应该被发送到哪个网络设备，由 6 个字节组成&lt;/li&gt;
+&lt;li&gt;源 MAC 地址：表示数据帧是从哪个网络设备发送的，同样由 6 个字节组成&lt;/li&gt;
+&lt;li&gt;类型：表示数据帧类型，0800 表示 IP 数据包，0806 表示 ARP 数据包&lt;/li&gt;
 &lt;li&gt;数据：实际的数据内容，长度可变&lt;/li&gt;
-&lt;li&gt;CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据包在发送的过程中是否出现了错误&lt;/li&gt;
+&lt;li&gt;CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据帧在发送的过程中是否出现了错误&lt;/li&gt;
 &lt;/ul&gt;
 &lt;h3 id=&#34;获取-mac-地址&#34;&gt;&lt;strong&gt;获取 MAC 地址&lt;/strong&gt;&lt;/h3&gt;
 &lt;p&gt;在网络通信中，使用 MAC 地址直接进行通信是不可行的，我们借助 IP 地址作为中间桥梁来实现通信。在局域网中，知道了要发送的 IP 地址，该如何获得目标设备的 MAC 地址呢？&lt;/p&gt;
