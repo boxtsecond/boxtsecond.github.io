@@ -22,7 +22,7 @@
       <pubDate>Thu, 28 Sep 2023 10:22:17 +0800</pubDate>
       
       <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/</guid>
-      <description>总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一个</description>
+      <description>总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一</description>
     </item>
     
     <item>

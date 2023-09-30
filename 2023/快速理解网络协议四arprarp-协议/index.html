@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一个'><title>快速理解网络协议（四）ARP、RARP 协议</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一'><title>快速理解网络协议（四）ARP、RARP 协议</title>
 
 <link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/'>
 
 <link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（四）ARP、RARP 协议'>
-<meta property='og:description' content='总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一个'>
+<meta property='og:description' content='总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一'>
 <meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-09-28T10:22:17&#43;08:00'/><meta property='article:modified_time' content='2023-09-28T10:22:17&#43;08:00'/>
 <meta name="twitter:title" content="快速理解网络协议（四）ARP、RARP 协议">
-<meta name="twitter:description" content="总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一个">
+<meta name="twitter:description" content="总览 ARP 协议 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Client A 要向 Client D 发送一">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
 <script>
 var doNotTrack = false;
@@ -356,7 +356,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    2704字
+                    2822字
                 </time>
             </div>
         
@@ -384,7 +384,7 @@ if (!doNotTrack) {
 	
 </figure></p>
 <h2 id="arp-协议">ARP 协议</h2>
-<p><strong>Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址</strong></p>
+<p><strong>Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。</strong></p>
 <h3 id="同一子网中">同一子网中</h3>
 <p><figure 
 	>
@@ -427,7 +427,7 @@ if (!doNotTrack) {
 <li>dMAC 目标 MAC 地址 ff:ff:ff:ff:ff:ff ，即广播包</li>
 <li>sMAC 源 MAC 地址，即 Client A 的 MAC 地址</li>
 <li>type 数据帧类型为 ARP</li>
-<li>ARP 数据报文内容
+<li>ARP 数据报文内容 <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>
 <ul>
 <li>HType（Hardware Type）硬件类型，标识链路层协议，当为 1 时表示以太网</li>
 <li>PType（Protocol Type）协议类型，标识网络层协议，当为 0x0800 时表示 IPv4 协议</li>
@@ -442,7 +442,7 @@ if (!doNotTrack) {
 </ul>
 </li>
 <li>
-<p>Client D 比较自己的 IP 地址和 ARP 请求报文中的 Target IP 地址，若二者相同，将 ARP 请求报文中的 Sender MAC、Sender IP 地址信息存入自己的 ARP 缓存表中，以<strong>单播</strong>的形式返回 ARP 响应报文 <strong>（Client C 也会将 Client A 的 IP、MAC 地址缓存在自己的 ARP 缓存表中，但并不响应 ARP 请求）</strong></p>
+<p>Client D 比较自己的 IP 地址和 ARP 请求报文中的 Target IP 地址，若二者相同，将 ARP 请求报文中的 Sender MAC、Sender IP 地址信息存入自己的 ARP 缓存表中，以<strong>单播</strong>的形式返回 ARP 响应报文 <strong>（Client C 也会将 Client A 的 IP、MAC 地址缓存在自己的 ARP 缓存表中，但并不响应 ARP 请求）。</strong></p>
 <p><figure 
 	>
 	<a href="/post/network_protocol/img/arp_detail_1.png" >
@@ -940,6 +940,14 @@ if (!doNotTrack) {
 </ul>
 </li>
 </ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>更多参数值查看：https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml#arp-parameters-3&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
 
 </section>
 
@@ -1121,7 +1129,7 @@ if (!doNotTrack) {
         &copy; 
         
         2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-      共书写了62.2k字·共 35篇文章</br><span><p>
+      共书写了62.3k字·共 35篇文章</br><span><p>
     </section>
     
     <section class="powerby">
