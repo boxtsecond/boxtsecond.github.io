@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能'><title>快速理解网络协议（二）TCP/IP 协议模型</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 本文概览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个'><title>快速理解网络协议（二）TCP/IP 协议模型</title>
 
 <link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/'>
 
 <link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（二）TCP/IP 协议模型'>
-<meta property='og:description' content='总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能'>
+<meta property='og:description' content='本文概览 本文概览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个'>
 <meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-08-23T14:52:03&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T14:52:03&#43;08:00'/>
 <meta name="twitter:title" content="快速理解网络协议（二）TCP/IP 协议模型">
-<meta name="twitter:description" content="总览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能">
+<meta name="twitter:description" content="本文概览 本文概览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
 <script>
 var doNotTrack = false;
@@ -356,7 +356,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    2511字
+                    2517字
                 </time>
             </div>
         
@@ -368,19 +368,20 @@ if (!doNotTrack) {
     <section class="article-content">
     
     
-    <p><figure 
+    <h2 id="本文概览"><strong>本文概览</strong></h2>
+<p><figure 
 	>
-	<a href="/post/network_protocol/img/ipmac.png" >
-		<img src="/post/network_protocol/img/ipmac.png"
+	<a href="/post/network_protocol/img/2-tcpip.png" >
+		<img src="/post/network_protocol/img/2-tcpip.png"
 			
 			
 			
 			loading="lazy"
-			alt="总览"
+			alt="本文概览"
 			width="85%">
 	</a>
 	
-	<figcaption>总览</figcaption>
+	<figcaption>本文概览</figcaption>
 	
 </figure></p>
 <h2 id="tcpip-协议模型"><strong>TCP/IP 协议模型</strong></h2>
@@ -432,19 +433,28 @@ if (!doNotTrack) {
 </tbody>
 </table></div>
 <h3 id="链路层"><strong>链路层</strong></h3>
-<p>链路层负责节点之间数据的传输控制和寻址，重点在于<strong>控制和寻址。控制，即谁先发，谁后发，发送时出现问题如何处理，寻址，即如何找到数据包的接收方。</strong></p>
+<p>链路层负责节点之间数据的传输控制和寻址，重点在于<strong>控制和寻址。控制，即谁先发，谁后发，发送时出现问题如何处理；寻址，即如何找到数据包的接收方。</strong></p>
 <p><strong>解决 “控制” 问题</strong></p>
 <p>网络中的链路分为两种类型，点对点链路 和 广播链路。点对点链路，由链路一端的单个发送方和链路另一端的单个接收方组成，如 点对点协议（PPP，Point-to-Point Protocol）、高级数据链路控制（HDLC，High-level Data Link Control）。广播链路，能够让多个发送和接收节点都连接到相同的、单一的、共享的广播信道上。很明显，在点对点链路中，由于只有两个节点参与通信，因此不需要进行数据传输的控制，“控制“ 主要解决的问题是如何协调多个发送和接收节点对单一共享广播信道的访问，即**多路访问问题。**为了解决多路访问问题，于是出现了多路访问控制协议，Multiple Access Control 简称 MAC。</p>
 <p>常见的多路访问协议</p>
 <ul>
-<li>信道划分协议 Channel Partitioning Protocol</li>
+<li>信道划分协议 Channel Partitioning Protocol
+<ul>
 <li>采用多路复用技术，将链路、网络资源（如带宽）划分为“资源片”，将“资源片”分配给各路通信，每路通信独占其分配到的资源片进行通信</li>
-<li>轮转协议 Taking-turns Protocol</li>
+</ul>
+</li>
+<li>轮转协议 Taking-turns Protocol
+<ul>
 <li>多个节点轮流发送数据</li>
 <li>当只有一个结点活跃时，以信道的全部发送速率 R 发送；当有M个结点活跃时，每个活跃结点的吞吐量接近 R/M</li>
-<li>随机访问协议 Random Access Protocol</li>
+</ul>
+</li>
+<li>随机访问协议 Random Access Protocol
+<ul>
 <li>以信道的全部速率发送数据，检测到冲突时通过延时重传等方式恢复</li>
 <li><strong>以太网使用的方式</strong></li>
+</ul>
+</li>
 </ul>
 <p><strong>解决 “寻址” 问题</strong></p>
 <p>这里要用到一个物理地址，叫作链路层地址，或 MAC 地址。<strong>MAC 地址用于在网络中唯一标示一个网卡（并不是设备）</strong>，一台设备若有一或多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址。</p>
@@ -862,6 +872,7 @@ document.getElementById('days').innerHTML = number_of_days;
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
+    <li><a href="#本文概览"><strong>本文概览</strong></a></li>
     <li><a href="#tcpip-协议模型"><strong>TCP/IP 协议模型</strong></a>
       <ol>
         <li><a href="#链路层"><strong>链路层</strong></a></li>
