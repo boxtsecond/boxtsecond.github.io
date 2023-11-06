@@ -95,11 +95,11 @@
 </description>
         </item>
         <item>
-        <title>快速理解网络协议（四）STP 协议</title>
-        <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Bstp-%E5%8D%8F%E8%AE%AE/</link>
+        <title>快速理解网络协议（五）STP 协议</title>
+        <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/</link>
         <pubDate>Mon, 30 Oct 2023 11:50:47 +0800</pubDate>
         
-        <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Bstp-%E5%8D%8F%E8%AE%AE/</guid>
+        <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/</guid>
         <description>&lt;p&gt;为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。&lt;/p&gt;
 &lt;h2 id=&#34;交换机自学习和转发帧的过程&#34;&gt;交换机自学习和转发帧的过程&lt;/h2&gt;
 &lt;p&gt;交换机 Switch 是一种网络设备，用于在局域网内连接多个网络设备，接收其发送的数据帧。基于目标 MAC 地址决定转发或丢弃数据帧，以及数据帧从哪个端口转发出去。交换机有多个端口，每个端口都被隔离成自己的碰撞域，即连接某个端口的网络设备独占整个带宽。&lt;/p&gt;
@@ -255,7 +255,7 @@
 	&lt;figcaption&gt;冗余备份&lt;/figcaption&gt;
 	
 &lt;/figure&gt;&lt;/p&gt;
-&lt;p&gt;根据&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Bstp-%E5%8D%8F%E8%AE%AE/#交换机自学习和转发帧的过程&#34; &gt;&lt;strong&gt;交换机自学习和转发帧的过程&lt;/strong&gt;&lt;/a&gt;的解析，当网络物理拓扑中存在环路时，会带来以下问题&lt;/p&gt;
+&lt;p&gt;根据&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/#交换机自学习和转发帧的过程&#34; &gt;&lt;strong&gt;交换机自学习和转发帧的过程&lt;/strong&gt;&lt;/a&gt;的解析，当网络物理拓扑中存在环路时，会带来以下问题&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;交换机自学习过程中，帧交换表震荡，MAC 地址表项不断被破坏和变化&lt;/p&gt;
