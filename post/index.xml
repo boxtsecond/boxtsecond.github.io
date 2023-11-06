@@ -6,7 +6,7 @@
     <description>Recent content in Posts on Bo&#39;s Blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-cn</language>
-    <lastBuildDate>Thu, 28 Sep 2023 10:22:17 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 30 Oct 2023 11:50:47 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>数据结构与算法总览</title>
       <link>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
@@ -14,6 +14,15 @@
       
       <guid>https://boxtsecond.github.io/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</guid>
       <description>BE BEST 思维导图 数据结构与算法总览 文章列表 如何学习算法 数据结构 线性表 - 数组、链表 线性表 - 栈、队列 树 — 二叉树、递归树 树 — 红黑树、堆 树 — B+树 图 图的</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（四）STP 协议</title>
+      <link>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Bstp-%E5%8D%8F%E8%AE%AE/</link>
+      <pubDate>Mon, 30 Oct 2023 11:50:47 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Bstp-%E5%8D%8F%E8%AE%AE/</guid>
+      <description>为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。 交换机自学习</description>
     </item>
     
     <item>
