@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。 交换机自学习'><title>快速理解网络协议（五）STP 协议</title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 本文概览 为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换'><title>快速理解网络协议（五）STP 协议</title>
 
 <link rel='canonical' href='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/'>
 
 <link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（五）STP 协议'>
-<meta property='og:description' content='为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。 交换机自学习'>
+<meta property='og:description' content='本文概览 本文概览 为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换'>
 <meta property='og:url' content='https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-10-30T11:50:47&#43;08:00'/><meta property='article:modified_time' content='2023-10-30T11:50:47&#43;08:00'/>
 <meta name="twitter:title" content="快速理解网络协议（五）STP 协议">
-<meta name="twitter:description" content="为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。 交换机自学习">
+<meta name="twitter:description" content="本文概览 本文概览 为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
 <script>
 var doNotTrack = false;
@@ -356,7 +356,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    3533字
+                    3541字
                 </time>
             </div>
         
@@ -368,7 +368,23 @@ if (!doNotTrack) {
     <section class="article-content">
     
     
-    <p>为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。</p>
+    <h2 id="本文概览"><strong>本文概览</strong></h2>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/5-stp.png" >
+		<img src="/post/network_protocol/img/5-stp.png"
+			
+			
+			
+			loading="lazy"
+			alt="本文概览"
+			width="85%">
+	</a>
+	
+	<figcaption>本文概览</figcaption>
+	
+</figure></p>
+<p>为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。</p>
 <h2 id="交换机自学习和转发帧的过程">交换机自学习和转发帧的过程</h2>
 <p>交换机 Switch 是一种网络设备，用于在局域网内连接多个网络设备，接收其发送的数据帧。基于目标 MAC 地址决定转发或丢弃数据帧，以及数据帧从哪个端口转发出去。交换机有多个端口，每个端口都被隔离成自己的碰撞域，即连接某个端口的网络设备独占整个带宽。</p>
 <p>交换机在网络中肩负着至关重要的角色，它以一种即插即用的方式，实现了网络设备之间的高效数据传输。在交换机刚启动时，其内部的帧交换表是空的。随着网络中各设备之间的通信，交换机通过自学习算法逐渐建立起帧交换表。</p>
@@ -1151,7 +1167,7 @@ if (!doNotTrack) {
         &copy; 
         
         2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-      共书写了65.8k字·共 36篇文章</br><span><p>
+      共书写了65.9k字·共 36篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -1294,6 +1310,7 @@ document.getElementById('days').innerHTML = number_of_days;
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ol>
+    <li><a href="#本文概览"><strong>本文概览</strong></a></li>
     <li><a href="#交换机自学习和转发帧的过程">交换机自学习和转发帧的过程</a>
       <ol>
         <li><a href="#自学习过程">自学习过程</a></li>

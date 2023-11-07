@@ -100,7 +100,23 @@
         <pubDate>Mon, 30 Oct 2023 11:50:47 +0800</pubDate>
         
         <guid>https://boxtsecond.github.io/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/</guid>
-        <description>&lt;p&gt;为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。&lt;/p&gt;
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/post/network_protocol/img/5-stp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/post/network_protocol/img/5-stp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;本文概览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;本文概览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。&lt;/p&gt;
 &lt;h2 id=&#34;交换机自学习和转发帧的过程&#34;&gt;交换机自学习和转发帧的过程&lt;/h2&gt;
 &lt;p&gt;交换机 Switch 是一种网络设备，用于在局域网内连接多个网络设备，接收其发送的数据帧。基于目标 MAC 地址决定转发或丢弃数据帧，以及数据帧从哪个端口转发出去。交换机有多个端口，每个端口都被隔离成自己的碰撞域，即连接某个端口的网络设备独占整个带宽。&lt;/p&gt;
 &lt;p&gt;交换机在网络中肩负着至关重要的角色，它以一种即插即用的方式，实现了网络设备之间的高效数据传输。在交换机刚启动时，其内部的帧交换表是空的。随着网络中各设备之间的通信，交换机通过自学习算法逐渐建立起帧交换表。&lt;/p&gt;
