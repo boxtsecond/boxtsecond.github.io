@@ -1,0 +1,2492 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>网络协议 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/</link>
+        <description>Recent content in 网络协议 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Tue, 07 Nov 2023 18:25:28 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>快速理解网络协议（六）VLAN</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/vlan/</link>
+        <pubDate>Tue, 07 Nov 2023 18:25:28 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/vlan/</guid>
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;本文概览&lt;/h2&gt;
+&lt;h2 id=&#34;vlan&#34;&gt;VLAN&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的网络设备可以直接通信，跨 VLAN 不能直接通信，必须经由路由器等路由设备，从而将广播报文限制在单个广播域内。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;vlan-出现的背景&#34;&gt;VLAN 出现的背景&lt;/h3&gt;
+&lt;p&gt;随着以太网的迅猛发展，网络接入设备呈指数级增长。而&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/mac-layer/#mac-层-link-layer&#34; &gt;&lt;strong&gt;以太网在节点间传输数据基于共享物理介质&lt;/strong&gt;&lt;/a&gt;，局域网中的网络设备越多，冲突的概率就会越高，性能会显著下降。其次，广播帧传递的范围太大，导致局域网的带宽资源、网络设备处理广播帧的 CPU 资源等资源的无谓消耗，影响整个局域网的性能。除此之外，在企业管理中，随着人员的变动，添加新设备时常常需要重新布线。而且通常会将不同部门划分不同的网络，以提高安全性。
+虽然路由器也可以分割广播域，但由于路由器设备的价格较贵，而且分割的局域网个数受限于路由器的端口，而路由器本身的端口数量较少。在这种环境下，用于在交换机（特指二层交换机）上分割局域网的 VLAN 技术应运而生。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;总结一下局域网物理拓扑的缺点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;网络设备越多，冲突概率越高，导致性能下降&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;广播风暴消耗资源，影响局域网的整体性能&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;扩展性低，无法灵活的分割网络&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;vlan-的作用&#34;&gt;VLAN 的作用&lt;/h3&gt;
+&lt;p&gt;VLAN 的出现解决了局域网物理拓扑带来的限制，其作用说白了只有一点，&lt;strong&gt;按需分割广播域。将一个物理网络划分成多个逻辑网络，可以理解为将一台真实的交换机在逻辑上分为了多个交换机。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;vlan-数据帧格式&#34;&gt;VLAN 数据帧格式&lt;/h3&gt;
+&lt;p&gt;重新复习一遍&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/mac-layer/#mac-层的传输单位-frame&#34; &gt;&lt;strong&gt;传统以太网帧的格式&lt;/strong&gt;&lt;/a&gt;的解析
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/mac_frame.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/mac_frame.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;传统以太网帧&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;传统以太网帧&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;IEEE 802.1Q 标准协议&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;的 VLAN 数据帧格式，是在传统以太网帧的目的 MAC 地址和源 MAC 地址字段之后，协议类型字段之前加入 4 个字节的 VLAN 标签（VLAN Tag 简称 Tag），用于标识数据帧所属的 VLAN。下图中的红色部分表示 VLAN 标签。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/6-vlan.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/6-vlan.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;VLAN 帧&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;VLAN 帧&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;em&gt;以下仅对 VLAN 标签作出解释，其他字段的含义可查看&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/mac-layer/#mac-层的传输单位-frame&#34; &gt;&lt;strong&gt;传统以太网帧的格式&lt;/strong&gt;&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TPID：Tag protocol identifier 标签协议标识符，表示数据帧类型，0x8100 表示 IEEE 802.1Q 帧，长度为 2 个字节&lt;/li&gt;
+&lt;li&gt;TCI：Tag control information，包含了数据帧控制信息，同样由 2 个字节组成
+&lt;ul&gt;
+&lt;li&gt;PCP（PRI）：Priority code point，表示数据帧的优先级。之前的名称为 PRI，具体含义没变。PCP 占 3 bits，所以取值范围为 0 ～ 8，值越大表示优先级越高。如果发生拥塞，交换机首先发送优先级最高的数据包&lt;/li&gt;
+&lt;li&gt;DEI（CFI）：Drop eligible indicator 丢弃资格标识符，表示 MAC 地址封装是否符合规范格式，之前的名称为 CFI。DEI 占 1 bit，0 表示 MAC 地址以标准格式进行封装&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;VID：VLAN identifier，表示帧所属的 VLAN。一般情况下在 TCI 中，只关心 VID。VID 占 12 bits，取值范围为 0 ～ 4095，总计可以标识 4096 个 VLAN&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在一个 VLAN 网络中，数据帧由两种类型，有标记帧（tagged frame）和无标记帧（untagged frame）。交换设备的端口按照处理数据帧的能力，分为 Access 接口、Trunk 接口和 Hybrid 接口。每个接口都可以配置一个默认的 VLAN ID，用于为 untagged frame 添加 VLAN Tag。称为缺省 VLAN ID，即 PVID（Port Default VLAN ID）。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;接口类型&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;作用&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;可处理的数据帧&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;Access&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;连接终端设备，如计算机或 IP 电话&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;单个 VLAN 的数据帧，即 untagged frame。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;Trunk&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;连接交换机之间或交换机与路由器之间&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;多个 VLAN 的数据帧，通过 VLAN 标签区分。&lt;/br&gt;即可同时收发 tagged、untagged frame。&lt;/br&gt; untagged frame 仅存在于发送数据帧时剥离 VLAN 标签，转发给特定 VLAN&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;Hybrid&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;结合 Access 和 Trunk 的功能，可连接终端设备，同时处理多个 VLAN&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;单个或多个 VLAN 的数据帧，根据配置确定&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;vlan-的优缺点&#34;&gt;VLAN 的优缺点&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;优点
+&lt;ul&gt;
+&lt;li&gt;按需分割广播域&lt;/li&gt;
+&lt;li&gt;减少广播流量&lt;/li&gt;
+&lt;li&gt;提高安全性&lt;/li&gt;
+&lt;li&gt;简化管理成本&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;缺点
+&lt;ul&gt;
+&lt;li&gt;VLAN ID 仅有 4096 个，在大型网络中不够用，&lt;/li&gt;
+&lt;li&gt;虽然可以从逻辑上划分成多个网络，但&lt;strong&gt;真实的数据帧无法脱离物理网络，即全部是 underlay 网络&lt;/strong&gt;，会带来以下问题
+&lt;ul&gt;
+&lt;li&gt;交换机需要学习转发多个 VLAN 的数据帧，而交换机的内存有限且比较宝贵。当交换机 MAC 地址表不足以支持存储网络中的所有设备时，未存储 MAC 地址的设备的数据帧的转发，需要泛洪&lt;/li&gt;
+&lt;li&gt;不同的 VLAN ID 通常会分配不同的 IP 地址段，当业务集中在某个 IP 段内时，会导致网络资源分配不均&lt;/li&gt;
+&lt;li&gt;若局域网内使用 STP/RSTP 协议避免环路，则整个网络中的&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/stp/#stp-协议的缺点&#34; &gt;&lt;strong&gt;多个 VLAN 仅构造一颗树&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;vlan-通信过程解析&#34;&gt;VLAN 通信过程解析&lt;/h2&gt;
+&lt;p&gt;为了更好的理解 VLAN 的实际通信过程，我们将分别从 VLAN 内通信、跨 VLAN 通信两个方面来详细描述及实践，其中又分别包括了同设备和跨设备两种类型，注意这里的设备指的是交换机等二层交换设备。&lt;/p&gt;
+&lt;h3 id=&#34;vlan-内通信&#34;&gt;VLAN 内通信&lt;/h3&gt;
+&lt;h4 id=&#34;同设备&#34;&gt;同设备&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_one_switch.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_one_switch.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;同设备同 VLAN&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;同设备同 VLAN&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;同设备同 VLAN 内通信，交换机与网络中的其他设备的连接如上图所示。A 想要与 B 通信。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;数据帧传输&lt;/strong&gt;：A 判断 B 和自己同属于一个网段，发送一个 &lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/arp-rarp/&#34; &gt;&lt;strong&gt;ARP 报文&lt;/strong&gt;&lt;/a&gt;获取 B 的 MAC 地址。A 发送 &lt;strong&gt;untagged&lt;/strong&gt; 数据帧至交换机&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;交换机学习&lt;/strong&gt;：交换机接收到一个 untagged 数据帧，将 PVID（缺省 VLAN ID）作为 VID，生成 Tag 添加至数据帧。并根据数据帧的源 MAC 地址、VID 和接收数据帧的端口，生成 MAC 表项（&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/stp/#交换机自学习和转发帧的过程&#34; &gt;&lt;strong&gt;交换机自学习详细过程&lt;/strong&gt;&lt;/a&gt;）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;交换机转发&lt;/strong&gt;：&lt;strong&gt;交换机根据数据帧的源 MAC 地址 和 VID 查找 MAC 表项&lt;/strong&gt;，此时交换机 MAC 表项中还没有 B 的信息，于是交换机会在 A 所属 VID 的 VLAN 中广播报文。在发出广播报文前，会剥离 Tag，即 B 收到的也是 &lt;strong&gt;untagged&lt;/strong&gt; 数据帧。B 响应 A 发出的 ARP 报文，交换机重复步骤 2，学习到 B 的 MAC 地址、VID 和接收数据帧的端口&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;直接通信&lt;/strong&gt;：此时交换机 MAC 表项中已经包含了 A、B 的 MAC 地址、VID、接收端口，后续 A、B 通信时，交换机会查找 MAC 表，从表项所对应的端口发出单播报文&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;同设备同-vlan-内实践&#34;&gt;同设备同 VLAN 内实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;按照图中所示分别配置 A、B 的 IP 地址为 10.1.1.10、10.1.1.20，可以自定义 VLAN，不配置的话默认是 VLAN 1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_a.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_a.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;配置 A&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;配置 A&lt;/figcaption&gt;
+	
+&lt;/figure&gt;
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_b.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_b.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;配置 B&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;配置 B&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A：ip 10.1.1.10/24 10.1.1.1&lt;/li&gt;
+&lt;li&gt;B：ip 10.1.1.20/24 10.1.1.1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;查看交换机 VLAN 信息，包括 VID 对应的端口信息，和 MAC 表项。可以看到，e0/0 和 e1/1 都属于 VLAN 1，且此时还无任何表项&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;show vlan &lt;br&gt;
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_switch.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_switch.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A、B 互 ping 后，查看交换机 MAC 表。可以看到 MAC 表项中包含 VID、MAC 地址及对应的端口。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;show mac address-table
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_mac_table.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_mac_table.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;MAC Table&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;MAC Table&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨设备&#34;&gt;跨设备&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_differ_switch.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_differ_switch.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;跨设备同 VLAN&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;跨设备同 VLAN&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;跨设备同 VLAN 内通信，交换机与网络中的其他设备的连接如上图所示。A 想要与 B 通信。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;交换机连接端口 PVID 与数据帧 VID 相同，即 IF1 与设备 A VID 相同&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;与同设备同 VLAN 内通信步骤相同&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;由于 VID 与交换机 IF1 的 PVID 相同，因此交换机在发出数据帧前，会将数据帧的 tag 剥离&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;IF1 发出的数据帧为 untagged 数据帧&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;交换机连接端口 PVID 与数据帧 VID 不同，即 IF1 与设备 A VID 不同&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;与同设备同 VLAN 内通信步骤相似&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;由于 VID 与交换机 IF1 的 PVID 不同，因此交换机在发出数据帧前，不会将数据帧的 tag 剥离，直接透传该数据帧&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;IF1 发出的数据帧为 tagged 数据帧&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨设备同-vlan-内实践&#34;&gt;跨设备同 VLAN 内实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置 A、B 的 IP 地址为 10.1.1.10、10.1.1.20，和同设备同 VLAN 的配置命令一样&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5 id=&#34;交换机连接端口-pvid-与数据帧-vid-相同&#34;&gt;交换机连接端口 PVID 与数据帧 VID 相同&lt;/h5&gt;
+&lt;p&gt;在不对交换机端口做特殊配置 VLAN 的情况下，所有设备和端口都是默认 VLAN 1，满足交换机连接端口 PVID 与 VID 相同的条件。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;查看 Switch 1 VLAN 信息，可以看到所有的端口都属于 VLAN 1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_switch1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_switch1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch 1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch 1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 B 上执行 ping A 的命令，并且在 Switch 1 和 Switch 2 之间抓包，&lt;strong&gt;可以看到 Switch 1 发往 Switch 2 的数据帧都是 untagged 数据帧&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_icmp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_icmp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch 1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch 1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h5 id=&#34;交换机连接端口-pvid-与数据帧-vid-不同&#34;&gt;交换机连接端口 PVID 与数据帧 VID 不同&lt;/h5&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;将 Switch 1 e1/1 端口的 PVID 改为 VLAN 10
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_conf_vlan.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_conf_vlan.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;e1/1 配置 VLAN 10&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;e1/1 配置 VLAN 10&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;conf term&lt;/li&gt;
+&lt;li&gt;int e1/1&lt;/li&gt;
+&lt;li&gt;switchport trunk encapsulation dot1q （使用 IEEE 802.1Q 标准协议）&lt;/li&gt;
+&lt;li&gt;switchport mode trunk&lt;/li&gt;
+&lt;li&gt;switchport trunk native vlan 10&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;查看 Switch 1 VLAN 信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;show vlan （端口 e1/1 已经不在 vlan 1 中）
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_conf_1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_conf_1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch 1 VLAN 信息&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch 1 VLAN 信息&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;li&gt;show int e1/1 switchport （Trunking Native Mode VLAN 为 10）
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_conf_2.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_conf_2.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch 1 e1/1 VLAN 信息&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch 1 e1/1 VLAN 信息&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 A 上执行 ping B 的命令，并且在 Switch 1 和 Switch 2 之间抓包，&lt;strong&gt;可以看到 Switch 1 发往 Switch 2 的数据帧都是 tagged 数据帧&lt;/strong&gt;
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_icmp_2.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_icmp_2.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch 1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch 1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;跨-vlan-通信&#34;&gt;跨 VLAN 通信&lt;/h3&gt;
+&lt;p&gt;在文章开头处我们就说过，&lt;strong&gt;跨 VLAN 不能直接通信，必须经由路由器、三层交换机等路由设备&lt;/strong&gt;，所以在后续的实践中我们需要使用三层交换机。&lt;strong&gt;三层交换机，本质上就是“带有路由功能的（二层）交换机”，三层交换机可以想象成一个路由器 + 一个（二层）交换机。&lt;/strong&gt;&lt;/p&gt;
+&lt;h4 id=&#34;同设备-1&#34;&gt;同设备&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_one_switch_differ.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_one_switch_differ.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;同设备跨 VLAN&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;同设备跨 VLAN&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;同设备跨 VLAN 通信，&lt;strong&gt;三层交换机&lt;/strong&gt;与网络中的其他设备的连接如上图所示。A 想要与 B 通信。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;数据帧传输&lt;/strong&gt;：A 判断 B 和自己不属于一个网段，发送一个 &lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/arp-rarp/&#34; &gt;&lt;strong&gt;ARP 报文&lt;/strong&gt;&lt;/a&gt;获取网关的 MAC 地址，目的 IP 为网关的地址 10.1.1.1。A 发送 &lt;strong&gt;untagged&lt;/strong&gt; 数据帧至交换机&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;交换机学习&lt;/strong&gt;：交换机接收到一个 untagged 数据帧，将 PVID（缺省 VLAN ID）作为 VID，生成 Tag 添加至数据帧。并根据数据帧的源 MAC 地址、VID 和接收数据帧的端口，生成 MAC 表项&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;交换机回复&lt;/strong&gt;：交换机发现目的 IP 地址是自己，附上自己的 MAC 地址，回复 ARP 应答报文&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据帧传输&lt;/strong&gt;：A 收到交换机回复的 ARP 应答报文，记录 IP、MAC 地址的对应关系至 arp 表中，重新封装数据帧，将目的 MAC 地址填为交换机回复的 MAC 地址，目的 IP 填为 B 的 IP 地址&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;查找路由表&lt;/strong&gt;：交换机接收到一个 untagged 数据帧，添加 VLAN Tag。发现数据帧中的目的 MAC 地址是自己，则需要进行三层转发。根据目的 IP 地址查找三层转发表，此时 B 的相关信息还不存在与此表中，于是继续查找路由表&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;交换机转发&lt;/strong&gt;：在路由表中发现目的 IP 地址属于另一个直连网段，在此网段中广播 ARP 报文以获取 B 的 MAC 地址。在发出广播报文前，同样会剥离 Tag，即发出 &lt;strong&gt;untagged&lt;/strong&gt; 数据帧&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据帧传输&lt;/strong&gt;：B 接收到 ARP 报文后，回复 ARP 应答报文，并记录 IP、MAC 地址至自己的 arp 表中，交换机重复步骤 2，学习到 B 的 IP、MAC、VID 对应关系，并记录到三层转发表中&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;直接通信&lt;/strong&gt;：后续 A、B 通信时，发送数据帧至网关并匹配三层转发表进行三层转发&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;同设备跨-vlan-抓包实践&#34;&gt;同设备跨 VLAN 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置 A、B 的 IP 地址为 10.1.1.10、10.1.2.10，和同设备同 VLAN 的配置命令相似，这里不再赘述&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置三层交换机&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;配置三层交换机&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;配置三层交换机&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;配置三层交换机&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;conf term&lt;/li&gt;
+&lt;li&gt;int e0/0&lt;/li&gt;
+&lt;li&gt;switchport mode access&lt;/li&gt;
+&lt;li&gt;switchport access vlan 10&lt;/li&gt;
+&lt;li&gt;int vlan 10&lt;/li&gt;
+&lt;li&gt;ip address 10.1.1.1 255.255.255.0&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;li&gt;vlan 20 同上&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ip routing&lt;/strong&gt; 这步必需，否则无法联通&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;查看 VLAN 信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;show vlan&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_vlan.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_vlan.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;VLAN 信息&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;VLAN 信息&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;查看路由信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;show ip route&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_route.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_route.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;route 信息&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;route 信息&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;查看 e0/0、e1/1 MAC 地址&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_e0.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_e0.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;e0/0 MAC 地址&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;e0/0 MAC 地址&lt;/figcaption&gt;
+	
+&lt;/figure&gt;
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_e1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_e1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;e1/1 MAC 地址&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;e1/1 MAC 地址&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 A 上执行 ping B 的命令，并且在 A 与 L3Switch、B 与 L3Switch之间抓包&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_a.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_a.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;A 与 L3Switch&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;A 与 L3Switch&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A 发出的是 &lt;strong&gt;untagged&lt;/strong&gt; 数据帧&lt;/li&gt;
+&lt;li&gt;A 请求的目的 MAC 地址是网关的 MAC 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_b.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_one_switch_differ_b.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;B 与 L3Switch&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;B 与 L3Switch&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;B 回复的是 &lt;strong&gt;untagged&lt;/strong&gt; 数据帧&lt;/li&gt;
+&lt;li&gt;B 请求的目的 MAC 地址是请求时的源 MAC 地址，即 e0/0 的 MAC 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨设备-1&#34;&gt;跨设备&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_differ_switch_differ.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_in_differ_switch_differ.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;跨设备跨 VLAN&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;跨设备跨 VLAN&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;跨设备跨 VLAN 通信，&lt;strong&gt;三层交换机&lt;/strong&gt;与网络中的其他设备的连接如上图所示。A 想要与 B 通信。&lt;/p&gt;
+&lt;p&gt;通信过程与同设备跨 VLAN 基本相似，同设备跨 VLAN 的过程中 &lt;strong&gt;A → 交换机 → B&lt;/strong&gt;，相当于跨设备跨 VLAN 过程中的 &lt;strong&gt;A → 交换机 1 → 交换机 2&lt;/strong&gt;，是整个跨设备跨 VLAN 通信过程的一半，剩余的半段通信过程类似。&lt;/p&gt;
+&lt;h4 id=&#34;跨设备跨-vlan-抓包实践&#34;&gt;跨设备跨 VLAN 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置 A、B 的 IP 地址为 10.1.1.10、10.1.2.10&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置三层交换机&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;L3Switch-1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;L3Switch-1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;conf term&lt;/li&gt;
+&lt;li&gt;配置 A 和 L3Switch-1 之间为 access 链路
+&lt;ul&gt;
+&lt;li&gt;int e0/0&lt;/li&gt;
+&lt;li&gt;switchport mode access&lt;/li&gt;
+&lt;li&gt;switchport access vlan 10&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;配置 VLAN 10、VLAN 20 IP 分别为 10.1.1.1、10.1.2.1
+&lt;ul&gt;
+&lt;li&gt;int vlan 10&lt;/li&gt;
+&lt;li&gt;ip address 10.1.1.1 255.255.255.0&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;li&gt;vlan 20 同理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;配置 L3Switch-1 和 L3Switch-2 之间为 trunk 链路
+&lt;ul&gt;
+&lt;li&gt;int e1/1&lt;/li&gt;
+&lt;li&gt;switchport trunk encapsulation dot1q&lt;/li&gt;
+&lt;li&gt;switchport mode trunk&lt;/li&gt;
+&lt;li&gt;switchport trunk native vlan 10&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_2.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_2.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;L3Switch-2&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;L3Switch-2&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A ping B，并在 L3Switch-1 和 L3Switch-2 之间抓包&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_icmp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/vlan_gns3_in_differ_switch_differ_icmp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;L3Switch-1 与 L3Switch-2&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;L3Switch-1 与 L3Switch-2&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;可以看到第一个 icmp 报文是不携带 VLAN ID，因为&lt;strong&gt;此时 L3Switch-1 的端口 PVID 和 报文中的 VID 一样，都是 10，所以发出的数据帧是 untagged 数据帧&lt;/strong&gt;。在 L3Switch-2 发送 icmp reply 报文时，L3Switch-1 的端口 PVID 和 报文中的 VID 不同，于是 &lt;strong&gt;L3Switch-2 发出的是 tagged 数据帧&lt;/strong&gt;，L3Switch-1 学习到 VID 是 20，后续的报文都会携带 VLAN ID。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;vlan-的常见应用&#34;&gt;VLAN 的常见应用&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;应用场景&lt;/th&gt;
+&lt;th style=&#34;text-align:center&#34;&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;部门划分&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;企业内不同部门间相互隔离，但共享同一个物理网络&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;客户和内部流量隔离&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;云服务提供商将客户的网络流量隔离，确保安全性&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;楼层或建筑划分&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;大型企业或学校拥有多个楼层或建筑，每个楼层独立管理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;无线网络划分&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;为企业活学校的无线网络划分多个虚拟网络&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;虚拟化环境中的隔离&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;在虚拟化环境中，为虚拟机隔离网络环境&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;多租户数据中心&lt;/td&gt;
+&lt;td style=&#34;text-align:center&#34;&gt;云计算环境或数据中心需要为多个租户提供独立的网络环境&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;div class=&#34;notice notice-tip&#34; &gt;
+    &lt;div class=&#34;notice-title&#34;&gt;&lt;svg xmlns=&#34;http://www.w3.org/2000/svg&#34; class=&#34;icon notice-icon&#34; viewBox=&#34;0 0 512 512&#34; fill=&#34;hsl(140, 65%, 65%)&#34;&gt;&lt;path d=&#34;M504 256a248 248 0 11-496 0 248 248 0 01496 0zM227 387l184-184c7-6 7-16 0-22l-22-23c-7-6-17-6-23 0L216 308l-70-70c-6-6-16-6-23 0l-22 23c-7 6-7 16 0 22l104 104c6 7 16 7 22 0z&#34;/&gt;&lt;/svg&gt;&lt;/div&gt;&lt;p&gt;就像我们在 &lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/vlan/#vlan-%e7%9a%84%e4%bd%9c%e7%94%a8&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;&lt;strong&gt;VLAN 的作用&lt;/strong&gt;&lt;/a&gt; 中提到的，任何需要在共用物理网络的基础上，划分多个逻辑网络的小型网络，都可使用 VLAN 实现。&lt;/p&gt;&lt;/div&gt;
+
+
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;除了 IEEE 802.1Q 还有 ISL，两者都可在数据帧中附加 VLAN 信息。唯一的区别是 ISL 是 Cisco 产品独有的，仅能在 Cisco 网络设备间使用。&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+        </item>
+        <item>
+        <title>快速理解网络协议（五）STP 协议</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/stp/</link>
+        <pubDate>Mon, 30 Oct 2023 11:50:47 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/stp/</guid>
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/5-stp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/5-stp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;本文概览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;本文概览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。&lt;/p&gt;
+&lt;h2 id=&#34;交换机自学习和转发帧的过程&#34;&gt;交换机自学习和转发帧的过程&lt;/h2&gt;
+&lt;p&gt;交换机 Switch 是一种网络设备，用于在局域网内连接多个网络设备，接收其发送的数据帧。基于目标 MAC 地址决定转发或丢弃数据帧，以及数据帧从哪个端口转发出去。交换机有多个端口，每个端口都被隔离成自己的碰撞域，即连接某个端口的网络设备独占整个带宽。&lt;/p&gt;
+&lt;p&gt;交换机在网络中肩负着至关重要的角色，它以一种即插即用的方式，实现了网络设备之间的高效数据传输。在交换机刚启动时，其内部的帧交换表是空的。随着网络中各设备之间的通信，交换机通过自学习算法逐渐建立起帧交换表。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;交换机接收某个端口的数据帧，通过数据帧的源 MAC 地址，就可以知道哪些设备连接此端口，记录下来用于转发数据帧时，根据目标 MAC 地址选择对应的端口&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;交换机根据目标 MAC 地址决定丢弃数据帧、转发数据帧及转发端口&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;如果不知道目标 MAC 地址对应的转发端口，则将数据帧转发给除接收端口外的全部端口&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;如果明确知道目标 MAC 地址对应的转发端口，则仅转发数据帧至对应端口&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;如果目标 MAC 地址和源端口一致，则丢弃此数据帧&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;下面我们来举例说明交换机的自学习和帧转发过程，网络拓扑如下图所示。假设各设备知道网络中其它设备的 MAC 地址（无需进行 &lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/arp-rarp/&#34; &gt;&lt;strong&gt;ARP&lt;/strong&gt;&lt;/a&gt;）。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_empty.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_empty.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;网络拓扑&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;网络拓扑&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;交换机 1 的端口 1、2、3 分别连接了网络设备 A、B、C，交换机 2 的端口 4 连接网络设备 E。&lt;br&gt;
+交换机 1 的端口 4 和交换机 2 的端口 2 相连。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;自学习过程&#34;&gt;自学习过程&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_learn.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_learn.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;自学习&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;自学习&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;设备 A 发送数据帧至设备 C，交换机 1 的端口 1 接收到此数据帧&lt;/li&gt;
+&lt;li&gt;交换机 1 将数据帧的源 MAC 地址和接收端口 1 记录到自己的帧交换表中，这个记录的行为就是交换机的自学习&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;转发帧过程&#34;&gt;转发帧过程&lt;/h3&gt;
+&lt;p&gt;交换机 1 自学习之后，根据目标 MAC 地址和交换机的帧交换表，决定转发或丢弃数据帧。其中包括三种情况，泛洪、明确转发和丢弃。&lt;/p&gt;
+&lt;h4 id=&#34;泛洪&#34;&gt;泛洪&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_flood.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_flood.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;泛洪&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;泛洪&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;交换机 1 记录源 MAC 地址和接收端口的映射关系到帧交换表后，开始转发数据帧&lt;/li&gt;
+&lt;li&gt;交换机 1 在帧交换表中查找数据帧的目标 MAC 地址，发现没有匹配项，交换机 1 向除端口 1 以外的全部端口广播这个帧，即泛洪&lt;/li&gt;
+&lt;li&gt;设备 B、E 收到此数据帧，发现目标 MAC 地址不是自己，丢弃此数据帧&lt;/li&gt;
+&lt;li&gt;设备 C 收到此数据帧，发现目标 MAC 地址是自己，接收此数据帧&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;转发数据帧&#34;&gt;转发数据帧&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_forward.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_forward.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;转发&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;转发&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;设备 C 发送数据帧至设备 A，交换机 1 的端口 3 接收到此数据帧&lt;/li&gt;
+&lt;li&gt;交换机 1 将数据帧的源 MAC 地址和接收端口记录到自己的帧交换表中&lt;/li&gt;
+&lt;li&gt;交换机 1 在帧交换表中查找数据帧的目标 MAC 地址，成功获取到目标 MAC 地址对应的端口 1，将数据帧仅转发至端口 1&lt;/li&gt;
+&lt;li&gt;设备 A 收到此数据帧，发现目标 MAC 地址是自己，接收此数据帧&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;丢弃数据帧&#34;&gt;丢弃数据帧&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_drop.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_switch_drop.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;丢弃&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;丢弃&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;设备 A 发送数据帧，设备 D 和交换机 1 都可以收到此数据帧&lt;/li&gt;
+&lt;li&gt;交换机 1 将数据帧的源 MAC 地址和接收端口记录到自己的帧交换表中&lt;/li&gt;
+&lt;li&gt;交换机 1 在帧交换表中查找数据帧的目标 MAC 地址，成功获取到目标 MAC 地址对应的端口 1，发现端口 1 和源端口一致，丢弃此数据帧&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;stp-协议&#34;&gt;STP 协议&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Spanning Tree Protocol，即 STP 协议，用于为以太网构建无环路的逻辑拓扑。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;stp-出现的背景&#34;&gt;STP 出现的背景&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_bg_single.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_bg_single.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;单点故障&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;单点故障&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;如图所示，设备 A、B、C 互相通信需要通过交换机 1、2、3。当交换机 1 出现故障时，设备 A 无法与 B、C 通信，此种现象称之为单点故障。为了解决单点故障的问题，提高网络的可靠性，需要在物理上冗余备份链路，如下图所示。交换机 1 和交换机 3 之间添加了一条冗余链路，当交换机 1 与交换机 2 间的链路出现故障时，设备 A 仍旧可以通过交换机 3 与 B、C 通信。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_bg_backup.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_bg_backup.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;冗余备份&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;冗余备份&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;根据&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/stp/#交换机自学习和转发帧的过程&#34; &gt;&lt;strong&gt;交换机自学习和转发帧的过程&lt;/strong&gt;&lt;/a&gt;的解析，当网络物理拓扑中存在环路时，会带来以下问题&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;交换机自学习过程中，帧交换表震荡，MAC 地址表项不断被破坏和变化&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_bg_mac_change.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_bg_mac_change.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;MAC 地址震荡&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;MAC 地址震荡&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;设备 A 发送一个广播包&lt;/li&gt;
+&lt;li&gt;交换机 1 的端口 2 收到广播包，根据数据帧的源 MAC 地址添加端口映射关系，并转发数据帧到端口 1、3&lt;/li&gt;
+&lt;li&gt;交换机 2 和交换机 3 同理，将数据帧转发给其他端口&lt;/li&gt;
+&lt;li&gt;交换机 1 的端口 3 收到此数据帧，源 MAC 地址仍旧为设备 A 的 MAC 地址，而对应端口变成了 3&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;数据帧在环路中不断转发，即广播风暴，消耗大量的网络资源，影响网络中的其他数据帧的转发性能，甚至无法转发&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在环路中的设备收到重复的数据帧，同样也会消耗设备资源&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;stp-协议的作用&#34;&gt;STP 协议的作用&lt;/h3&gt;
+&lt;p&gt;STP 协议通过阻塞交换机端口，令其不再转发数据帧，使得环路被裁剪成一颗树，达到**在逻辑上消除环路的目的。**在链路发生故障后，激活备份链路，及时恢复网络连通性。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;消除环路：允许网络物理拓扑中存在备份链路，消除逻辑拓扑上的二层环路&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;备份链路：发生故障后使用备份链路，及时恢复网络，提高网络的可靠性&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;stp-协议过程解析&#34;&gt;STP 协议过程解析&lt;/h3&gt;
+&lt;p&gt;在解析 STP 协议的具体过程前，先来了解一下 STP 协议中的重要组成部分。&lt;/p&gt;
+&lt;h4 id=&#34;stp-协议的重要概念&#34;&gt;STP 协议的重要概念&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;根桥 Root Bridge，是整个 STP 网络的逻辑中心，一般会选择性能高的交换设备作为根桥。根桥没有根端口，根桥的全部端口都是指定端口。&lt;/li&gt;
+&lt;li&gt;根端口 Root Port，交换机上距离根桥路径最短的端口，每个交换机上最多有一个根端口，负责向根桥方向转发数据。&lt;/li&gt;
+&lt;li&gt;指定端口 Designated Port，交换机向所连网段转发配置消息的端口，每个网段只能有一个指定端口。&lt;/li&gt;
+&lt;li&gt;阻塞端口 Blocked Port，如果一个端口既不是根端口又不是指定端口，这个端口将被阻塞。被阻塞的端口仅接受 BPDU 消息，不会接受或发送其他非 BPDU 的数据帧。&lt;/li&gt;
+&lt;li&gt;BPDU Bridge Protocol Data Units，STP 生成树过程中所传递的配置消息。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;stp-协议过程解析-1&#34;&gt;STP 协议过程解析&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;选举根桥，根据根桥 ID 选举
+&lt;ul&gt;
+&lt;li&gt;根桥 ID（BID）：桥优先级（默认 32769，且必须为 4096 的倍数） + 桥 MAC&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;非根桥交换机选举根端口（RP），按照以下顺序选举
+&lt;ul&gt;
+&lt;li&gt;根路径成本最低&lt;/li&gt;
+&lt;li&gt;对端 BID（Bridge ID）最小&lt;/li&gt;
+&lt;li&gt;对端 PID（Port ID）最小&lt;/li&gt;
+&lt;li&gt;本端 PID 最小&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;每个网段选举指定端口（DP），根桥的所有端口都是指定端口，非根桥按照以下顺序选举
+&lt;ul&gt;
+&lt;li&gt;根路径成本最低&lt;/li&gt;
+&lt;li&gt;对端 BID 最小&lt;/li&gt;
+&lt;li&gt;对端 PID 最小&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;阻塞既不是根端口也不是指定端口的端口&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;stp-协议实践&#34;&gt;STP 协议实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;按照图中所示 BridgeID 分别配置交换机的优先级&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns_switch_priority_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns_switch_priority_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;priority 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;priority 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;进入配置模式 configure terminal&lt;/li&gt;
+&lt;li&gt;配置优先级
+&lt;ul&gt;
+&lt;li&gt;spanning-tree vlan 1 priority 4096&lt;/li&gt;
+&lt;li&gt;exit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;查看是否配置成功
+&lt;ul&gt;
+&lt;li&gt;show spanning-tree&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;重复上述命令，配置其他交换机&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;按照此拓扑推理并验证&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Switch A，优先级 4096&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;Switch A 在整个网络中优先级最高，为根桥，所有端口都为指定端口&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switcha.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switcha.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch A&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch A&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Switch B，优先级 20480&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;e0/0 与根桥的根路径成本最低，e0/0 为 RP&lt;/li&gt;
+&lt;li&gt;e1/0 与 Switch E 相连比较，e1/0 为 DP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchb.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchb.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch B&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch B&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Switch C，优先级 8192&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;同 Switch B，e1/1 为 RP，e2/0、e3/0 为 DP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchc.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchc.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch C&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch C&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Switch D，优先级 40960&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;同 Switch B，e2/2 为 RP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchd.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchd.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch D&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch D&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Switch E，优先级 8192&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;同 Switch B，e0/0 为 RP，e1/1 为 DP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switche.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switche.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch E&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch E&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Switch F，优先级 12288&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;同 Switch B，e0/0 为 RP&lt;/li&gt;
+&lt;li&gt;e1/1 与 Switch E 相连比较，e1/1 优先级更低，被阻塞&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch F&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch F&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Switch G，优先级 16384&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;推理
+&lt;ul&gt;
+&lt;li&gt;同 Switch B，e0/0 为 RP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchg.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switchg.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch G&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch G&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;关闭 Switch B，查看 Switch F 的变化
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_closeb.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_closeb.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;关闭 Switch B&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;关闭 Switch B&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;查看 Switch F
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switche_closed_switchf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/stp_gns3_switche_closed_switchf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Switch F&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Switch F&lt;/figcaption&gt;
+	
+&lt;/figure&gt;
+&lt;ul&gt;
+&lt;li&gt;可以看到 Switch F 原先被阻塞的 e1/1 端口，由于网络拓扑的改变更新为 DP&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Switch A 感知到网络拓扑发生变化后，向 Switch C、D 发送 BPDU 报文，通知 Switch C、D 把 MAC 地址表项的老化时间由默认的 300 秒修改为 Forward Delay 的时间（默认为15秒）&lt;/li&gt;
+&lt;li&gt;Switch C 继续向 Switch F 发送 BPDU 报文，Swith F 重新计算自己的 DP、RP&lt;/li&gt;
+&lt;li&gt;最多等待15秒之后，Switch F 开始 MAC 表项的学习及转发操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;stp-协议的缺点&#34;&gt;STP 协议的缺点&lt;/h3&gt;
+&lt;p&gt;由上可知，当网络中的某个设备发生故障不可用时，需要等待所有的网络设备接收和传播 BPDU，重新选举根桥、根端口、指定端口和阻塞端口，&lt;strong&gt;收敛速度慢&lt;/strong&gt;。而且在网络设备端口状态的转换过程中，数据流量会被阻塞，可能会加剧延时。除此之外，&lt;strong&gt;STP 协议对局域网仅生成一棵树，对于所有 VLAN 都使用相同的拓扑&lt;/strong&gt;。这意味着在多个 VLAN 环境中，可能存在不必要的阻塞端口。如果需要不同的拓扑或特定的 VLAN 配置，可能需要手动配置。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;总结一下，STP 协议的缺点有以下两条&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;收敛速度慢&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;不支持 VLAN&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;rstpmstp-协议&#34;&gt;RSTP、MSTP 协议&lt;/h2&gt;
+&lt;p&gt;针对 STP 协议缺点的改进，出现了 RSTP 和 MSTP 协议&lt;/p&gt;
+&lt;h3 id=&#34;rstp-协议&#34;&gt;RSTP 协议&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;RSTP 是 STP 的改进版本，它的主要目标是加速 STP 的收敛速度。&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;RSTP 引入了两种端口状态：指定端口（Designated Port）和替代端口（Alternate Port）。&lt;/li&gt;
+&lt;li&gt;RSTP 使用不同的 BPDU 格式和机制，以快速传播拓扑变化。&lt;/li&gt;
+&lt;li&gt;RSTP 的收敛速度较快，通常可以在数秒内响应拓扑变化，而不是 STP 的30秒或更长时间。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;mstp-协议&#34;&gt;MSTP 协议&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;MSTP 是STP的另一种改进版本，旨在提供更大的灵活性，特别是在多 VLAN 环境下。&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;MSTP 引入了多个实例（Instance），每个实例可以关联到一个或多个 VLAN。&lt;/li&gt;
+&lt;li&gt;MSTP 允许管理员为每个实例配置独立的树状拓扑，支持不同 VLAN，从而提高网络的灵活性。&lt;/li&gt;
+&lt;li&gt;MSTP 使用单一 BPDU 格式，但在每个实例中维护独立的树状拓扑，因此可以减少网络开销。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;stp-vs-rstp-vs-mstp&#34;&gt;STP vs RSTP vs MSTP&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;特征&lt;/th&gt;
+&lt;th&gt;STP（Spanning Tree Protocol）&lt;/th&gt;
+&lt;th&gt;RSTP（Rapid Spanning Tree Protocol）&lt;/th&gt;
+&lt;th&gt;MSTP（Multiple Spanning Tree Protocol）&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;防止环路&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;选举根桥和根端口&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;收敛速度&lt;/td&gt;
+&lt;td&gt;慢&lt;/td&gt;
+&lt;td&gt;较快&lt;/td&gt;
+&lt;td&gt;较快&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;支持多树状拓扑实例&lt;/td&gt;
+&lt;td&gt;否&lt;/td&gt;
+&lt;td&gt;否&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;带宽利用&lt;/td&gt;
+&lt;td&gt;较低&lt;/td&gt;
+&lt;td&gt;较高&lt;/td&gt;
+&lt;td&gt;较高&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;配置复杂性&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;td&gt;低&lt;/td&gt;
+&lt;td&gt;较高&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;适用性&lt;/td&gt;
+&lt;td&gt;单一 VLAN 环境&lt;/td&gt;
+&lt;td&gt;单一 VLAN 环境&lt;/td&gt;
+&lt;td&gt;多 VLAN 环境&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;设备支持&lt;/td&gt;
+&lt;td&gt;大多数网络设备支持&lt;/td&gt;
+&lt;td&gt;大多数网络设备支持&lt;/td&gt;
+&lt;td&gt;需要支持 MSTP 的设备&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+</description>
+        </item>
+        <item>
+        <title>快速理解网络协议（四）ARP、RARP 协议</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/arp-rarp/</link>
+        <pubDate>Thu, 28 Sep 2023 10:22:17 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/arp-rarp/</guid>
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/4-arp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/4-arp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;本文概览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;本文概览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;arp-协议过程解析&#34;&gt;ARP 协议过程解析&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;同一子网中&#34;&gt;同一子网中&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;假设 Client A 和 Client D 在&lt;strong&gt;同一个子网&lt;/strong&gt;中，Client A 要向 Client D 发送一个 IP 数据包（IP Packet）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Client A 查看自己的 ARP 缓存表，判断是否包含 Client D 对应的 ARP 表项。如果有，则直接利用 ARP 缓存表中的 MAC 地址，对 IP 数据包进行帧封装，发送数据帧给 Client D&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;若 Client A 的 ARP 缓存表中，没有包含 Client D 的信息，则 Client A 先将此数据帧缓存，以&lt;strong&gt;广播&lt;/strong&gt;的形式发送 ARP 请求报文，交换机收到广播包时，会原样复制该包到除源端口外的所有端口，具体包格式如下图&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_detail.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_detail.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request Packet&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request Packet&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;dMAC 目标 MAC 地址 ff:ff:ff:ff:ff:ff ，即广播包&lt;/li&gt;
+&lt;li&gt;sMAC 源 MAC 地址，即 Client A 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;type 数据帧类型为 ARP&lt;/li&gt;
+&lt;li&gt;ARP 数据报文内容 &lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;
+&lt;ul&gt;
+&lt;li&gt;HType（Hardware Type）硬件类型，标识链路层协议，当为 1 时表示以太网&lt;/li&gt;
+&lt;li&gt;PType（Protocol Type）协议类型，标识网络层协议，当为 0x0800 时表示 IPv4 协议&lt;/li&gt;
+&lt;li&gt;HLen（Hardware Length），硬件地址长度，以太网的长度为 6&lt;/li&gt;
+&lt;li&gt;PLen（Protocol Length），协议地址长度，IPv4 的长度为 4&lt;/li&gt;
+&lt;li&gt;Opcode 操作码，1 表示 ARP 请求（“Request”）&lt;/li&gt;
+&lt;li&gt;Sender MAC、Sender IP，为 Client A 的 MAC 地址 和 IP 地址&lt;/li&gt;
+&lt;li&gt;Target MAC 为 00:00:00:00:00:00，说明此时 Client A 还不知道 Client D 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;Target IP 为 Client D 的 IP 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client D 比较自己的 IP 地址和 ARP 请求报文中的 Target IP 地址，若二者相同，将 ARP 请求报文中的 Sender MAC、Sender IP 地址信息存入自己的 ARP 缓存表中，以&lt;strong&gt;单播&lt;/strong&gt;的形式返回 ARP 响应报文 &lt;strong&gt;（Client C 也会将 Client A 的 IP、MAC 地址缓存在自己的 ARP 缓存表中，但并不响应 ARP 请求）。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_detail_1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_detail_1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply Packet&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply Packet&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;dMAC 目标 MAC 地址，即 Client A 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;sMAC 源 MAC 地址，即 Client D 的 MAC 地址&lt;/li&gt;
+&lt;li&gt;type 数据帧类型为 ARP&lt;/li&gt;
+&lt;li&gt;ARP 数据报文内容
+&lt;ul&gt;
+&lt;li&gt;HType、PType、HLen、PLen 与 ARP 包请求相似&lt;/li&gt;
+&lt;li&gt;Opcode 为 “Reply”，即 ARP 响应包&lt;/li&gt;
+&lt;li&gt;Sender MAC、Sender IP，为 Client D 的 MAC 地址 和 IP 地址&lt;/li&gt;
+&lt;li&gt;Target MAC、Target IP， 为 Client A 的 MAC 地址 和 IP 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;同一子网内-arp-抓包实践&#34;&gt;同一子网内 ARP 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;申请在同一个 VPC 下的 2 台云主机，内网地址分别为 10.23.139.22、10.23.197.59&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;登陆到 10.23.139.22，使用命令 arp -n 查看已经存在的 arp 缓存表项。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_n.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_n.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;arp -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;arp -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;如果这里发现已经有了 10.23.197.59 的缓存，使用命令 arp -d 10.23.197.59 删掉缓存，删完之后再 check 下，如果没有的话就继续下一步。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_d.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_d.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;arp -d&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;arp -d&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用 tcpdump -i eth0 arp -w arp.pcap 命令开始抓包&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;再开一个 tab，还是登陆到 10.23.139.22，执行命令 ping 10.23.197.59，对 10.23.197.59 发送一个 ICMP 报文&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;结束抓包，将 arp.pcap 下载到本地，用 wireshark 打开 arp.pcap&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Request&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_req.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_req.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可以看到 ARP 报文中的目标 MAC 地址是 00:00:00:00:00:00，而外层的目标 MAC 地址是 ff:ff:ff:ff:ff:ff，即广播&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Reply&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_rep.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_rep.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ARP Reply 报文中，由于已经知道目标 MAC 地址，直接以单播的形式返回&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;跨网段&#34;&gt;跨网段&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_wan.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/arp_wan.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP&lt;/figcaption&gt;
+	
+&lt;/figure&gt;
+假设 Client A 和 Client D 不在同一个子网中，Client A 要向 Client D 发送一个 IP 数据包（IP Packet），还会像在同一子网内那样发送 ARP 报文吗？答案是否定的，这里要分两种情况，Client A 本身是否存在网关。由于之前已经解析过 ARP 报文中的具体字段，之后的 ARP 报文我们就只关注于字段的值而不再赘述字段含义。&lt;/p&gt;
+&lt;h4 id=&#34;普通-arp跨子网有网关&#34;&gt;普通 ARP（跨子网有网关）&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;Client A 和 Client D 不在同一个子网中且 Client A 存在网关&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Client A 首先发现目标 IP 是跨网段的，并且 Client A 此时有网关，那么 Client A 就会发送 ARP 报文去查找网关的 MAC 地址，而不是跨网段的目标 IP 的 MAC 地址（本地无网关 MAC 地址缓存）&lt;/li&gt;
+&lt;li&gt;Client A 以&lt;strong&gt;广播&lt;/strong&gt;的形式发送 ARP 请求报文&lt;/li&gt;
+&lt;li&gt;网关以单播的形式返回 ARP 响应报文&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨子网有网关的-arp-抓包实践&#34;&gt;跨子网有网关的 ARP 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;路由器配置地址 192.168.1.1 和 10.10.10.1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_router_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_router_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Router 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Router 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;进入配置模式 configure terminal&lt;/li&gt;
+&lt;li&gt;配置接口 int e0/0
+&lt;ul&gt;
+&lt;li&gt;ip add 192.168.1.1 255.255.255.0&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;li&gt;exit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;e1/0 与 e0/0 相同&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client D-ARP 配置地址 10.10.10.20&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_d_arp_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_d_arp_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Client D-ARP 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Client D-ARP 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ip 10.10.10.20/24 10.10.10.1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client A 配置地址 192.168.1.100 和 网关地址 192.168.1.1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_a_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_a_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Client A 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Client A 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;注意这里的 Client A 是由路由器模拟的，为了方便后续的 proxy arp 实验&lt;/li&gt;
+&lt;li&gt;进入配置模式 configure terminal&lt;/li&gt;
+&lt;li&gt;配置接口 int e0/0
+&lt;ul&gt;
+&lt;li&gt;ip add 192.168.1.100 255.255.255.0&lt;/li&gt;
+&lt;li&gt;no shut&lt;/li&gt;
+&lt;li&gt;exit&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;关闭路由功能 no ip routing&lt;/li&gt;
+&lt;li&gt;设置默认网关 ip default-gateway 192.168.1.1&lt;/li&gt;
+&lt;li&gt;退出配置模式后，检查下是否配置成功 show ip route&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开始抓包&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 Client A 上 ping 10.10.10.20
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_arp_ping.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_arp_ping.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ping 10.10.10.20&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ping 10.10.10.20&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Request&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_arp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_arp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;仍旧是广播的形式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可以看到 Target IP 是 192.168.1.1 即网关的地址，而不是 10.10.10.20&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Reply&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_arp_rep.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_arp_rep.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;网关单播回复 ARP Reply，附上自己的 MAC 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;proxy-arp跨子网无网关&#34;&gt;Proxy ARP（跨子网无网关）&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;Client A 和 Client D 不在同一个子网中且 Client A 不存在网关&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;先来看看什么是 Proxy ARP
+&lt;ul&gt;
+&lt;li&gt;当局域网内部主机发起跨网段的 ARP 请求，&lt;strong&gt;网关设备开启 ARP 代理功能且知道目标的路由信息时&lt;/strong&gt;，会使用自身的 MAC 地址回复该请求&lt;/li&gt;
+&lt;li&gt;这里有两个非常重要的点，一个是 Proxy ARP 需要网关设备支持且开启 ARP 代理功能，这说明 &lt;strong&gt;Proxy ARP 依赖且受限于网关设备&lt;/strong&gt;，因此必定会来可扩展性差和不可靠的缺点。另一个是&lt;strong&gt;网关设备会用自身的 MAC 地址回复 ARP 请求报文&lt;/strong&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Proxy ARP 和普通 ARP 的请求路径类似，唯一不同的是 ARP 请求报文中的 Target IP Address 中的值是目标 IP（而不是网关 IP）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;跨子网无网关的-arp-抓包实践&#34;&gt;跨子网无网关的 ARP 抓包实践&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;gns3 网络拓扑及配置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_topo.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_topo.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GNS3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GNS3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;路由器和上述相同&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client D-ProxyARP 类似，配置地址换为 10.10.10.10&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Client A 这里要关闭路由功能（上述已关闭）且去掉默认网关&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_a_proxyarp_conf.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_a_proxyarp_conf.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Client A 配置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Client A 配置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;no ip default-gateway&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开始抓包&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 Client A 上 ping 10.10.10.10&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_proxyarp_ping.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_proxyarp_ping.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ping 10.10.10.10&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ping 10.10.10.10&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Request&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_proxyarp.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_proxyarp.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Request&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Request&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;仍旧是广播的形式&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可以看到 Target IP 是 10.10.10.10 即目标地址，而不是网关地址&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ARP Reply&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_proxyarp_rep.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/gns3_proxyarp_rep.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ARP Reply&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ARP Reply&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;仍旧是网关单播回复 ARP Reply，附上自己的 MAC 地址&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;arp-缓存&#34;&gt;ARP 缓存&lt;/h2&gt;
+&lt;h3 id=&#34;arp-动态表项&#34;&gt;ARP 动态表项&lt;/h3&gt;
+&lt;p&gt;由 ARP 协议通过 ARP 报文自动生成和维护，可以被 ARP 静态表项覆盖，可以被 ARP 报文更新，可以过期&lt;/p&gt;
+&lt;h3 id=&#34;arp-静态表项&#34;&gt;ARP 静态表项&lt;/h3&gt;
+&lt;p&gt;手动配置和维护，不会被 ARP 动态表项覆盖，不会被 ARP 报文更新，不会过期&lt;/p&gt;
+&lt;h2 id=&#34;gratuitous-arp免费-arp&#34;&gt;Gratuitous ARP（免费 ARP）&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Gratuitous ARP 是一种特殊的 ARP 请求。当主机启动时，发送一个 Gratuitous ARP 请求，即请求自己的 IP 地址和 MAC 地址，即目标 IP 地址为 自己的 IP 地址。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Gratuitous ARP 的作用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;以广播的形式发送自己的 IP 地址 和 MAC 地址，在网络中宣告自己的信息，可以是宣告新添加的主机或者更新自己的 MAC 地址&lt;/li&gt;
+&lt;li&gt;检测 IP 地址冲突，若收到了 ARP 响应报文，则说明网络中已存在使用该 IP 地址的主机&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;arp-欺骗及防御&#34;&gt;ARP 欺骗及防御&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;由于 ARP 请求不会验证 ARP 响应报文，若此时有主机在收到广播 ARP 请求报文后伪造 ARP 响应报文，则可以欺骗发送方，伪造 IP 地址 - MAC 地址 的映射关系
+&lt;ul&gt;
+&lt;li&gt;劫持通信内容&lt;/li&gt;
+&lt;li&gt;广播攻击&lt;/li&gt;
+&lt;li&gt;丢弃通信，拒绝服务&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;防御措施
+&lt;ul&gt;
+&lt;li&gt;建立正确的 ARP 映射关系、检测并过滤伪造的 ARP 报文，保证经过其转发的 ARP报文正确合法&lt;/li&gt;
+&lt;li&gt;抑制短时间内大量 ARP 报文的冲击&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;arp-常见命令&#34;&gt;ARP 常见命令&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;查看 arp 表项 arp -a/ arp -e&lt;/li&gt;
+&lt;li&gt;删除 arp 表项 arp -d，例：arp -i eth1 -d 192.168.60.1&lt;/li&gt;
+&lt;li&gt;添加 arp 表项 arp -s，例：arp -s IP MAC-ADDRESS&lt;/li&gt;
+&lt;li&gt;更多：arp -h&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rarp-协议&#34;&gt;RARP 协议&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Reverse Address Resolution Protocol 反向地址转换协议，用于获得已知 MAC 地址的 IP 地址。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;一般在主机刚接入网络时，通过本地 MAC 地址来发送 RARP 请求，如果局域网内有 RARP Server 且 Server 上存在关于此 MAC 地址的映射 IP，则会返回 RARP Reply 响应，此时主机就获取了 IP 地址。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;需要 RARP 服务器，一般用于无法使用 DHCP 或没有任何输入接口的小型嵌入式设备&lt;/li&gt;
+&lt;li&gt;主机以广播的形式发送 RARP 请求包，声明自己的 MAC 地址，并请求分配一个 IP 地址&lt;/li&gt;
+&lt;li&gt;RARP 服务器收到 RARP 请求包后，检查 RARP 列表，查找该 MAC 地址对应的 IP 地址
+&lt;ul&gt;
+&lt;li&gt;若存在，则返回 RARP 响应包，成功分配 IP 地址&lt;/li&gt;
+&lt;li&gt;若不存在，则不做任何响应，分配 IP 地址失败&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;更多参数值查看：https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml#arp-parameters-3&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+        </item>
+        <item>
+        <title>快速理解网络协议（三）MAC 层</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/mac-layer/</link>
+        <pubDate>Wed, 23 Aug 2023 17:16:32 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/mac-layer/</guid>
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/3-mac.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/3-mac.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;本文概览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;本文概览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;物理层-physical-layer&#34;&gt;物理层 Physical Layer&lt;/h2&gt;
+&lt;p&gt;虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;物理层，顾名思义，表示实际的物理链接。物理层利用物理传输介质为通信的两端建立链接，实现比特流的传输，如铜线、光缆或无线通道，保证比特流正确的传输到对端。常见设备包括&lt;strong&gt;中继器、集线器&lt;/strong&gt;等。其中集线器 Hub，完全在物理层工作，会将自己收到的每一个字节，都复制到其他端口上去，即广播模式。&lt;/p&gt;
+&lt;h2 id=&#34;mac-层-link-layer&#34;&gt;&lt;strong&gt;MAC 层 Link Layer&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;链路层，又称 MAC 层。MAC 的全称为 Medium Access Control，即媒体访问控制，主要有两个功能，&lt;strong&gt;寻址和控制&lt;/strong&gt;。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;寻址，即如何找到数据帧接收方&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;控制，即谁先发、谁后发，发送出现问题如何处理&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;解决控制问题&#34;&gt;&lt;strong&gt;解决“控制”问题&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;在以太网中，两个节点间传输的数据最终都会转换成电信号，在物理传输介质上发送出去。物理传输介质肯定是共享的，在发送数据时需要考虑谁先发、谁后发、同时发送时怎么避免冲突、出现问题怎么处理等。&lt;strong&gt;这就是多路访问问题，即如何协调多个发送和接收节点对单一共享广播信道的访问。&lt;/strong&gt; 计算机网络使用多路访问协议来规范它们在共享的广播信道上的传输行为。&lt;/p&gt;
+&lt;h4 id=&#34;多路访问协议&#34;&gt;&lt;strong&gt;多路访问协议&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;我们可以先来思考一下，理想情况下在共享信道上期望怎么传输数据。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;如果只有一个节点需要发送数据，那么我们期望它可以以整个信道的速率 R 发送数据&lt;/li&gt;
+&lt;li&gt;如果有 M 个节点需要同时发送数据，那么我们期望它可以以信道的传输速率 R / M来发送数据&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;规划车道 ➡️ 信道划分协议 Channel Partitioning Protocol&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;采用多路复用技术，将链路、网络资源（如带宽）划分为“资源片”，将“资源片”分配给各路通信，每路通信&lt;strong&gt;独占&lt;/strong&gt;其分配到的资源片进行通信。这样的划分方式，可以满足理想情况 2。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;依次排队&lt;/strong&gt; ➡️ &lt;strong&gt;轮转协议 Taking-turns Protocol&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;多个节点轮流发送数据。当只有一个结点活跃时，以信道的全部发送速率 R 发送；当有M个结点活跃时，每个活跃结点的吞吐量接近 R/M。完全满足理想情况 1，几乎满足理想情况 2。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;随机应变&lt;/strong&gt; ➡️ &lt;strong&gt;随机访问协议 Random Access Protocol&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;节点总是以信道的全部速率发送数据，传输时可能且允许出现冲突。当检测到冲突时通过延时重传等方式恢复，&lt;strong&gt;这也是以太网使用的方式。&lt;/strong&gt; 完全满足理想情况 1，几乎满足理想情况 2。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在轮转协议和随机访问协议中，好像都可以满足理想情况。为什么以太网使用的是随机访问协议而不是轮转协议？主要有以下三个原因&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;网络架构更简单&lt;/strong&gt;，所有设备都可以同时发送和接收数据，不需要等待其他设备的轮转时机&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;更加灵活和高效&lt;/strong&gt;，随机访问协议允许多个设备同时发送数据，不需要进行时间调度或协调&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可扩展性高&lt;/strong&gt;，新设备可以随时连接到网络，并立即开始发送和接收数据，不需要调度或配置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;解决寻址问题&#34;&gt;&lt;strong&gt;解决“寻址”问题&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;MAC 地址是指网络设备的硬件地址，是由网络设备的制造商烧录在设备的网卡中的一个全球唯一的地址，如果一台设备有多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址。MAC 地址共 48 位（6个字节），以十六进制表示。&lt;/p&gt;
+&lt;p&gt;当数据传输时，源设备会根据目标设备的 MAC 地址 “寻址” ，确保数据能够被正确地传送到目标设备。当设备接收到数据后，如果发现目的地址与本地 MAC 地址不一致，则会丢弃，只有真正的目标设备才会接收并处理收到的数据。&lt;/p&gt;
+&lt;p&gt;MAC 地址是一个局域网（LAN）范围内的地址，它只在局域网中起作用，不能直接进行跨网络通信。在局域网中，可以通过交换机（Switch）来完成数据的传输。交换机通过学习和记录连接到它的设备的 MAC 地址，根据 MAC 地址来决定数据的转发。而在互联网中，数据通常是通过路由器（Router）等设备进行转发，而不是根据 MAC 地址进行直接传输。&lt;/p&gt;
+&lt;h4 id=&#34;获取-mac-地址&#34;&gt;&lt;strong&gt;获取 MAC 地址&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;在网络通信中，使用 MAC 地址直接进行通信是不可行的，我们借助 IP 地址作为中间桥梁来实现通信。在局域网中，知道了要发送的 IP 地址，该如何获得目标设备的 MAC 地址呢？&lt;/p&gt;
+&lt;p&gt;每个设备的网卡的 MAC 地址都是固定的，我们可以手动一个个添加局域网中其他设备的 MAC 地址，随着局域网中的主机越来越多，这种方式难以为继。我们需要自动获取、更新和维护各个设备的 MAC 地址，这就是 Address Resolution Protocol。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ARP 协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址&lt;/strong&gt;。而手动配置 MAC 地址的方式，一般是出于安全考虑，为了防止非法用户访问，由网络管理员手动在 MAC 地址表中添加合法用户的 MAC 地址表项，当手动配置的数量比较大时，难以人工维护，可以使用端口安全功能实现 MAC 地址和接口的动态绑定。&lt;/p&gt;
+&lt;p&gt;具体的 ARP 协议内容，查看&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/arp-rarp/&#34; &gt;&lt;strong&gt;快速理解网络协议（四）ARP、RARP 协议&lt;/strong&gt;&lt;/a&gt;。&lt;/p&gt;
+&lt;h3 id=&#34;mac-层的传输单位-frame&#34;&gt;&lt;strong&gt;MAC 层的传输单位 Frame&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;以太网帧 Ethernet frame 是 MAC 层传输数据的基本单位&lt;/strong&gt;。其中 MAC 头部包含 目标 MAC 地址、源 MAC 地址 和 类型。类型标识了传输数据的封装协议&lt;sup id=&#34;fnref:2&#34;&gt;&lt;a href=&#34;#fn:2&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;2&lt;/a&gt;&lt;/sup&gt;。常见的类型有，0x0800 表示 IPv4 数据报，0x0806 表示 ARP 数据报，0x86DD 表示 IPv6 数据报&lt;sup id=&#34;fnref:3&#34;&gt;&lt;a href=&#34;#fn:3&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;3&lt;/a&gt;&lt;/sup&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/mac_frame.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/mac_frame.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;frame&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;frame&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;目标 MAC 地址：表示数据帧应该被发送到哪个网络设备，由 6 个字节组成&lt;/li&gt;
+&lt;li&gt;源 MAC 地址：表示数据帧是从哪个网络设备发送的，同样由 6 个字节组成&lt;/li&gt;
+&lt;li&gt;类型：表示数据帧类型，0800 表示 IP 数据包，0806 表示 ARP 数据包&lt;/li&gt;
+&lt;li&gt;数据：实际的数据内容，长度可变&lt;/li&gt;
+&lt;li&gt;CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据帧在发送的过程中是否出现了错误&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;小测验&#34;&gt;&lt;strong&gt;小测验&lt;/strong&gt;&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;在物理层工作的常见设备有哪些？&lt;/li&gt;
+&lt;li&gt;在 MAC 层工作的常见设备有哪些？&lt;/li&gt;
+&lt;li&gt;MAC 层传输数据的基本是什么？它的头的格式是什么？每个字段的含义和作用是什么？&lt;/li&gt;
+&lt;li&gt;如何通过 IP 地址获取 MAC 地址？&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;footnotes&#34; role=&#34;doc-endnotes&#34;&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id=&#34;fn:1&#34;&gt;
+&lt;p&gt;有些文章描述 TCP/IP 模型有五层，其中包括了物理层 Physical Layer。但在 RFC 1122 中未指定物理层，我还是倾向于四层。详情可参考：https://datatracker.ietf.org/doc/html/rfc1122#page-8&amp;#160;&lt;a href=&#34;#fnref:1&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:2&#34;&gt;
+&lt;p&gt;以太网II帧：https://en.wikipedia.org/wiki/Ethernet_frame#Ethernet_II&amp;#160;&lt;a href=&#34;#fnref:2&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li id=&#34;fn:3&#34;&gt;
+&lt;p&gt;更多类型含义：https://en.wikipedia.org/wiki/EtherType#Values&amp;#160;&lt;a href=&#34;#fnref:3&#34; class=&#34;footnote-backref&#34; role=&#34;doc-backlink&#34;&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+        </item>
+        <item>
+        <title>快速理解网络协议（二）TCP/IP 协议模型</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/tcp-ip-model/</link>
+        <pubDate>Wed, 23 Aug 2023 14:52:03 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/tcp-ip-model/</guid>
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/2-tcpip.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/2-tcpip.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;本文概览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;本文概览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;tcpip-协议模型&#34;&gt;&lt;strong&gt;TCP/IP 协议模型&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/tcpip.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/tcpip.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;TCP/IP 协议模型&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;TCP/IP 协议模型&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;我们从下往上依次介绍这些层级，有一个很重要的原因是，&lt;strong&gt;在网络中传输的数据包，会按照这些层级来封装报文，一个数据包只可能有下层没上层，绝不会有上层没下层（这句话要牢牢记住）。&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;层级&lt;/th&gt;
+&lt;th&gt;作用&lt;/th&gt;
+&lt;th&gt;在此层的协议&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;链路层&lt;/td&gt;
+&lt;td&gt;负责节点之间数据的传输控制和寻址&lt;/td&gt;
+&lt;td&gt;ATM, PPP 等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;网络层&lt;/td&gt;
+&lt;td&gt;负责数据包的路由和转发&lt;/td&gt;
+&lt;td&gt;IP, ICMP, OSPF 等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;传输层&lt;/td&gt;
+&lt;td&gt;负责数据端到端之间的具体传输行为控制&lt;/td&gt;
+&lt;td&gt;TCP, UDP 等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;应用层&lt;/td&gt;
+&lt;td&gt;负责不同应用使用的通信协议的数据封装&lt;/td&gt;
+&lt;td&gt;HTTP, SMTP, FTP, DNS, SSH 等&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;链路层&#34;&gt;&lt;strong&gt;链路层&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;链路层负责节点之间数据的传输控制和寻址，重点在于&lt;strong&gt;控制和寻址。控制，即谁先发，谁后发，发送时出现问题如何处理；寻址，即如何找到数据包的接收方。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解决 “控制” 问题&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;网络中的链路分为两种类型，点对点链路 和 广播链路。点对点链路，由链路一端的单个发送方和链路另一端的单个接收方组成，如 点对点协议（PPP，Point-to-Point Protocol）、高级数据链路控制（HDLC，High-level Data Link Control）。广播链路，能够让多个发送和接收节点都连接到相同的、单一的、共享的广播信道上。很明显，在点对点链路中，由于只有两个节点参与通信，因此不需要进行数据传输的控制，“控制“ 主要解决的问题是如何协调多个发送和接收节点对单一共享广播信道的访问，即**多路访问问题。**为了解决多路访问问题，于是出现了多路访问控制协议，Multiple Access Control 简称 MAC。&lt;/p&gt;
+&lt;p&gt;常见的多路访问协议&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;信道划分协议 Channel Partitioning Protocol
+&lt;ul&gt;
+&lt;li&gt;采用多路复用技术，将链路、网络资源（如带宽）划分为“资源片”，将“资源片”分配给各路通信，每路通信独占其分配到的资源片进行通信&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;轮转协议 Taking-turns Protocol
+&lt;ul&gt;
+&lt;li&gt;多个节点轮流发送数据&lt;/li&gt;
+&lt;li&gt;当只有一个结点活跃时，以信道的全部发送速率 R 发送；当有M个结点活跃时，每个活跃结点的吞吐量接近 R/M&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;随机访问协议 Random Access Protocol
+&lt;ul&gt;
+&lt;li&gt;以信道的全部速率发送数据，检测到冲突时通过延时重传等方式恢复&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;以太网使用的方式&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;解决 “寻址” 问题&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;这里要用到一个物理地址，叫作链路层地址，或 MAC 地址。&lt;strong&gt;MAC 地址用于在网络中唯一标示一个网卡（并不是设备）&lt;/strong&gt;，一台设备若有一或多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址。&lt;/p&gt;
+&lt;p&gt;在此层的头部一般被称为 MAC 头。具体格式如下图橙色部分&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/macheader.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/macheader.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;MAC 头&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;MAC 头&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;目标 MAC 地址：表示数据包应该被发送到哪个网络设备，由 6 个字节组成&lt;/li&gt;
+&lt;li&gt;源 MAC 地址：表示数据包是从哪个网络设备发送的，同样由 6 个字节组成&lt;/li&gt;
+&lt;li&gt;类型：表示数据包类型，0800 表示 IP 数据包，0806 表示 ARP 数据包&lt;/li&gt;
+&lt;li&gt;数据：实际的数据内容，长度可变&lt;/li&gt;
+&lt;li&gt;CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据包在发送的过程中是否出现了错误&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;网络层&#34;&gt;&lt;strong&gt;网络层&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;网络层负责数据包的路由和转发，重点在于&lt;strong&gt;路由，即选择合适的路径转发到目标主机。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;网络层使用 IP 协议来提供基本的数据传输服务，包括数据包的路由、分组和转发等功能。IP 协议使用 &lt;strong&gt;IP 地址唯一标识网络中的设备&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;IP 地址主要有两个作用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;定位，即提供设备网络中的“位置”信息&lt;/li&gt;
+&lt;li&gt;路由，即数据包选择什么 “路径” 到达目标设备&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在此层的头部一般被称为 IP 头。IPv4 头具体格式如图所示&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/ipheader.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/ipheader.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;IPv4 头&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;IPv4 头&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;IPv4 头&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;版本：指定 IP 协议的版本，4 表示 IPv4，占用 4 bits&lt;/li&gt;
+&lt;li&gt;首部长度 IHL：表示 IP 头的长度，占用 4 bits&lt;/li&gt;
+&lt;li&gt;区分服务：用于标识网络中不同类型的数据流，只有在使用区分服务时，此字段才有作用，占用 6 bits&lt;/li&gt;
+&lt;li&gt;显示拥塞通告：可选功能，在两端都支持且底层网络支持时可被使用，占用 2 bits&lt;/li&gt;
+&lt;li&gt;全长：IP 数据报总长度，包括 IP 首部和 IP 数据部分的长度，占用 16 bits&lt;/li&gt;
+&lt;li&gt;标识符：唯一标识一个 IP 数据报的所有分片，占用 16 bits&lt;/li&gt;
+&lt;li&gt;标志：用于控制和识别报文的分片，占用 3 bits&lt;/li&gt;
+&lt;li&gt;分片偏移：用于标识每个分片相对于原始报文开头的偏移量，占用 13 bits&lt;/li&gt;
+&lt;li&gt;生存时间：用于防止 IP 数据报在网络中无限循环，作为跳数计数器，每经过一个路由都会减 1，为0时，将丢弃该数据报，占用 8 bits&lt;/li&gt;
+&lt;li&gt;协议：表示 IP 数据报中使用的上层协议类型，例如 TCP、UDP 等，占用 8 bits&lt;/li&gt;
+&lt;li&gt;首部校验和：用于检验 IP 首部（不包括数据部分）在传输过程中是否有错，占用 16 bits&lt;/li&gt;
+&lt;li&gt;源地址：IP 数据报的源地址&lt;/li&gt;
+&lt;li&gt;目的地址：IP 数据报的目的地址&lt;/li&gt;
+&lt;li&gt;选项：其他附加信息，首部长度必须是 32 的倍数，若不满足则填充 EOL（0x00），直至满足&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;传输层&#34;&gt;&lt;strong&gt;传输层&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;传输层负责数据端到端之间的具体传输行为控制，重点在于&lt;strong&gt;端到端和传送控制。端到端，即将数据具体送达至哪个程序，传送控制，即如何将数据送达到目的地。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;传输层上有两个最重要也最常见的协议，TCP 和 UDP，用于端到端的数据传输控制。这两块的内容比较复杂和重要，后面会专门拿出来单独说明，在此就先不赘述了。&lt;/p&gt;
+&lt;h3 id=&#34;应用层&#34;&gt;&lt;strong&gt;应用层&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;应用层负责不同应用使用的通信协议的数据封装，重点在于&lt;strong&gt;通信协议的数据封装，即在通信时按照哪种格式如何封装数据。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;应用层上的协议是和我们日常开发息息相关的，比如程序使用 HTTP 协议发送一个 HTTP 请求、使用 SMTP 协议向客户发送一封邮件等等。在应用层上，每个协议的封装和解析是协议特有的，HTTP 协议的数据不能被 SMTP 协议解析。&lt;/p&gt;
+&lt;h2 id=&#34;分层的原因&#34;&gt;&lt;strong&gt;分层的原因&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;任何复杂、大型的工程都需要分层来实现模块化，用来降低不同模块之间耦合度，提高模块之间的可替代性和整个工程的复杂度。分层带来的优点有以下几个方面：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;降低不同层级、模块之间的耦合度，提高网络的灵活性。每层的功能和任务清晰且明确，可以分别设计和实现，使得单一协议或模块的开发、维护、升级变得更加容易。&lt;/li&gt;
+&lt;li&gt;提高相同层级内模块的可替代性。比如 DNS 协议，既可以使用 TCP 协议又可以使用 UDP 协议作为传输层协议。&lt;/li&gt;
+&lt;li&gt;更低的层级可以统一的向上提供服务，比如传输层的 TCP 协议可以为应用层的 HTTP、FTP 协议等提供服务。&lt;/li&gt;
+&lt;li&gt;促进了层级和模块的标准化，使得网络在技术和商业上更加开放和透明。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在日常的开发设计中，我们也要将这种分层的思想融入到自己开发的系统中。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;模块化或分层：将系统按照不同的功能和职责进行分层，使系统的各个部分职责清晰、功能单一、易于维护和扩展。&lt;/li&gt;
+&lt;li&gt;标准化：遵循接口规范，对不同层之间的数据传输进行约束和规范，从而提高系统的稳定性、可靠性和可维护性。&lt;/li&gt;
+&lt;li&gt;可替代性：通过定义接口和协议来约束不同层之间的数据传输，降低模块间的耦合度，提高模块的可替代性。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;小测验&#34;&gt;&lt;strong&gt;小测验&lt;/strong&gt;&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;TCP/IP 协议模型有几层，它们的作用分别是什么？&lt;/li&gt;
+&lt;li&gt;在网络中的数据包，有没有可能有 TCP 头，但是没有 IP 头？如果有的话，举例说明。&lt;/li&gt;
+&lt;li&gt;在网络中的数据包，有没有可能有 TCP 头，但是没有 HTTP 头？如果有的话，举例说明。&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>快速理解网络协议（一） IP 地址、MAC 地址</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/ip-mac-address/</link>
+        <pubDate>Tue, 22 Aug 2023 14:50:03 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/ip-mac-address/</guid>
+        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;快速理解网络协议（一），基础知识的补充&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/1-ipmac.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/1-ipmac.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;本文概览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;本文概览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;ip-地址&#34;&gt;&lt;strong&gt;IP 地址&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是在 IP 协议下使用的地址，IP 地址有三个主要功能：&lt;strong&gt;标识设备或网络、定位和选择路由&lt;/strong&gt;。由于 IPv4 是第一个架构中的主要版本，所以在没有特殊说明的时候，IP 地址一般指的是 IPv4 地址。&lt;/p&gt;
+&lt;h3 id=&#34;ipv4-地址&#34;&gt;&lt;strong&gt;IPv4 地址&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;一个 IPv4 地址被 “.” 分割成 4 个部分，每个部分 8 个 bit，总共 32 位，使用十进制表示。在设计之初，IPv4 地址被分成 5 类，如下图所示，我们平时接触到的基本是 ABC 三类。一个 IPv4 地址被分为两部分，网络号 + 主机号，这种地址分类的方式叫做&lt;strong&gt;分类网络&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/ipv4.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/ipv4.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;IPv4地址分类&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;IPv4地址分类&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;在分类网络中，A、B、C 三类的 IPv4 地址的数量分割一点都不合理，范围跨度太大了。随着互联网的快速发展，CIDR 取代了分类网络。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;CIDR （Classless Inter-Domain Routing ）无类别域间路由&lt;/strong&gt;，旨在重新划分地址空间，将地址块可以较为自由合理的分配给用户。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CIDR（“/” 后带着数字这种表示形式，“/” 后）将 32 位的 IP 地址一分为二，网络号 + 主机号，例如 100.100.100.2/24，前 24 位是网络号，后 8 位是主机号&lt;/li&gt;
+&lt;li&gt;网络号全为 1 的就是子网掩码，主机号全为 1 的就是广播地址&lt;/li&gt;
+&lt;li&gt;将子网掩码和 IP 地址按位计算 AND，可以得到网络号，即&lt;strong&gt;可以判断一个 IP 地址是不是在当前子网内&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;示例：&lt;/strong&gt; 100.100.100.2/24&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;子网掩码：255.255.255.0&lt;/li&gt;
+&lt;li&gt;广播地址：100.100.100.255，所有 100.100.100 网络里面的机器都可以收到&lt;/li&gt;
+&lt;li&gt;100.100.100.20 与子网掩码做按位与运算，得到 100.100.100.0，即为网络号&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;易错计算：&lt;/strong&gt; 求 16.158.165.91/22 的网络号、第一个地址、子网掩码和广播地址&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;16.158.165.91/22 → 16.158. 101001/01. 01011011&lt;/li&gt;
+&lt;li&gt;网络号：16.158. 101001/00.0 → 16.158.164.0&lt;/li&gt;
+&lt;li&gt;第一个地址：16.158.164.1&lt;/li&gt;
+&lt;li&gt;子网掩码：255.255.252.0&lt;/li&gt;
+&lt;li&gt;广播地址：16.158.167.255&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;常见特殊-ipv4-地址&#34;&gt;&lt;strong&gt;常见特殊 IPv4 地址&lt;/strong&gt;&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;127.0.0.1 表示本机地址&lt;/li&gt;
+&lt;li&gt;0.0.0.0 有两种含义，默认路由地址和通配符地址。默认路由地址我们之后再说。通配符地址指的是，若进程监听了通配符地址，那么进程监听了本机上的所有 IP 地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;ipv6-地址&#34;&gt;&lt;strong&gt;IPv6 地址&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;由于互联网的快速兴起，导致 IPv4 地址很快就不够用了，于是出现了 IPv6 地址。一个 IPv6 地址被 “:” 分为 8 个部分，每个部分以 4 位十六进制方式表示，总共 128 位。比如：2001:0db8:85a3:08d3:1319:8a2e:0370:734。&lt;/p&gt;
+&lt;p&gt;IPv6 地址和 IPv4 地址相似，也使用网络号 + 主机号的形式划分。一个 IPv4 地址可以很容易的转换成一个 IPv6 地址，如果一个地址是 IPv4 地址，可以直接表示成，::ffff:IPv4地址，比如 ::ffff:192.168.89.9，这种格式叫做**IPv4映射地址。**而::1 类似于 IPv4 中的 127.0.0.1。&lt;/p&gt;
+&lt;h3 id=&#34;ip-地址的功能&#34;&gt;&lt;strong&gt;IP 地址的功能&lt;/strong&gt;&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;标识设备或网络、定位，提供设备在网络中的位置信息&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;选择路由，在网络传输中，通过 IP 地址选择路由&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;mac-地址&#34;&gt;&lt;strong&gt;MAC 地址&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;和 IP 地址相似，由于此地址作用于 MAC 层，所以称之为 MAC 地址。MAC 地址是指网络设备的硬件地址，是由网络设备的制造商烧录在设备的网卡中的一个&lt;strong&gt;全球唯一&lt;/strong&gt;的地址。类比现实生活的话，IP 地址更像是精确到门牌号的地址信息，而 MAC 地址则是拥有唯一身份证号的“人”。&lt;/p&gt;
+&lt;h2 id=&#34;ip-地址-和-mac-地址的区别&#34;&gt;&lt;strong&gt;IP 地址 和 MAC 地址的区别&lt;/strong&gt;&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;区别&lt;/th&gt;
+&lt;th&gt;IP地址&lt;/th&gt;
+&lt;th&gt;MAC地址&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;地址类型&lt;/td&gt;
+&lt;td&gt;逻辑地址&lt;/td&gt;
+&lt;td&gt;物理地址&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;分配方式&lt;/td&gt;
+&lt;td&gt;由运营商分配&lt;/td&gt;
+&lt;td&gt;由设备制造商烧录到设备的网卡中&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;作用范围&lt;/td&gt;
+&lt;td&gt;全球互联网上的通信&lt;/td&gt;
+&lt;td&gt;局域网内通信&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;主要功能&lt;/td&gt;
+&lt;td&gt;标识设备和选择路由&lt;/td&gt;
+&lt;td&gt;唯一标识设备&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;查看-ip-地址mac-地址&#34;&gt;&lt;strong&gt;查看 IP 地址、MAC 地址&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;Linux 下使用 ip addr 或 ifconfig，Windows 下使用 ipconfig&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/ifconfig.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/network_protocol/img/ifconfig.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ifconfig&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ifconfig&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;“1” 表示 MAC 地址，是一个网卡的物理地址，使用十六进制，6个 byte表示&lt;/li&gt;
+&lt;li&gt;“2” 表示 net_device flags，网络设备的状态标识
+&lt;ul&gt;
+&lt;li&gt;BROADCAST 表示此网卡有广播地址，可以发送广播包&lt;/li&gt;
+&lt;li&gt;MULTICAST 表示此网卡可以发送多播包&lt;/li&gt;
+&lt;li&gt;UP 表示此网卡处于启动状态&lt;/li&gt;
+&lt;li&gt;LOWER_UP 表示 L1 启动，即网线已插入&lt;/li&gt;
+&lt;li&gt;mtu 1500 表示最大传输单元 MTU 为 1500，是以太网的默认值，即正文部分不允许超过 1500 个字节&lt;/li&gt;
+&lt;li&gt;qdisc，表示 queueing discipline 排队规则，内核通过网络接口发送数据包时，需要按照 qdisc 配置的规则把数据包加入队列
+&lt;ul&gt;
+&lt;li&gt;mq，是一个虚拟 qdisc，目的是为网络设备的每个硬件队列创建一个 pfifo_fast 队列&lt;/li&gt;
+&lt;li&gt;pfifo，不对数据包做任何处理，先入先出&lt;/li&gt;
+&lt;li&gt;pfifo_fast，数据包按照服务类型 TOS Type Of Service（ IP 头中的一个字段）分配到不同的波段中，每个波段对应的优先级不同&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;小测验&#34;&gt;&lt;strong&gt;小测验&lt;/strong&gt;&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;如何判断一个 IP 地址是否在子网内？&lt;/li&gt;
+&lt;li&gt;IP 地址是逻辑地址还是物理地址？它在网络中的作用是什么？&lt;/li&gt;
+&lt;li&gt;IP 地址和 MAC 地址的区别？&lt;/li&gt;
+&lt;li&gt;MAC 地址是逻辑地址还是物理地址？它在网络中的作用是什么？&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

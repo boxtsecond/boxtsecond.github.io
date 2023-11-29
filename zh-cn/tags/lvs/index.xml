@@ -1,0 +1,1447 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>LVS on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/lvs/</link>
+        <description>Recent content in LVS on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Tue, 05 Sep 2023 20:52:03 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/lvs/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/</link>
+        <pubDate>Tue, 05 Sep 2023 20:52:03 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/</guid>
+        <description>&lt;p&gt;深入浅出 LVS 负载均衡系列：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理
+&lt;ul&gt;
+&lt;li&gt;两台计算机如何在互联网中通信&lt;/li&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「源 IP 地址」或 「目标 IP 地址」
+&lt;ul&gt;
+&lt;li&gt;NAT 模式&lt;/li&gt;
+&lt;li&gt;FULLNAT 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（二）DR、TUN 模型原理
+&lt;ul&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「目标 MAC 地址」
+&lt;ul&gt;
+&lt;li&gt;DR 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;通过二次封装数据包的「IP 报文」
+&lt;ul&gt;
+&lt;li&gt;TUN 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型、深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用
+&lt;ul&gt;
+&lt;li&gt;使用 UCloud 云主机实操各个模型&lt;/li&gt;
+&lt;li&gt;使用 Keepalived 实现 LVS-DR 的高可用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;LVS（Linux Virtual Server）是一个虚拟服务器集群系统。工作在 OSI 模型的传输层，即四层负载均衡。LVS 本身实现了 NAT、DR、TUN 模型，这些模型仅做数据包的转发，而不会与客户端建立连接，成本低效率高。FULLNAT 基于 NAT 实现，LVS 本身不支持，需要额外对内核打补丁后才能使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;本系列按照负载均衡器对数据包的处理方式分类，从计算机间通信的角度出发，浅谈 NAT、FULLNAT、DR、TUN 模型的实现原理。&lt;/p&gt;
+&lt;p&gt;之前介绍了 LVS 负载均衡 NAT、FULLNAT、DR、TUN 模型的实现原理。现在来动手实践一下～&lt;/p&gt;
+&lt;h2 id=&#34;实验环境&#34;&gt;实验环境&lt;/h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;LVS 目前已经是 Linux 内核中的一部分，在内核中的模块叫做 ipvs，支持 NAT、DR、TUNNEL 模型。用户不能直接操作 ipvs 模块，需要安装交互软件 ipvsadm，使用 ipvsadm 和 ipvs 进行交互。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;p&gt;我使用 4 台 UCloud 云主机来搭建实验环境，创建云主机的时候选择分时购买，更划算一点。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;实验机器及环境
+&lt;ul&gt;
+&lt;li&gt;4 台 UCloud 云主机，CentOS 7.9 64位，1 核 1 G，需要注意一下防火墙规则，我选择的是【Web服务器推荐】，开放 22、3389、80、443 的端口号，这个可以自行配置
+&lt;ul&gt;
+&lt;li&gt;两台 Real Server：RS01、RS02，一台负载均衡服务器：LB01&lt;/li&gt;
+&lt;li&gt;RS01：10.23.190.76、RS02：10.23.122.152、LB01：10.23.21.184、LB02：10.23.115.100&lt;/li&gt;
+&lt;li&gt;VIP：10.23.88.247&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;RS01、RS02 安装 httpd，快速启动 http 服务器，且配置不同的请求响应&lt;/li&gt;
+&lt;li&gt;LB01、LB02 安装 ipvsadm、keepalived，并启动 ipvsadm、keepalived&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;实验机器展示
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_19.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_19.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;实验机器&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;实验机器&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;dr-模式实操&#34;&gt;DR 模式实操&lt;/h2&gt;
+&lt;p&gt;回顾一下 DR 模式的特点&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_dr.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_dr.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;DR&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;DR&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;DR 模式仅修改数据包的「目标 MAC 地址」，只有请求数据包需要经过负载均衡器，所以 DR 模式不支持对端口的转换&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器和负载均衡器必须在同一个网段，且真实服务器的默认网关不能是负载均衡器&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器的 lo 接口上需要配置 VIP 的 IP 地址，且真实服务器需要更改 ARP 协议，“隐藏” lo 接口上的 VIP&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;前置准备工作和 NAT 模式的一样，这里就不赘述了。&lt;/p&gt;
+&lt;p&gt;开始配置 DR 模式。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RS01、RS02&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;修改 ARP 协议
+&lt;ul&gt;
+&lt;li&gt;echo 1 &amp;gt; /proc/sys/net/ipv4/conf/lo/arp_ignore&lt;/li&gt;
+&lt;li&gt;echo 1 &amp;gt; /proc/sys/net/ipv4/conf/lo/arp_ignore&lt;/li&gt;
+&lt;li&gt;echo 2 &amp;gt; /proc/sys/net/ipv4/conf/lo/arp_announce&lt;/li&gt;
+&lt;li&gt;echo 2 &amp;gt; /proc/sys/net/ipv4/conf/all/arp_announce&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;在 lo 接口上配置 VIP
+&lt;ul&gt;
+&lt;li&gt;ifconfig lo:0 10.23.21.184 netmask 255.255.255.255&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证配置
+&lt;ul&gt;
+&lt;li&gt;ifconfig
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_20.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_20.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ifconfig&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ifconfig&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LB01&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;配置路由入口规则
+&lt;ul&gt;
+&lt;li&gt;ipvsadm -A -t 10.23.21.184:80 -s rr&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;配置路由出口规则
+&lt;ul&gt;
+&lt;li&gt;ipvsadm -a -t 10.23.21.184:80 -r 10.23.190.76 -g -w 1&lt;/li&gt;
+&lt;li&gt;ipvsadm -a -t 10.23.21.184:80 -r 10.23.122.152 -g -w 1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如果 VIP 和本机地址不一致，要配置 VIP（我这里就不用了）
+&lt;ul&gt;
+&lt;li&gt;配置 VIP
+&lt;ul&gt;
+&lt;li&gt;ifconfig eth0:0 VIP/24&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证配置
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ipvsadm -ln
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_21.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_21.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ipvsadm&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ipvsadm&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;ifconfig
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_22.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_22.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ifconfig&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ifconfig&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;配置完成，现在我们来验证下 DR 模式下的负载均衡。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_23.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_23.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;发现直接在本地请求 LB01 的外网 IP 地址时，一直处于等待状态，最终报错：Operation timed out。&lt;/p&gt;
+&lt;p&gt;我们先来看下 LB01 有没有正确的收到连接请求&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;查看 LB01 记录的连接信息：ipvsadm -Lnc
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_24.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_24.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ipvsadm&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ipvsadm&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;可以看到 LB01 正确的收到了连接请求，并且转发给了 RS02。接下来我们登陆到 RS02 上，检查 RS02 是否接收到了数据包。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;查看 RS02 上的 TCP 连接信息：netstat -natp | grep 10.23.21.184
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_25.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_25.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;netstat&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;netstat&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;RS02 收到了数据包，并且也发出了返回的数据包，返回数据包的 IP 地址和端口号也和发出的一致。所以可以合理地猜测，问题出在由 RS02 直接返回数据包给客户端的过程中。那么只有两种情况，RS02 无法连接到客户端或者客户端拒绝接收这个数据包。&lt;/p&gt;
+&lt;p&gt;检查 RS02 是否能正常连接到客户端&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ping 106.75.220.2
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_26.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_26.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ping&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ping&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;RS02 和客户端可以正常请求访问。那么应该是客户端拒绝接收了这个数据包，抓包来看下，客户端是否有收到这个数据包。&lt;/p&gt;
+&lt;p&gt;再次请求 LB01，并查看客户端和 LB01 交互的数据包&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;tcpdump host 106.75.253.112 -nne
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_27.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_27.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;tcpdump&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;tcpdump&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;发现只有发出的数据包，而没有收到的数据包。现在情况是：RS02 发出了数据包，但是客户端却没收到。那只有一种可能，就是云主机的 EIP 转发数据包的时候，由于某种条件限制，扔掉了这个数据包。如果是这样的话，在内网环境中应该是可以正常访问的。我们再申请一台在相同网段的云主机，验证一下。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_28.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_28.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;果然是可以正常访问的，后来和官方交流之后也证实了这一点。（我猜测应该是出于对安全的考虑，所有进出的数据包，IP 地址 和 MAC 地址必须和本机一致，否则数据包会被丢弃。）&lt;/p&gt;
+&lt;p&gt;到此实验配置完成，验证也完成～&lt;/p&gt;
+&lt;h2 id=&#34;keepalived-实现-dr-模型的高可用性实操&#34;&gt;Keepalived 实现 DR 模型的高可用性实操&lt;/h2&gt;
+&lt;p&gt;在成功搭建 DR 模型之后，不由得思考这么一个问题，如果负载均衡服务器宕机了怎么办？负载均衡服务器承载着客户端对服务端的所有请求路由，如果一旦宕机，影响的是整个系统不可用。所以我们需要一些措施来保证负载均衡的高可用性。&lt;/p&gt;
+&lt;p&gt;最简单的办法就是将单点部署的负载均衡服务器变成多点部署。如果当前使用的节点出现问题，迅速地切换到另一个节点上，这样就可以保证系统的整个可用性。那么，现在负载均衡服务器单点故障的问题就转换成多点部署的切换问题。&lt;/p&gt;
+&lt;p&gt;我们先来看看解决多点部署的切换问题，需要什么条件？首先我们需要发现问题，即需要不断地检查当前节点是否正常，如果当前节点不正常的话，需要快速地切换到其他的节点上。keepalived 就是这样工作的。&lt;/p&gt;
+&lt;p&gt;我们来实际操作一下～&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RS01、RS02 和 DR 模型实操类似，只不过我们要重新申请一个 VIP：10.23.88.247，绑定在 RS01、RS02 的 lo:0 上
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_29.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_29.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ifconfig lo:0 10.23.88.247 netmask 255.255.255.255 broadcast 10.23.88.247 up&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LB01、LB02&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;安装 ipvsadm、keepalived&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;yum install ipvsadm keepalived -y&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改 keepalived 配置文件&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;cp keepalived.conf keepalived.conf.bak&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre&gt;&lt;code class=&#34;language-bash&#34;&gt;! Configuration File for keepalived
+
+vrrp_instance VI_1 {
+    state MASTER  // 备节点：BACKUP
+    interface eth0
+    virtual_router_id 51
+    priority 100  // 备节点：50
+    advert_int 1
+    authentication {
+        auth_type PASS
+        auth_pass 1111
+    }
+    virtual_ipaddress {
+        10.23.88.247 dev eth0
+    }
+}
+
+virtual_server 10.23.88.247 80 {
+    delay_loop 6
+    lb_algo rr
+    lb_kind DR
+        nat_mask 255.255.0.0
+    persistence_timeout 0
+    protocol TCP
+
+    real_server 10.23.190.76 80 {
+        weight 1
+                HTTP_GET {
+                url {
+                        path /
+                status_code 200
+                }
+            connect_timeout 3
+            nb_get_retry 3
+            delay_before_retry 3
+            }
+    }
+    real_server 10.23.122.152 80 {
+        weight 1
+        HTTP_GET {
+            url {
+                path /
+                status_code 200
+            }
+            connect_timeout 3
+            nb_get_retry 3
+            delay_before_retry 3
+        }
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;重新启动 keepalived
+&lt;ul&gt;
+&lt;li&gt;systemctl restart keepalived&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;验证 keepalived DR 模型&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_30.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_30.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;验证&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;验证&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;可以正常访问到两台服务器，接下来把 LB01 的 keepalived 停掉，继续访问 VIP。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_31.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_31.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;验证&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;验证&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;还是可以正常访问，VIP 漂到了 LB02 上。使用 ipvsadm -lnc 查看具体连接信息。&lt;/p&gt;
+&lt;p&gt;实验完成，差不多断断续续的用了 4.5 小时，包括一些额外的排查时间，共计花费不到 5 块～&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/</link>
+        <pubDate>Tue, 05 Sep 2023 18:52:03 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/</guid>
+        <description>&lt;p&gt;深入浅出 LVS 负载均衡系列：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理
+&lt;ul&gt;
+&lt;li&gt;两台计算机如何在互联网中通信&lt;/li&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「源 IP 地址」或 「目标 IP 地址」
+&lt;ul&gt;
+&lt;li&gt;NAT 模式&lt;/li&gt;
+&lt;li&gt;FULLNAT 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（二）DR、TUN 模型原理
+&lt;ul&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「目标 MAC 地址」
+&lt;ul&gt;
+&lt;li&gt;DR 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;通过二次封装数据包的「IP 报文」
+&lt;ul&gt;
+&lt;li&gt;TUN 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型、深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用
+&lt;ul&gt;
+&lt;li&gt;使用 UCloud 云主机实操各个模型&lt;/li&gt;
+&lt;li&gt;使用 Keepalived 实现 LVS-DR 的高可用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;LVS（Linux Virtual Server）是一个虚拟服务器集群系统。工作在 OSI 模型的传输层，即四层负载均衡。LVS 本身实现了 NAT、DR、TUN 模型，这些模型仅做数据包的转发，而不会与客户端建立连接，成本低效率高。FULLNAT 基于 NAT 实现，LVS 本身不支持，需要额外对内核打补丁后才能使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;aside&gt;
+📌 本系列按照负载均衡器对数据包的处理方式分类，从计算机间通信的角度出发，浅谈 NAT、FULLNAT、DR、TUN 模型的实现原理。
+&lt;/aside&gt;
+&lt;p&gt;之前介绍了 LVS 负载均衡 NAT、FULLNAT、DR、TUN 模型的实现原理。现在来动手实践一下～&lt;/p&gt;
+&lt;h2 id=&#34;实验环境&#34;&gt;实验环境&lt;/h2&gt;
+&lt;p&gt;LVS 目前已经是 Linux 内核中的一部分，在内核中的模块叫做 ipvs，支持 NAT、DR、TUNNEL 模型。用户不能直接操作 ipvs 模块，需要安装交互软件 ipvsadm，使用 ipvsadm 和 ipvs 进行交互。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;我使用 3 台 UCloud 云主机来搭建实验环境，创建云主机的时候选择分时购买，更划算一点。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;实验机器及环境
+&lt;ul&gt;
+&lt;li&gt;3 台 UCloud 云主机，CentOS 7.9 64位，1 核 1 G，需要注意一下防火墙规则，我选择的是【Web服务器推荐】，开放 22、3389、80、443 的端口号，这个可以自行配置
+&lt;ul&gt;
+&lt;li&gt;两台 Real Server：RS01、RS02，一台负载均衡服务器：LB01&lt;/li&gt;
+&lt;li&gt;RS01：10.23.190.76、RS02：10.23.122.152、LB01：10.23.21.184&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;RS01、RS02 安装 httpd，快速启动 http 服务器，且配置不同的请求响应&lt;/li&gt;
+&lt;li&gt;LB01 安装 ipvsadm，并启动 ipvsadm&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;实验机器展示
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;实验机器&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;实验机器&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;nat-模式实操&#34;&gt;NAT 模式实操&lt;/h2&gt;
+&lt;p&gt;回顾一下 NAT 模式的特点&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_2.svg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_2.svg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;NAT&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;NAT&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;NAT 模式修改数据包的「目标 IP 地址」或 「源 IP 地址」，所有的请求数据包、响应数据包都要经过负载均衡器，所以 NAT 模式支持对端口的转换&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器的默认网关是负载均衡器，所以真实服务器和负载均衡器必须在同一个网段&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;实操开始，首先我们要做一些前置的准备工作，即把该安装的软件和服务，安装和启动起来。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RS01、RS02 安装 httpd，快速启动 http 服务&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;yum install httpd -y &amp;amp;&amp;amp; service httpd start&lt;/li&gt;
+&lt;li&gt;echo &amp;ldquo;Hello From RS01/RS02&amp;rdquo; &amp;gt; /var/www/html/index.html&lt;/li&gt;
+&lt;li&gt;验证：curl 0.0.0.0，返回对应的信息
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_2.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_2.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;curl 0.0.0.0&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;curl 0.0.0.0&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LB01 安装 ipvsadm，并启动 ipvsadm&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;yum install ipvsadm &amp;amp;&amp;amp; ipvsadm &amp;ndash;save&amp;gt; /etc/sysconfig/ipvsadm &amp;amp;&amp;amp; service ipvsadm start&lt;/p&gt;
+&lt;p&gt;看到下图就表示成功启动了 ipvsadm
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_3.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_3.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ipvsadm&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ipvsadm&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;做完这些前置准备工作之后，接下来我们来对照 NAT 模式来配置具体的负载规则。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RS01、RS02&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;设置默认网关为 DIP，即 LB01 的内网 IP - 10.23.21.184
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;查看 RS01、RS02 当前的默认网关&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;route -n
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_4.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_4.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;route -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;route -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;可以看到当前的默认网关是 10.23.0.1&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;设置默认网关为 10.23.21.184&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;route add default gw 10.23.21.184&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;输入命令并按下回车之后，会很长时间没有响应，是正常的。我们等它连接断掉之后，再通过 LB01 登陆到 RS01、RS02 上
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_5.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_5.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_6.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_6.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;删除之前的默认网关&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;route del default gw 10.23.0.1
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_7.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_7.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LB01&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;配置路由入口规则，使用 -A 参数&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;因为实验使用的是云主机，而云主机的 EIP 或者说外网 IP 地址，本身就是通过 NAT 方式映射到了绑定的云主机上，所以不能将 EIP 当作 VIP 绑定端口。这里就直接将内网 IP  当作 DIP 使用。&lt;/li&gt;
+&lt;li&gt;ipvsadm -A -t 10.23.21.184:8000 -s rr&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置路由入口规则，使用 -a 参数&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ipvsadm -a -t 10.23.21.184:8000 -r 10.23.190.76:80 -m&lt;/li&gt;
+&lt;li&gt;ipvsadm -a -t 10.23.21.184:8000 -r 10.23.122.152:80 -m&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;验证配置&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ipvsadm -ln
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_8.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_8.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;开启路由转发&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;echo 1 &amp;gt;/proc/sys/net/ipv4/ip_forward&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;这里大概解释下对 ipvsadm 的配置信息&lt;/br&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;-A 添加一条新的虚拟服务器记录，即添加一台新的虚拟服务器&lt;/td&gt;&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-a 添加一条新的真实服务器记录，即在虚拟服务器中添加一台真实服务器&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-t 真实服务器提供的是 TCP 服务&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-s 负载均衡使用的调度算法，rr 表示轮询&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-w 设置权重&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-r 指定真实服务器&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-m 指定 LVS 使用 NAT 模式&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-g 指定 LVS 使用 DR 模式&lt;/br&gt;&lt;/li&gt;
+&lt;li&gt;-i 指定 LVS 使用 TUNNEL 模式&lt;/br&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;可以看到，我们配置的是使用 NAT 模式，调度算法为轮询。&lt;/p&gt;
+&lt;p&gt;到这里我们的配置就全部完成了，接下来让我们验证一下 LB01 能不能按照预期负载到 RS01、RS02 。使用浏览器直接打开 LB01 的外网 IP 地址。&lt;/p&gt;
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td &gt;&lt;center&gt;&lt;img src=&#34;https://boxtsecond.github.io/post/networks/img/lb4_m_9.png&#34; &gt;&lt;/center&gt;&lt;/td&gt;
+        &lt;td &gt;&lt;center&gt;&lt;img src=&#34;https://boxtsecond.github.io/post/networks/img/lb4_m_10.png&#34;  &gt;&lt;/center&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+&lt;p&gt;由于浏览器的缓存机制，在短时间内刷新的时候，返回可能不会发生变化。可以使用 curl 更准确的查看。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_11.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_11.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;验证&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;验证&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;验证成功～&lt;/p&gt;
+&lt;h2 id=&#34;tunnel-模式实操&#34;&gt;TUNNEL 模式实操&lt;/h2&gt;
+&lt;p&gt;回顾一下 TUNNEL 模式的特点&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_tunnel.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_tunnel.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;TUN&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;TUN&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;TUNNEL 模式不改变原数据包，而是在原数据包上新增一层 IP 首部信息。所以 TUNNEl 模式不支持对端口的转换，且真实服务器必须能够支持解析两层 IP 首部信息&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器和负载均衡器可以不在同一个网段中&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器需要更改 ARP 协议，“隐藏” lo 接口上的 VIP&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;TUNNEL 模式和其他模式有点不同，不能像之前那样直接使用 VIP 来充当 DIP。所以我们需要额外一个 DIP：10.23.21.180。&lt;/p&gt;
+&lt;p&gt;开始配置具体的负载规则～&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;RS01、RS02&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;安装 ipip 模块&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;modprobe ipip&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;验证 ipip 模块是否加载成功&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;lsmod | grep ipip&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_12.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_12.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ipip&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ipip&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;修改 ARP 协议&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;echo 1 &amp;gt; /proc/sys/net/ipv4/conf/tunl0/arp_ignore&lt;/li&gt;
+&lt;li&gt;echo 2 &amp;gt; /proc/sys/net/ipv4/conf/tunl0/arp_announce&lt;/li&gt;
+&lt;li&gt;echo 1 &amp;gt; /proc/sys/net/ipv4/conf/all/arp_ignore&lt;/li&gt;
+&lt;li&gt;echo 2 &amp;gt; /proc/sys/net/ipv4/conf/all/arp_announce&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;rp_filter 表示是否开启对数据包源地址的校验，这里我们直接关闭校验即可。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;echo 0 &amp;gt; /proc/sys/net/ipv4/conf/tunl0/rp_filter&lt;/li&gt;
+&lt;li&gt;echo 0 &amp;gt; /proc/sys/net/ipv4/conf/all/rp_filter&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;配置 DIP&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ifconfig tunl0 10.23.21.180 broadcast 10.23.21.180 netmask 255.255.255.255 up&lt;/li&gt;
+&lt;li&gt;route add -host 10.23.21.180 tunl0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;验证配置&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ifconfig
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_13.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_13.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ifconfig&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ifconfig&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;route -n
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_14.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_14.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;route -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;route -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;LB01&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;配置路由入口规则
+&lt;ul&gt;
+&lt;li&gt;ipvsadm -A -t 10.23.21.180:80 -s wrr&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;配置路由出口规则，由于在不同的网段，这里需要配置 RS01、RS02 的外网地址
+&lt;ul&gt;
+&lt;li&gt;ipvsadm -a -t 10.23.21.180:80 -r 10.23.190.76 -i -w 1&lt;/li&gt;
+&lt;li&gt;ipvsadm -a -t 10.23.21.180:80 -r 10.23.122.152 -i -w 1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;配置 DIP
+&lt;ul&gt;
+&lt;li&gt;安装 ipip 模块
+&lt;ul&gt;
+&lt;li&gt;modprobe ipip&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ifconfig tunl0 10.23.21.180 broadcast 10.23.21.180 netmask 255.255.255.255 up&lt;/li&gt;
+&lt;li&gt;route add -host 10.23.21.180 tunl0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;验证配置
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;ipvsadm -ln
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_15.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_15.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ipvsadm&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ipvsadm&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;route -n
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_16.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_16.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;route -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;route -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;配置完成，我们再申请一台云主机来验证实操结果。&lt;/p&gt;
+&lt;p&gt;DIP 是我们虚拟出来的 IP 地址，所以实际在网络中是找不到的，我们需要先手动将访问 DIP 的路由，访问到 LB01 上。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;route add -host 10.23.21.180 gw 10.23.21.184&lt;/li&gt;
+&lt;li&gt;验证一下
+&lt;ul&gt;
+&lt;li&gt;route -n
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_17.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_17.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;route -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;route -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;现在让我们来验证一下 TUNNEL 模型是否成功。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_18.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_m_18.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;验证&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;验证&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;验证成功～&lt;/p&gt;
+&lt;p&gt;下篇继续 DR 模型的实操，及使用 Keepalived 实现 DR 模型的高可用。&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>深入浅出 LVS 负载均衡（二）DR、TUN 模型原理</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</link>
+        <pubDate>Tue, 05 Sep 2023 16:52:03 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</guid>
+        <description>&lt;p&gt;深入浅出 LVS 负载均衡系列：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理
+&lt;ul&gt;
+&lt;li&gt;两台计算机如何在互联网中通信&lt;/li&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「源 IP 地址」或「目标 IP 地址」
+&lt;ul&gt;
+&lt;li&gt;NAT 模式&lt;/li&gt;
+&lt;li&gt;FULLNAT 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（二）DR、TUN 模型原理
+&lt;ul&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「目标 MAC 地址」
+&lt;ul&gt;
+&lt;li&gt;DR 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;通过二次封装数据包的「IP 报文」
+&lt;ul&gt;
+&lt;li&gt;TUN 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;深入浅出 LVS 负载均衡（三）实操 NAT、DR 模型、深入浅出 LVS 负载均衡（四）实操 TUNNEL 模型、Keepalived DR 模型的高可用
+&lt;ul&gt;
+&lt;li&gt;使用 UCloud 云主机实操各个模型&lt;/li&gt;
+&lt;li&gt;使用 Keepalived 实现 LVS-DR 的高可用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;LVS（Linux Virtual Server）是一个虚拟服务器集群系统。工作在 OSI 模型的传输层，即四层负载均衡。LVS 本身实现了 NAT、DR、TUN 模型，这些模型仅做数据包的转发，而不会与客户端建立连接，成本低效率高。FULLNAT 基于 NAT 实现，LVS 本身不支持，需要额外对内核打补丁后才能使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;aside&gt;
+📌 本系列按照负载均衡器对数据包的处理方式分类，从计算机间通信的角度出发，浅谈 NAT、FULLNAT、DR、TUN 模型的实现原理。
+&lt;/aside&gt;
+&lt;p&gt;上篇从计算机间的通信说起，知道通信必要的六要素是 源 IP 地址、端口号、源 MAC 地址，目标 IP 地址、端口号、目标 MAC 地址。其中，端口号标志了在应用层的两个具体应用信息，即快递的具体发送人和接收人，IP 地址表示在网络层上两个端点的地址，即快递的发出地址和收货地址，MAC 地址表示在数据链路层上节点间的地址，即快递传送中的各个驿站的地址。&lt;/p&gt;
+&lt;p&gt;在了解 LVS 的 NAT、FULLNAT 模型对数据包的修改方式以及它们的缺点之后，站在 NAT 模型的肩膀上，怎样才能更好地优化负载均衡器？&lt;/p&gt;
+&lt;p&gt;在 NAT 和 FULLNAT 模式中，不管是请求数据包还是响应数据包，都要经过负载均衡器。但是响应数据包一般要比请求数据包大很多，这可能会成为系统的瓶颈。如果能够将请求数据包转发到真实服务器之后，响应数据包由真实服务器直接返回，这样对负载均衡器的压力就小很多。这种模式又应该如何实现呢？&lt;/p&gt;
+&lt;h2 id=&#34;lvs-负载均衡&#34;&gt;LVS 负载均衡&lt;/h2&gt;
+&lt;h3 id=&#34;dr-模式&#34;&gt;DR 模式&lt;/h3&gt;
+&lt;hr&gt;
+&lt;p&gt;如果真的能够由真实服务器直接响应客户端，而不经过负载均衡器。那么这个由负载均衡器直接响应回客户端的数据包需要满足什么条件，才能被客户端正常接收？&lt;/p&gt;
+&lt;p&gt;真实服务器发出的数据包，在客户端接收到的时候，一定要匹配得上从客户端发出的数据包。如果不匹配的话，客户端收到响应数据包后会直接将数据包丢弃。&lt;/p&gt;
+&lt;aside&gt;
+📌 客户端发出的请求数据包：CIP ➡️  VIP，则收到的响应数据包一定是 VIP ➡️  CIP。
+&lt;p&gt;💡做个小思考，为什么没有带上 MAC 地址？后文有解释～&lt;/p&gt;
+&lt;/aside&gt;
+&lt;p&gt;但是 VIP 已经绑定在负载均衡器上，真实服务器也有多个，在连通的网络里，如何能让多个真实服务器和负载均衡器的 VIP 地址相同？并且真实服务器的 VIP 不能被其他设备访问的到。也就是说在每台真实服务器上的 VIP 地址，只能它们自己知道“我悄悄藏着 VIP”，别的设备压根不知道。&lt;/p&gt;
+&lt;p&gt;这里不得不提另一个非常神奇的 IP 地址 127.0.0.1/0.0.0.0。仔细想一下，127.0.0.1 不就是每台设备上都相同，“悄悄藏着”的 IP 地址吗，除了自己的其他设备都没办法访问。这个神奇的 IP 地址，叫做 Loopback 接口。它是一种纯软件性质的虚拟接口，当有请求数据包送达到 lo 接口，那么 lo 接口会将这个数据包直接 “掉头”，返回给这个设备本身，这就是“环回”接口的由来。所以，如果将 VIP 绑定在 lo 接口上，是不是就可以完成“只有自己知道这个 VIP，别的设备不知道”呢？&lt;/p&gt;
+&lt;p&gt;将 VIP 绑定在 lo 接口上，其实只完成了一半，只是做到了在多台真实服务器上绑定相同的 VIP 地址。还记得上篇文章中所讲的 ARP 协议吗，ARP 协议会采集在当前局域网中，除了自己之外的其他主机的 MAC 地址和 IP 地址的映射关系。而 VIP 是一个不能被别的设备采集到的地址，所以我们要对真实服务器的 ARP 协议做一些修改，让 VIP 不会被其他设备采集到。很显然，这不但要修改设备收到 ARP 请求之后的响应（arp_ignore 参数)，也要修改设备向外通告 ARP 的请求 （arp_announce 参数）。&lt;/p&gt;
+&lt;aside&gt;
+📌 arp_ignore：定义接收 ARP 请求时的响应级别  &lt;/br&gt;
+0：响应任意网卡上接收到的对本机 IP 地址的 ARP 请求（包括环回网卡），不论目的 IP 地址是否在接收网卡上  &lt;/br&gt;
+1：只响应目的 IP 地址为接收网卡地址的 ARP 请求  &lt;/br&gt;
+2：只响应目的 IP 地址为接收网卡地址的 ARP 请求，且 ARP 请求的源 IP 地址必须和接收网卡的地址在同网段  &lt;/br&gt;
+&lt;/aside&gt;
+&lt;aside&gt;
+📌 arp_announce：定义将自己地址向外通告时的通告级别  &lt;/br&gt;
+0：允许任意网卡上的任意地址向外通告  &lt;/br&gt;
+1：尽量仅向目标网络通告与其网络匹配的地址  &lt;/br&gt;
+2：仅向与本地接口上地址匹配的网络进行通告  &lt;/br&gt;
+&lt;/aside&gt;
+&lt;p&gt;可以看到，arp_ignore 为 1 并且 arp_announce 为 1 时，lo 接口上绑定的 VIP 可以被藏在本机上，只有自己知道。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_dr.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_dr.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;DR&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;DR&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;红色表示发出的数据包&lt;/br&gt;
+绿色表示返回的数据包&lt;/br&gt;
+黄色表示负载均衡器修改的内容&lt;/br&gt;
+虚线表示经过 N 个下一跳，即可以不在同一局域网内&lt;/br&gt;
+实线表示只能 “跳跃一次”，即必须在同一局域网内&lt;/br&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;当计算机发出一个请求的数据包到达负载均衡器后，负载均衡器修改请求数据包的 { 目标MAC 地址 }  为 真实服务器的 MAC 地址，其余信息不变。&lt;strong&gt;负载均衡器和真实服务器必须在同一局域网内，否则负载均衡器无法替换请求数据包的 { 目标MAC 地址 }  为 真实服务器的 MAC 地址&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;真实服务器收到请求的数据包，发现自己有一个 “隐藏“ 的 VIP，于是接收这个数据包，并交由对应的上层应用处理&lt;/li&gt;
+&lt;li&gt;处理完成后，将响应数据包直接返回给客户端。此时在真实服务器上查看 TCP 连接为：VIP ➡️ CIP&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;总结一下 DR 模式的特点：&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;仅修改请求数据包的「目标 MAC 地址」，作用在数据链路层。因此负载均衡器必须和真实服务器在同一局域网内，且不能对端口进行转发&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器中的 VIP，只能被自己 “看见”，其他设备不可知。因此 VIP 必须绑定在真实服务器的 lo 网卡上，并且不允许将此网卡信息经过 ARP 协议对外通告&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;请求的数据包经过负载均衡器后，直接由真实服务器返回给客户端，响应数据包不需要再经过负载均衡器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;tun-模式&#34;&gt;TUN 模式&lt;/h3&gt;
+&lt;hr&gt;
+&lt;p&gt;除了直接修改请求数据包的目标 MAC 地址，做一次 MAC 地址欺骗之外，还有没有其他方式能够将响应数据包由真实服务器直接返回给客户端呢？看看 VPN 是怎么能够支持你远程办公的吧～&lt;/p&gt;
+&lt;p&gt;我们已经讨论过，如果真实服务器直接将响应数据包返回给客户端，那么真实服务器必须有一个 “隐藏” 的 VIP，即配置在 lo 网卡上并且不允许此 VIP 通过 ARP 协议对外通告。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_tunnel.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_tunnel.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;TUN&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;TUN&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;红色表示发出的数据包&lt;/br&gt;
+绿色表示返回的数据包&lt;/br&gt;
+黄色表示负载均衡器修改的内容&lt;/br&gt;
+虚线表示经过 N 个下一跳，即可以不在同一局域网内&lt;/br&gt;
+实线表示只能 “跳跃一次”，即必须在同一局域网内&lt;/br&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;当计算机发出一个请求的数据包到达负载均衡器后，负载均衡器不改变源数据包，而是在源数据包上新增一层 IP 首部 { 分发 IP、端口号、MAC 地址 } ➡️ { 真实服务器 IP、端口号、MAC 地址 }&lt;/li&gt;
+&lt;li&gt;真实服务器收到请求的数据包后，将最外层封装的 IP 首部去掉，发现还有一层 IP 首部，并且目标 IP 地址能够和 lo 上的地址匹配，于是收下请求数据包，并交由对应的上层应用处理&lt;/li&gt;
+&lt;li&gt;处理完成后，将响应数据包直接返回给客户端。此时在真实服务器上查看 TCP 连接为：VIP ➡️ CIP&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;总结一下 TUN 模式的特点：&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;不改变请求数据包，而是在请求数据包上新增一层 IP 首部信息。因此负载均衡器不能对端口进行转发，但可以和真实服务器不在同一局域网内，且真实服务器需要支持能够解析两层 IP 首部信息，即需要支持“IP Tunneling”或“IP Encapsulation”协议&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器中的 VIP，只能被自己 “看见”，其他设备不可知。因此 VIP 必须绑定在真实服务器的 lo 网卡上，并且不允许将此网卡信息经过 ARP 协议对外通告&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;请求的数据包经过负载均衡器后，直接由真实服务器返回给客户端，响应数据包不需要再经过负载均衡器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;p&gt;在 DR 和 TUN 模式中，负载均衡器只转发了请求数据包，响应数据包不经过负载均衡器，而是直接返回给客户端。解决了在通常情况下响应数据包比请求数据包大，如果请求和响应数据包都经过负载均衡器，在高并发下可能成为系统瓶颈的问题。&lt;/p&gt;
+&lt;p&gt;根据我们的推导过程，可以轻易地得出各种模式的特点和它们要解决的问题。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;NAT 模式，通过修改数据包的「目标 IP 地址」和 「源 IP 地址」，将请求负载到多台真实服务器，是四层负载均衡模式中最基础的负载方式。因为它是对 IP 地址层面的修改，作用在网络层，所以可以对端口进行映射。真实服务器返回的响应数据包必须经过负载均衡器，所以要求真实服务器的默认网关是负载均衡器。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;FULLNAT 模式，是对 NAT 模式的一种演进。通过同时修改「源 IP 地址」和「目标 IP 地址」，突破 NAT 模式中真实服务器的默认网关必须是负载均衡器的限制。但是由于同时修改了「源 IP 地址」和「目标 IP 地址」，真实服务器建立的真实连接和客户端毫无关系，所以会丢失客户端的信息。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DR 模式，是对 NAT 模式的另一种演进。由于真实请求中响应数据包比请求数据包大很多的特点，在高并发下会成为系统的瓶颈，于是将响应数据包直接由真实服务器返回给客户端。使用 MAC 地址欺骗来达到此目的，作用于数据链路层，所以不能对端口映射。并且在真实服务器上，必须有一个仅自己可见的 “隐藏” VIP。在网络中，真实的 VIP 绑定在负载均衡器上，用来接收客户端的真实请求数据包。而 “隐藏” 的 VIP 绑定在真实服务器的 lo 接口上，用来欺骗自己可以正常接收目标地址是 VIP 的数据包。所以真实服务器和负载均衡器必须在同一局域网中。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TUN 模式，是对 DR 模式的一种演进。突破 DR 模式中真实服务器和负载均衡器必须在同一局域网中的限制。TUN 模式不会对源数据包进行修改，而是在源数据包上额外新增一条 IP 首部信息，所以不能对端口映射，且要求真实服务器必须能够卸载掉两层 IP 首部信息。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;💡 回顾之前的小思考题：为什么在说真实服务器能够正常接收负载均衡器转发的数据包的必要条件时，没有带上 MAC 地址？&lt;/p&gt;
+  &lt;aside&gt;
+  📌 在网络通信部分介绍 ARP 协议和下一跳机制时，我们提到数据包在网络中的转发和快递传送中的驿站类似，每一次数据包的发送，会不断地找到 “下一个目的地” 的 MAC 地址。所以，但凡涉及到物理端口的变迁，都涉及到源 MAC 地址的变化，这个变化是 IP 通信的特性，而并不是负载均衡的特点。
+  &lt;/aside&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;在对负载均衡的各个模式有一定的了解之后，下一篇我们来具体实践和配置～&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</link>
+        <pubDate>Tue, 05 Sep 2023 14:52:03 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</guid>
+        <description>&lt;p&gt;深入浅出 LVS 负载均衡系列：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;两台计算机如何在互联网中通信&lt;/li&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「源 IP 地址」或「目标 IP 地址」
+&lt;ul&gt;
+&lt;li&gt;NAT 模式&lt;/li&gt;
+&lt;li&gt;FULLNAT 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;深入浅出 LVS 负载均衡（二）DR、TUN 模型原理&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;LVS 负载均衡
+&lt;ul&gt;
+&lt;li&gt;通过修改数据包的「目标 MAC 地址」
+&lt;ul&gt;
+&lt;li&gt;DR 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;通过二次封装数据包的「IP 报文」
+&lt;ul&gt;
+&lt;li&gt;TUN 模式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;深入浅出 LVS 负载均衡（三）实操 NAT、DR 模型、深入浅出 LVS 负载均衡（四）实操 TUNNEL 模型、Keepalived DR 模型的高可用&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用 UCloud 云主机实操各个模型&lt;/li&gt;
+&lt;li&gt;使用 Keepalived 实现 LVS-DR 的高可用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;LVS（Linux Virtual Server）是一个虚拟服务器集群系统。工作在 OSI 模型的传输层，即四层负载均衡。LVS 本身实现了 NAT、DR、TUN 模型，这些模型仅做数据包的转发，而不会与客户端建立连接，成本低效率高。FULLNAT 基于 NAT 实现，LVS 本身不支持，需要额外对内核打补丁后才能使用。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;aside&gt;
+📌 本系列按照负载均衡器对数据包的处理方式分类，从计算机间通信的角度出发，浅谈 NAT、FULLNAT、DR、TUN 模型的实现原理。
+&lt;/aside&gt;
+&lt;h2 id=&#34;两台计算机如何在互联网中通信&#34;&gt;两台计算机如何在互联网中通信&lt;/h2&gt;
+&lt;hr&gt;
+&lt;p&gt;在了解 LVS 负载均衡之前，先要搞清楚两台计算机如何在互联网中通信。茫茫互联网中，两台计算机如何才能找到对方？&lt;/p&gt;
+&lt;p&gt;我们先来看看，快递是如何被快递小哥完美地送到你手上的。根据你的地址，快递先送到你所在的省市区，接着在当前省市区找到你的门牌号，最后根据门牌号和姓名，再亲手把快递交给你。&lt;/p&gt;
+&lt;p&gt;两台计算机在互联网中的通信也是如此。首先需要知道双方的 IP 地址，即省市区，其次需要知道双方的 MAC 地址，即门牌号。MAC 地址标志着唯一的计算机。在同一台计算机上，可能有多个不同的服务，如何能像快递小哥按照姓名找到你一样，在计算机上找到对应的服务呢？没错，就是按照端口号。&lt;/p&gt;
+&lt;p&gt;这样，通信中每台计算机需要提供的信息就很清晰了，即 IP 地址、MAC 地址、端口号。总结一下，通信必需的六个要素就是，源 IP 地址、端口号、源 MAC 地址，目标 IP 地址、端口号、目标 MAC 地址。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_1.svg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_1.svg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;通信&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;通信&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;假设计算机 A 和计算机 B 在上述的网络拓扑图（不在同一局域网）中。可以很清晰地看到 计算机 A 和 计算机 B 通信需要五个步骤，其中 ①② 和 ④⑤ 的原理相同。现在我们来看看具体的每个步骤在计算机的世界中是如何实现的。&lt;/p&gt;
+&lt;p&gt;首先 A 和 B 的 IP 地址和端口号是已知的，即一个数据包从哪来要发往哪去。所以现在的问题是：A 如何能知道 B 的 MAC 地址？&lt;/p&gt;
+&lt;p&gt;最简单的方式就是 A 保存网络中全部设备的 MAC 地址，在发送时查询一下，这样就能得到 B 的 MAC 地址。但是网络中的设备有几十亿个，还在不断地增长，显然这种方式是不可取的。如果按照快递发送过程中，在每个驿站之间进行转移，这样只需要知道该发往的下一目的地在哪里，最终也能将快递成功地交到你的手上。在实际网络中发送数据包也是这样，现在的目标就是确定 “下一个目的地” 的 MAC 地址。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;步骤 ①②：发送数据包至网关&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;A 不知道 B 的 MAC 地址，且 A 和 B 也不在同一个局域网中。这时 A 会根据 ARP 协议先发出一个广播包，即目标 MAC 地址是 FF:FF:FF:FF:FF:FF 的数据包。当 交换机1 收到这个广播包之后，会将这个数据包转发给其他端口，并且记录 A 的 MAC 地址和交换机端口之间的映射关系，后续再看到这个 MAC 地址，就知道该从哪个端口转发出去。当 路由器1 收到广播包后，会将自己的 MAC 地址返回。A 接收到返回后，就知道 “下一个目的地” 的 MAC 地址了。A 重新发送数据包，将目标 MAC 地址填写为 路由器1 的 MAC 地址，并在本地的缓存表中记录返回的 MAC 地址。&lt;/p&gt;
+&lt;aside&gt;
+💡 查看当前设备缓存表里已存的 MAC 地址：arp -a
+&lt;/aside&gt;
+&lt;aside&gt;
+📌 ARP 协议的目的就是找到“下一个目的地”的 MAC 地址，即 IP 地址和 MAC 地址之间的映射关系。
+当两台设备同处于一个局域网时，“下一个目的地” 就是目标设备的 MAC 地址，当两台设备不处于同一个局域网时，“下一个目的地” 就是网关的 MAC 地址。
+&lt;/aside&gt;
+&lt;blockquote&gt;
+&lt;p&gt;步骤 ③：网关间跳转&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;经过步骤 ①②，此时 路由器1 收到的数据包为 { A_IP、PORT、A_MAC }  ➡   { B_IP、PORT、路由器1_MAC } 。收到数据包后，路由器1 查看自己的路由表，如下图所示。&lt;/p&gt;
+&lt;aside&gt;
+💡 查看当前设备设置的路由表：route -n
+&lt;/aside&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/route.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/route.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;route -n&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;route -n&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;路由器1 会将 B_IP 与 路由表中每条记录的子网掩码（Genmask）做按位与运算。如果得到的结果和目的网络（Destination）相同，那么 “下一个目的地“ 的 MAC 地址，就是配置的网关（Gateway）的 MAC 地址，这种找到相邻网络的方式叫做 “下一跳机制”。如果网关的地址为 0.0.0.0，说明可以在局域网中直接通信，不需要 “下一跳”。至此，再次找到了 “下一个目的地” 的 MAC 地址，即 路由器2 的 MAC 地址。此时 路由器2 收到的数据包为 { A_IP、PORT、路由器1_MAC }  ➡   { B_IP、PORT、路由器2_MAC } 。步骤 ④⑤ 和 ①② 的原理相同，在这里就不赘述了。&lt;/p&gt;
+&lt;aside&gt;
+📌 下一跳的目的就是找到“下一个目的地”，即下一步该到达哪里，侧重 “路线” 的选择，并由此获取到对应的 MAC 地址，继续传送数据包。
+&lt;/aside&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;总结一下：&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;使用 ARP 协议找到网关出口或同一局域网内设备的 MAC 地址&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;按照路由表的每条规则和 目标 IP 地址做按位与运算，找到相邻网关入口的 MAC 地址&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;“下一个目的地” 和当前地址都仅仅相邻一步，且每次 “跳跃” 后的源 MAC 地址 和 目标 MAC 地址都会发生对应的替换&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据包中，IP 地址指明起点终点，MAC 地址指明跳跃的节点，端口号指明对应的应用服务&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;当然，光是找到对方还不够，还需要一个约定的交流方式，平时我们所熟知的各种协议，都是计算机「约定的交流方式」。&lt;/p&gt;
+&lt;h2 id=&#34;lvs-负载均衡&#34;&gt;LVS 负载均衡&lt;/h2&gt;
+&lt;hr&gt;
+&lt;p&gt;随着使用互联网的设备不断增长，服务端对应接收到的 HTTP 请求更是呈指数型的增长。当一台服务器无法承载非常大的请求量时，使用多台服务器来分摊请求。将请求分摊给多台服务器的行为，就称之为负载均衡。&lt;/p&gt;
+&lt;p&gt;从网络中计算机通信的角度，而非使用更上层的应用（如 Nginx）出发，搭建四层负载均衡器后，数据包的发送链路为：CIP ➡  VIP ➡  DIP ➡  RIP，即 客户端 IP ➡  虚拟 IP ➡  分发 IP ➡  真实服务器 IP。对于客户端来说，只需要知道请求到达的地址是 VIP，不需要考虑负载，即 CIP ➡  VIP 是固定的。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;所以负载均衡器要做的事情，就是将 CIP 发送到 VIP 的数据包，经由 DIP 转发给 RIP，服务响应后再将响应的数据包返回给 CIP。&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;nat-模式&#34;&gt;NAT 模式&lt;/h3&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_2.svg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_2.svg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;NAT&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;NAT&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;红色表示发出的数据包&lt;/br&gt;
+绿色表示返回的数据包&lt;/br&gt;
+黄色表示负载均衡器修改的内容&lt;/br&gt;
+虚线表示经过 N 个下一跳，即可以不在同一局域网内&lt;/br&gt;
+实线表示只能 “跳跃一次”，即必须在同一局域网内&lt;/br&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;当计算机发出一个请求的数据包到达负载均衡器后，负载均衡器将发送数据包的 { 目标 IP 地址、端口号、目标 MAC 地址 } 转换为 { 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 } ，其余信息不变。这种只转换数据包的目标设备信息，而不修改数据包的源设备信息，称之为 DNAT，即目标网络地址转换。&lt;/li&gt;
+&lt;li&gt;真实服务器收到请求的数据包，返回响应的数据包：{ 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 } ➡️  { 原始请求的 IP 地址、端口号、跳跃的 MAC 地址 } 。所以此时在服务器上查看 TCP 连接为：CIP ➡️  RIP。&lt;/li&gt;
+&lt;li&gt;真实服务器返回的数据包的 “下一个目的地” 必须是负载均衡器。如果返回数据包直接返回给客户端，客户端发现返回数据包的源设备信息和发出数据包的目标设备信息不一致，将会丢弃返回数据包。所以真实服务器的默认网关必须是 DIP，保证返回数据包的 “下一个目的地” 是负载均衡器。&lt;/li&gt;
+&lt;li&gt;当返回的数据包到达负载均衡器后，负载均衡器将返回数据包的 { 原始请求的 IP 地址、端口号、跳跃的 MAC 地址 }  转换为原始请求的 { 目标 IP 地址、端口号、目标 MAC 地址 } 。这种只转换数据包的源设备信息，而不修改数据包的目标设备信息，称之为 SNAT，即源网络地址转换。&lt;/li&gt;
+&lt;li&gt;负载均衡器返回数据包给客户端。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;总结一下 NAT 模式的特点：&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;修改数据包的「源 IP 地址」或 「目标 IP 地址」，可以对端口进行转发&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器的默认网关必须是负载均衡器，所以真实服务器和负载均衡器必须在同一个局域网内&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;所有的请求数据包、响应数据包都要经过负载均衡器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;fullnat-模式&#34;&gt;FULLNAT 模式&lt;/h3&gt;
+&lt;hr&gt;
+&lt;p&gt;NAT 模式中，负载均衡器和真实服务器必须在同一局域网内，但在实际的开发过程中，真实服务器可能分布在不同的网段，甚至不同的城市。如何能将 NAT 模式应用在真实服务器分布在不同网段的场景下？&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_3.svg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/lb4/img/lb4_3.svg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;FULLNAT&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;FULLNAT&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;红色表示发出的数据包&lt;/br&gt;
+绿色表示返回的数据包&lt;/br&gt;
+黄色表示负载均衡器修改的内容&lt;/br&gt;
+虚线表示经过 N 个下一跳，即可以不在同一局域网内&lt;/br&gt;
+实线表示只能 “跳跃一次”，即必须在同一局域网&lt;/br&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;当计算机发出一个请求的数据包到达负载均衡器后，负载均衡器会对请求数据包同时做 SNAT 和 DNAT，将请求数据包修改为：{ 均衡出口 IP 地址、端口号、负载均衡器的 MAC 地址 } ➡️  { 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 }。&lt;/li&gt;
+&lt;li&gt;这样负载均衡器就可以独立的和真实服务器进行数据包的传送&lt;/li&gt;
+&lt;li&gt;真实服务器收到请求的数据包，返回响应的数据包：{ 某台真实服务器的 IP 地址、真实服务的端口号、真实服务器的 MAC 地址 } ➡️  { 负载均衡器的 IP 地址、端口号、负载均衡器的 MAC 地址 } 。此时在真实服务器上查看 TCP 连接为：DIP ➡️  RIP。&lt;/li&gt;
+&lt;li&gt;当返回的数据包到达负载均衡器后，负载均衡器将返回数据包再次同时做 DNAT 和 SNAT。&lt;/li&gt;
+&lt;li&gt;负载均衡器返回数据包给客户端。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;总结一下FULL NAT 模式的特点：&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;同时修改数据包的「源 IP 地址」和「目标 IP 地址」，可以对端口进行转发&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;负载均衡器不需要以网关的形式存在，即负载均衡器可以和真实服务器在不同的网络中&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真实服务器最终建立的连接是 DIP ➡️  RIP，无法获取真实客户端的 IP 地址&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;所有的请求数据包、响应数据包都要经过负载均衡器&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;LVS 本身不支持 FULLNAT 模式，需要额外对内核打补丁后才能使用。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;可以看到在 NAT 和 FULLNAT 模式中，不管是请求数据包还是响应数据包，都要经过负载均衡器。但是响应数据包一般要比请求数据包大很多，这可能会成为系统的瓶颈。如果能够将请求数据包转发到真实服务器之后，响应数据包由真实服务器直接返回，这样对负载均衡器的压力就小很多。这种模式又该如何实现？&lt;/p&gt;
+&lt;p&gt;下篇继续～&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

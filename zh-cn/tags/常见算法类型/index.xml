@@ -1,0 +1,1440 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>常见算法类型 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/</link>
+        <description>Recent content in 常见算法类型 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Thu, 24 Aug 2023 12:40:26 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>常见算法类型（九）基本算法思想</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</link>
+        <pubDate>Thu, 24 Aug 2023 12:40:26 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</guid>
+        <description>&lt;h2 id=&#34;贪心算法-greedy-algorithm&#34;&gt;贪心算法 Greedy Algorithm&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;适用场景明确包含期望值和限制值
+&lt;ul&gt;
+&lt;li&gt;一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;确定是否可以使用贪心算法
+&lt;ul&gt;
+&lt;li&gt;每次选择当前情况下，在&lt;strong&gt;对限制值同等贡献量&lt;/strong&gt;的情况下，对期望值贡献最大&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;初步验证贪心算法求得的结果是否是最优
+&lt;ul&gt;
+&lt;li&gt;尝试举几个例子&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;不能使用贪心算法的问题的特征
+&lt;ul&gt;
+&lt;li&gt;前面的选择，会影响后面的选择，例如 地图的最短路径&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;贪心算法的常见示例&#34;&gt;贪心算法的常见示例&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;霍夫曼编码 Huffman Coding
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;给字符进行编码，字符出现的频率越高，则编码后的符号越短&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;任何字符的编码都不是另一个的前缀&lt;/li&gt;
+&lt;li&gt;解压缩时，尽可能长地读取二进制串&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;按照字符出现的频率，放入优先级队列中从小到大排列，若频率相同则按照出现次序排列&lt;/li&gt;
+&lt;li&gt;构建霍夫曼树
+&lt;ul&gt;
+&lt;li&gt;每次从队列中取出前两个元素（最小的两个元素），将它们的频率相加后，放入优先级队列中，仍旧保证优先级队列是有序的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;根据霍夫曼树进行编码
+&lt;ul&gt;
+&lt;li&gt;给霍夫曼树中的所有左链接 0，右链接 1&lt;/li&gt;
+&lt;li&gt;从根结点开始，依次记录所有字母的编码&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Prim 最小生成树算法、Kruskal 最小生成树算法&lt;/li&gt;
+&lt;li&gt;Dijkstra 单源最短路径算法&lt;/li&gt;
+&lt;li&gt;分糖果
+&lt;ul&gt;
+&lt;li&gt;每次从剩下的孩子中找到需求最小的孩子&lt;/li&gt;
+&lt;li&gt;从剩下的糖果中找到能满足他的最小的糖果&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;钱币找零
+&lt;ul&gt;
+&lt;li&gt;如果钱币的面额分布较为均匀，如 100、50、20，则可以使用贪心算法。每次找出最大面额的钱币支付&lt;/li&gt;
+&lt;li&gt;如果钱币的面额分布不均匀，如 100、99、1，则贪心算法不再适用，需要使用动态规划
+6.区间覆盖&lt;/li&gt;
+&lt;li&gt;n 个区间的最左端点为 lmin，最右端点为 rmax&lt;/li&gt;
+&lt;li&gt;n 个区间按照起始端点从小到大排序&lt;/li&gt;
+&lt;li&gt;每次选择左端点和已经覆盖的区间不重合，右端点尽量小的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;分治算法-divide-and-conquer&#34;&gt;分治算法 Divide and Conquer&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;原问题可以分解成一系列的子问题，且原问题与分解成的小问题有相同的模式&lt;/li&gt;
+&lt;li&gt;原问题分解成的子问题可以独立求解，子问题之间没有相关性&lt;/li&gt;
+&lt;li&gt;具有分解终止条件，在问题足够小时，可以直接求解&lt;/li&gt;
+&lt;li&gt;可以将子问题合并成原问题，合并操作的复杂度不高&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;分治算法-递归操作&#34;&gt;分治算法-递归操作&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;分解，将原问题分解成一系列子问题&lt;/li&gt;
+&lt;li&gt;解决，递归地求解各个子问题，若子问题足够小，则直接求解&lt;/li&gt;
+&lt;li&gt;合并，将子问题的结果合并成原问题&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;分治算法的常见示例&#34;&gt;分治算法的常见示例&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;一组数据的有序对个数或者逆序对个数
+&lt;ul&gt;
+&lt;li&gt;将数组分成前后两段 A1、A2，则数组的逆序对个数等于 A1 的逆序对个数 K1 与 A2 的逆序对个数 K2、A1 A2 的逆序对个数 K3 之和，即 K1 + K2 + K3&lt;/li&gt;
+&lt;li&gt;借助归并排序，当 A1、A2 两个有序数组合并时，找出 A1 中比 A2 大的元素个数&lt;/li&gt;
+&lt;li&gt;最后将结果全部相加，得到总的逆序对个数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;求平面内的最近点对&lt;/li&gt;
+&lt;li&gt;矩阵计算&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;回溯算法-backtracking-algorithm&#34;&gt;回溯算法 Backtracking Algorithm&lt;/h2&gt;
+&lt;p&gt;枚举搜索的思想，有规律地枚举所有可能的解&lt;/p&gt;
+&lt;h3 id=&#34;回溯算法的常见示例&#34;&gt;回溯算法的常见示例&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;八皇后&lt;/li&gt;
+&lt;li&gt;0 - 1 背包&lt;/li&gt;
+&lt;li&gt;正则表达式&lt;/li&gt;
+&lt;li&gt;图的着色&lt;/li&gt;
+&lt;li&gt;旅行商问题&lt;/li&gt;
+&lt;li&gt;数独&lt;/li&gt;
+&lt;li&gt;全排列&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;动态规划-dynamic-programming&#34;&gt;动态规划 Dynamic Programming&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;适用场景
+&lt;ul&gt;
+&lt;li&gt;用于求解最优问题，如最大值、最小值等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;思路
+&lt;ul&gt;
+&lt;li&gt;把问题分解为多个阶段，每个阶段对应一个决策&lt;/li&gt;
+&lt;li&gt;记录每个阶段可达的状态集合（去掉重复的）&lt;/li&gt;
+&lt;li&gt;通过当前阶段的状态集合，来推导下一个阶段的状态集合，动态地向前推进&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;动态规划适用的问题&#34;&gt;动态规划适用的问题&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;动态规划适合解决的问题的模型（一个模型），即&lt;strong&gt;多阶段决策最优解模型&lt;/strong&gt;
+&lt;ol&gt;
+&lt;li&gt;解决问题的过程中，需要经历多个决策阶段&lt;/li&gt;
+&lt;li&gt;每个决策阶段都对应着一组状态&lt;/li&gt;
+&lt;li&gt;求解最优解时，可以经过某组决策序列来找到&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;三个特征
+&lt;ul&gt;
+&lt;li&gt;最优子结构
+&lt;ul&gt;
+&lt;li&gt;问题的最优解包含子问题的最优解，即可以通过子问题的最优解，推导出问题的最优解&lt;/li&gt;
+&lt;li&gt;后面阶段的状态可以通过前面阶段的状态推导出来&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;无后效性
+&lt;ul&gt;
+&lt;li&gt;推到后面阶段的状态时，只需要关心前面阶段的状态值，而不需要关心这个状态值是怎么得到的&lt;/li&gt;
+&lt;li&gt;某阶段的状态确定后，不受后面阶段的决策影响&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;重复子问题
+&lt;ul&gt;
+&lt;li&gt;不同的决策序列，到达某个相同的阶段时，可能会产生重复的状态&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;动态规划解决思路&#34;&gt;动态规划解决思路&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;状态转移表法
+&lt;ul&gt;
+&lt;li&gt;先建立一个状态表（一般都是二维的，如果问题的状态比较复杂的话，可能是多维）&lt;/li&gt;
+&lt;li&gt;状态表的每个状态包含三个变量，行、列、数组值&lt;/li&gt;
+&lt;li&gt;根据决策的过程，从前往后递推地填充状态表&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;状态转移方程法
+&lt;ul&gt;
+&lt;li&gt;递归 + 缓存、迭代递推&lt;/li&gt;
+&lt;li&gt;找到最优子结构&lt;/li&gt;
+&lt;li&gt;推导出状态转移方程&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;动态规划-和-回溯算法-的关系&#34;&gt;动态规划 和 回溯算法 的关系&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;根据回溯算法画出递归树&lt;/li&gt;
+&lt;li&gt;如果存在子问题，则可以考虑是否能用动态规划实现&lt;/li&gt;
+&lt;li&gt;如果不存在子问题，则回溯算法就是最优解&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;并行算法&#34;&gt;并行算法&lt;/h2&gt;
+&lt;h3 id=&#34;并行处理的常见示例&#34;&gt;并行处理的常见示例&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;并行排序
+&lt;ul&gt;
+&lt;li&gt;处理思想：先将数据进行分片，然后并行处理&lt;/li&gt;
+&lt;li&gt;并行执行归并排序，先随意地对数据分片，排序之后再合并&lt;/li&gt;
+&lt;li&gt;并行执行快速排序，先对数据按照大小划分区间，然后再排序，排完序后不需要合并&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;并行查找
+&lt;ul&gt;
+&lt;li&gt;使用散列表存储一定量的数据，当需要对散列表动态扩容时，会耗费很多不必要的内存&lt;/li&gt;
+&lt;li&gt;将数据随机分割成 k 份，每份中的数据只有原来的 1/k，针对这 k 个小数据集合分别构建散列表&lt;/li&gt;
+&lt;li&gt;当某个散列表的装载因子过大时，可以单独对这个小散列表进行扩容，这样不仅从内存的利用率或扩容的执行效率上，都比只使用一个大的散列表高效&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;并行匹配字符串
+&lt;ul&gt;
+&lt;li&gt;将一个大文本分割成 k 个小文本，并行地在这些小文本中查找关键词&lt;/li&gt;
+&lt;li&gt;在相邻的两个小文本中，将前一个小文本的结尾取 m 个字符，后一个小文本的开始取 m 个字符，在这个 2m 的字符串中再查找一遍需要匹配的字符串&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;并行搜索
+&lt;ul&gt;
+&lt;li&gt;并行化广度优先搜索算法&lt;/li&gt;
+&lt;li&gt;广度优先搜索是一种逐层搜索的搜索策略，可以基于当前结点，启动多个线程并行地搜索下一个层的顶点&lt;/li&gt;
+&lt;li&gt;使用两个队列 A、B，多个线程并行地处理队列 A 中的顶点，并将扩展得到的顶点存储在队列 B 中。队列 A 中的顶点都遍历过之后，队列 A 被清空。再遍历队列 B 中的顶点，将扩展得到的顶点存储在队列 A 中。A、B 循环使用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（八）相似</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/</link>
+        <pubDate>Thu, 24 Aug 2023 12:33:23 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/</guid>
+        <description>&lt;h2 id=&#34;字符串相似度&#34;&gt;字符串相似度&lt;/h2&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/&#34; &gt;字符串相似度&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;推荐系统-recommendation-system&#34;&gt;推荐系统 Recommendation System&lt;/h2&gt;
+&lt;h3 id=&#34;解析推荐系统&#34;&gt;解析推荐系统&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;找到偏好相似的用户，推荐他们喜欢的内容&lt;/li&gt;
+&lt;li&gt;找到特征相似的内容，推荐这些内容&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;基于相似用户推荐&#34;&gt;基于相似用户推荐&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;需要有当前用户喜爱歌曲的数据，根据用户间的“口味”相似度来进行推荐&lt;/li&gt;
+&lt;li&gt;定义“口味”相似
+&lt;ul&gt;
+&lt;li&gt;遍历所有的用户，对比每个用户和你共同喜爱的歌曲个数，并且设置一个阈值，当通过喜爱的歌曲个数超过这个阈值，则认为这个用户和你的“口味”相似&lt;/li&gt;
+&lt;li&gt;将和你“口味”相似的用户喜爱且你没有听过的歌曲，推荐给你&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;定义喜爱程度
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;给每个行为定义一个得分，得分越高表示喜爱程度越高&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/similar_score.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/similar_score.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;定义得分&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;定义得分&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;使用欧几里得距离来计算两个用户之间的相似度&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用向量表示每个用户对所有歌曲的喜爱程度&lt;/li&gt;
+&lt;li&gt;计算两个向量之间的欧几里得距离，度量两个用户的“口味”相似程度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/similar_distance.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/similar_distance.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;计算向量距离&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;计算向量距离&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;基于相似歌曲推荐&#34;&gt;基于相似歌曲推荐&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;根据当前用户喜欢的歌曲，找到相似的歌曲来进行推荐&lt;/li&gt;
+&lt;li&gt;定义歌曲“相似”
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;对歌曲定义一些特征项，基于歌曲特征项向量的距离来比表示两首歌曲相似度，&lt;strong&gt;缺点&lt;/strong&gt;是需要人工标记出每首歌的特征项，数据量太大且有很高的主观性&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;找到喜欢听的“相似”人群，如果两首歌曲的喜爱人群相似，则说明这两首歌比较相似&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;遍历所有的歌曲，将每个用户的打分作为向量，计算出歌曲的相似度&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/similar_song.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/similar_song.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;歌曲的相似度&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;歌曲的相似度&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（七）过滤</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/</link>
+        <pubDate>Thu, 24 Aug 2023 12:17:11 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/</guid>
+        <description>&lt;h2 id=&#34;过滤器&#34;&gt;过滤器&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;过滤重复的数据
+&lt;ul&gt;
+&lt;li&gt;位图&lt;/li&gt;
+&lt;li&gt;布隆过滤器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;过滤、拦截数据（如 短信、邮件等）
+&lt;ul&gt;
+&lt;li&gt;基于黑名单的过滤器&lt;/li&gt;
+&lt;li&gt;基于规则的过滤器&lt;/li&gt;
+&lt;li&gt;基于概率统计的过滤器&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;布隆过滤器-bloom-filter&#34;&gt;布隆过滤器 Bloom Filter&lt;/h2&gt;
+&lt;h3 id=&#34;位图-bit-map&#34;&gt;位图 Bit Map&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;位图是一种“特殊”的散列表，使用一个二进制位（bit）来表示一个布尔类型，通过位运算来实现对 bit 的使用&lt;/li&gt;
+&lt;li&gt;位图通过数组下标来定位数据，访问效率高，需要的内存小&lt;/li&gt;
+&lt;li&gt;1 Byte = 8 bit， 1 KB = 1024 B，1 MB = 1024 KB，1 GB = 1024 MB&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;位图与布隆过滤器&#34;&gt;位图与布隆过滤器&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;位图适合数据个数和数据范围的差值不大的情况
+&lt;ul&gt;
+&lt;li&gt;当差值过大时，位图需要的存储空间可能超过使用散列表存储的空间&lt;/li&gt;
+&lt;li&gt;若通过哈希函数对数字处理，使得数字落在一个合适的数据范围内，则可能出现哈希冲突&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;布隆过滤器
+&lt;ul&gt;
+&lt;li&gt;布隆过滤器是基于位图的改进，为了处理数据个数和数据范围的差值过大的情况&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;布隆过滤器存在误判&lt;/strong&gt;，当判断不存在时一定不存在，而判断存在时可能存在，也可能不存在&lt;/li&gt;
+&lt;li&gt;布隆过滤器一般不用删除数据，如果要支持删除操作，可以额外使用其他的数据结构用来记录删除的数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;布隆过滤器-bloom-filter-1&#34;&gt;布隆过滤器 Bloom Filter&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;使用 K 个哈希函数，对同一个数字分别使用这 K 个哈希函数求哈希值，分别为 X1、X2、X3 &amp;hellip;. Xk，将求得的这 K 个哈希值的下标都置为 true，用 K 个二进制位来表示一个数字的存在&lt;/li&gt;
+&lt;li&gt;查询数字是否存在时，使用同样的 K 个哈希函数求哈希值，通过这 K 个哈希值对应位图中的数值是否都为 true，如果都是 true 则说明这个数字存在，如果其中有任意一个不为 true，则说明这个数字不存在&lt;/li&gt;
+&lt;li&gt;布隆过滤器会出现误判的情况，但只会对存在的情况发生误判。如果某个数字经过布隆过滤器判断不存在，则这个数字一定不存在，而某个数字经过布隆过滤器判断为存在，则这个数字可能存在，也可能不存在&lt;/li&gt;
+&lt;li&gt;降低布隆过滤器误判概率的方法
+&lt;ul&gt;
+&lt;li&gt;增加哈希函数的个数&lt;/li&gt;
+&lt;li&gt;增加位图的大小和存储数字的个数之间的比例&lt;/li&gt;
+&lt;li&gt;在数据个数与位图大小的比例超过一定阈值的时候，可以重新申请一个新的位图。当需要判断某个数据是否存在时，需要查看多个位图&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;布隆过滤器 vs 散列表
+&lt;ul&gt;
+&lt;li&gt;布隆过滤器使用多个哈希函数对同一个数据进行处理，CPU 只需要从内存中读取一次，进行多次哈希运算，属于 CPU 密集型操作&lt;/li&gt;
+&lt;li&gt;散列表中可能存在散列冲突，当出现散列冲突时，需要读取散列值相同的多个数据，并跟原数据进行对比，属于内存密集型操作&lt;/li&gt;
+&lt;li&gt;理论上来看，布隆过滤器比散列表更加快速&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;布隆过滤器的应用&#34;&gt;布隆过滤器的应用&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;判断是否存在
+&lt;ul&gt;
+&lt;li&gt;爬虫网页的去重&lt;/li&gt;
+&lt;li&gt;快速判断某个数字是否存在于数据中&lt;/li&gt;
+&lt;li&gt;统计大型网站的每日 UV 数，对重复访问的用户去重&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;过滤拦截器&#34;&gt;过滤、拦截器&lt;/h2&gt;
+&lt;h3 id=&#34;基于黑名单的过滤器&#34;&gt;基于黑名单的过滤器&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;动态维护一个发送方信息的黑名单，即判断是否为黑名单的数据来源，如骚扰电话号码和垃圾短信发送号码、IP 地址等&lt;/li&gt;
+&lt;li&gt;若黑名单的数据量不大，可以使用散列表、二叉树等动态数据结构存储&lt;/li&gt;
+&lt;li&gt;若黑名单的数据量很大
+&lt;ul&gt;
+&lt;li&gt;使用布隆过滤器来减少所占用内存的大小，缺点是可能存在误判&lt;/li&gt;
+&lt;li&gt;将黑名单存储在服务器上，手机端将需要检查的号码发送给服务器端，完全不需要占用手机内存，缺点是必须联网工作，且网络延迟会降低处理速度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;基于规则的过滤器&#34;&gt;基于规则的过滤器&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;通过内容判断是否为垃圾信息，基于人工制定的规则
+&lt;ul&gt;
+&lt;li&gt;内容包含特殊单词&lt;/li&gt;
+&lt;li&gt;发送号码为群发号码&lt;/li&gt;
+&lt;li&gt;包含回拨的联系方式，如网页链接、QQ、微信等&lt;/li&gt;
+&lt;li&gt;格式花哨、内容很长，包含表情、图片、网页链接等&lt;/li&gt;
+&lt;li&gt;符合已知的垃圾内容的模版&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;结合多条规则综合来判断是否为垃圾信息
+&lt;ul&gt;
+&lt;li&gt;符合 N 条以上&lt;/li&gt;
+&lt;li&gt;每个规则对应不同的得分，总得分超过一定数值&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;基于概率统计的方法判断是否为垃圾信息
+&lt;ul&gt;
+&lt;li&gt;有大量的样本数据，且样本数据已经做好了标记，是否为垃圾信息&lt;/li&gt;
+&lt;li&gt;对样本信息进行分词处理，去掉“的、和、是”等没有意义的停用词（Stop Words），得到 n 个不同的单词&lt;/li&gt;
+&lt;li&gt;针对每个单词，统计此单词出现在有多少个垃圾信息中，即此单词出现在垃圾信息中的概率&lt;/li&gt;
+&lt;li&gt;如果此单词出现在垃圾信息中的概率远大于出现在非垃圾短信中的概率，则标记此单词为“垃圾单词”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;缺点
+&lt;ul&gt;
+&lt;li&gt;人工制定的规则受人思维方式的限制，规则简单、局限&lt;/li&gt;
+&lt;li&gt;垃圾内容发送方可能会针对这些规则，精心设计内容，绕过这些规则的拦截&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;基于概率统计的过滤器&#34;&gt;基于概率统计的过滤器&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;基于朴素贝叶斯算法 Native Bayesian Classification&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/nbc.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/nbc.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;朴素贝叶斯算法&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;朴素贝叶斯算法&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用概率来表示一个内容是垃圾信息的可信程度，将内容抽象成一组计算机可识别且可计算的特征项，用这一组特征项来代替内容本身&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/p.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/p.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;概率&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;概率&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;利用朴素贝叶斯公式计算出概率&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;独立事件发生的概率计算公式：P(A*B) = P(A)*P(B)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果事件 A 和事件 B 是独立事件，两者的发生没有相关性，事件 A 发生的概率 P(A) 等于 p1，事件 B 发生的概率 P(B) 等于 p2，那两个同时发生的概率 P(A*B) 就等于 P(A)*P(B)&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/calculate_p.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/calculate_p.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;计算概率&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;计算概率&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/calculate_p1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/calculate_p1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;计算概率&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;计算概率&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;计算同时包含 W1，W2，W3，…，Wn， 这 n 个单词的内容，是垃圾信息的概率 P1 和非垃圾信息的概率 P2，利用 P1 和 P2 的比值来判断此内容是否为垃圾信息&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;P（W1，W2，W3，…，Wn 同时出现在一条短信中） 在计算 P1 和 P2 的比值中抵消了&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/calculate_p2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/calculate_p2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;计算概率&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;计算概率&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;实际应用&#34;&gt;实际应用&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;可以结合上述三种不同的过滤拦截方式的结果，对同一个内容处理，如果三者都表明是垃圾信息，则过滤拦截&lt;/li&gt;
+&lt;li&gt;不断地调整策略
+&lt;ul&gt;
+&lt;li&gt;准确率，是否会把不是垃圾的短信错判为垃圾短信&lt;/li&gt;
+&lt;li&gt;召回率，是否能把所有的垃圾短信都找到&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（六）查找</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/</link>
+        <pubDate>Thu, 24 Aug 2023 12:06:40 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/</guid>
+        <description>&lt;h2 id=&#34;二分查找&#34;&gt;二分查找&lt;/h2&gt;
+&lt;h3 id=&#34;思想说明&#34;&gt;思想说明&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;针对&lt;strong&gt;有序&lt;/strong&gt;数据集合的查找算法，依赖于顺序表结构，即数组&lt;/li&gt;
+&lt;li&gt;每次通过和区间的中间元素对比，将待查找的区间缩小为之前的一半，直到找到要查找的元素，或区间被缩小至 0&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;分析&#34;&gt;分析&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;时间复杂度 O（log(n)）&lt;/li&gt;
+&lt;li&gt;代码实操注意事项
+&lt;ul&gt;
+&lt;li&gt;循环退出条件 &lt;strong&gt;low &amp;lt;= high&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;mid 的取值，如果 low 和 high 比较大的话，两者之和可能会溢出，改进为：low + ( high - low ) / 2，更进一步，将性能优化到极致 low + (( high - low) &amp;raquo; 1)&lt;/li&gt;
+&lt;li&gt;low 和 high 的更新，low = mid + 1，high = mid - 1&lt;/li&gt;
+&lt;li&gt;可以使用循环和递归两种实现方式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;应用场景&#34;&gt;应用场景&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;只能应用在数据是通过顺序表来存储的数据结构上&lt;/li&gt;
+&lt;li&gt;只能应用在有序数据，且插入、删除操作不频繁，一次排序多次查找的场景&lt;/li&gt;
+&lt;li&gt;数据量的要求
+&lt;ul&gt;
+&lt;li&gt;数据量太小不适合二分查找，直接顺序遍历就足够，但如果数据之间的比较操作非常耗时，&lt;strong&gt;使用二分查找尽可能地减少比较次数&lt;/strong&gt;，例如 数组中存储的都是长度超过 300 的字符串&lt;/li&gt;
+&lt;li&gt;数据量太大也不适合二分查找，二分查找的底层需要依赖数组这种数据结构，而数组为了支持随机访问的特性，要求&lt;strong&gt;内存空间连续&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;非常适合用在“近似”查找问题&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;凡是用二分查找能解决的，绝大部分更倾向于用散列表或者二叉树查找&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;常见的二分查找变形问题&#34;&gt;常见的二分查找变形问题&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;查找第一个值等于给定值的元素
+&lt;ol&gt;
+&lt;li&gt;当 a[mid] &amp;gt; value，high = mid - 1&lt;/li&gt;
+&lt;li&gt;当 a[mid] &amp;lt; value，low = mid + 1&lt;/li&gt;
+&lt;li&gt;当 a[mid] == value
+&lt;ul&gt;
+&lt;li&gt;如果 mid == 0，或者 a[mid - 1] != value，则 mid 就是第一个等于给定值的元素&lt;/li&gt;
+&lt;li&gt;如果不是，则继续 high = mid - 1，要找的元素一定在 [ low，mid - 1] 中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;查找最后一个值等于给定值的元素
+&lt;ol&gt;
+&lt;li&gt;当 a[mid] &amp;gt; value，high = mid - 1&lt;/li&gt;
+&lt;li&gt;当 a[mid] &amp;lt; value，low = mid + 1&lt;/li&gt;
+&lt;li&gt;当 a[mid] == value
+&lt;ul&gt;
+&lt;li&gt;如果 mid == n - 1，或者 a[mid + 1] != value，则 mid 就是最后一个值等于给定值的元素&lt;/li&gt;
+&lt;li&gt;如果不是，则继续 low = mid + 1，要找的元素一定在 [ mid + 1， high ] 中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;查找第一个大于等于给定值的元素
+&lt;ol&gt;
+&lt;li&gt;当 a[mid] &amp;gt;= value
+&lt;ul&gt;
+&lt;li&gt;如果 mid == 0，或者 a[mid + 1] &amp;lt; value，则 mid 就是第一个大于等于给定值的元素&lt;/li&gt;
+&lt;li&gt;如果不是，则继续 high = mid - 1，要找的元素一定在 [ low，mid - 1 ] 中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;当 a[mid] &amp;lt; value，low = mid + 1&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;查找最后一个小于等于给定值的元素
+&lt;ol&gt;
+&lt;li&gt;当 a[mid] &amp;lt;= value
+&lt;ul&gt;
+&lt;li&gt;如果 mid == n - 1，或者 a[mid + 1] &amp;gt; value，则 mid 就是最后一个小于等于给定值的元素&lt;/li&gt;
+&lt;li&gt;如果不是，则继续 low = mid + 1，要找的元素一定在 [ mid + 1，high ] 中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;当 a[mid] &amp;gt; value，high = mid - 1&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;跳表&#34;&gt;跳表&lt;/h2&gt;
+&lt;h3 id=&#34;思想说明-1&#34;&gt;思想说明&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;将原始有序链表每 n 个结点就提取一个结点到上层索引，添加多层索引&lt;/li&gt;
+&lt;li&gt;链表 ➕ 多级索引的结构，就是跳表&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;分析-1&#34;&gt;分析&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;查找、插入、删除操作，时间复杂度均为 O（log(n)）
+&lt;ul&gt;
+&lt;li&gt;查找时间复杂度
+&lt;ul&gt;
+&lt;li&gt;假设每 m 个结点抽出一个结点作为上一级索引的结点&lt;/li&gt;
+&lt;li&gt;第一级索引的结点个数大约为 n / m，第二级索引的结点个数 n / m，第 k 级索引的结点个数是 n / （），&lt;/li&gt;
+&lt;li&gt;假设 h 级索引，最高级索引有 m 个结点， n / （） = m，，整个跳表的高度就是&lt;/li&gt;
+&lt;li&gt;时间复杂度 = 每层需要遍历的结点数 x 跳表的高度 = O（m * ） = O（log(n)）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;空间复杂度 O（n）
+&lt;ul&gt;
+&lt;li&gt;假设每 m 个结点抽出一个结点作为上一级索引的结点&lt;/li&gt;
+&lt;li&gt;索引结点的总和就是 n / m + n / + n / + &amp;hellip;.+ + m&lt;/li&gt;
+&lt;li&gt;在实际的软件开发中，原始链表中存储的有可能是很大的对象，而索引结点只需要存储关键值和几个指针，并不需要存储对象，所以当对象比索引结点大很多时，索引占用的额外空间就可以忽略&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;索引动态更新
+&lt;ul&gt;
+&lt;li&gt;当不停地往跳表中插入数据是，如果不更新索引，就有可能出现某 2 个索引结点之间数据非常多的情况&lt;/li&gt;
+&lt;li&gt;通过一个随机函数，来决定将这个结点插入到哪几级索引中，譬如随机函数生成了值 k，就将这个结点添加到 第 1 级至第 k 级 这 k 级索引中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;应用场景-1&#34;&gt;应用场景&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;Redis 中的有序集合，使用跳表、散列表来实现
+&lt;ul&gt;
+&lt;li&gt;使得【按照区间查找数据】功能，可以在时间复杂度 O（log(n)）定位区间的起点，然后在原始链表中顺序往后遍历就可以了&lt;/li&gt;
+&lt;li&gt;跳表更为灵活，可以通过改变索引构建策略，有效平衡执行效率和内存消耗&lt;/li&gt;
+&lt;li&gt;跳表的代码实现更加容易&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;散列表&#34;&gt;散列表&lt;/h2&gt;
+&lt;h3 id=&#34;思想说明-2&#34;&gt;思想说明&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;散列表是一种数组的扩展，用的是数组支持按照下表随机访问数据的特性&lt;/li&gt;
+&lt;li&gt;关键字 / 键 key
+&lt;ul&gt;
+&lt;li&gt;标识数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;散列函数（Hash 函数）
+&lt;ul&gt;
+&lt;li&gt;将数据转化为数组下标的映射方法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;散列值
+&lt;ul&gt;
+&lt;li&gt;由散列函数计算得到的值&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;装载因子（load factor）
+&lt;ul&gt;
+&lt;li&gt;表示空位的多少&lt;/li&gt;
+&lt;li&gt;散列表的装载因子 = 填入表中的元素个数 / 散列表的长度&lt;/li&gt;
+&lt;li&gt;装载因子越大，说明空闲位置越少，冲突越多&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;散列函数设计的基本要求&#34;&gt;散列函数设计的基本要求&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;散列函数计算得到的散列值是一个非负整数&lt;/li&gt;
+&lt;li&gt;如果 key1 = key2，那么 hash( key1 ) == hash( key2 )&lt;/li&gt;
+&lt;li&gt;如果 key1 ≠ key2，那么 hash( key1 ) ≠ hash( key2 )
+&lt;ul&gt;
+&lt;li&gt;在真实情况下，要想找到一个不同的 key 对应的散列值都不一样的散列函数，几乎是不可能的，存在&lt;strong&gt;散列冲突&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;由于数组的存储空间有限，也会加大散列冲突的概率&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;常见的解决散列冲突的办法&#34;&gt;常见的解决散列冲突的办法&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;开放寻址法
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;线性探测（Linear Probing）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;插入：如果出现了散列冲突，重新探测一个空闲位置，将其插入&lt;/li&gt;
+&lt;li&gt;查找：通过散列函数求出要查找元素的键值对应的散列值，比较数组中下标为散列值的元素和要查找的元素，如果相等，则说明找到了，否则就顺序往后依次查找，如果遍历到数组中的空闲位置还没有找到，则说明查找的元素不存在散列表中&lt;/li&gt;
+&lt;li&gt;删除：将删除的元素标记为 deleted，当线性探测查找时，遇到标记为 deleted 的空间，并不是停下来，而是继续往下探测&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（1），最坏时间复杂度 O（n）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;二次探测（Quadratic Probing）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;类似线性探测，线性探测每次探测的步长是 1，hash( key ) + 0，hash( key ) + 1，，hash( key ) + 2&lt;/li&gt;
+&lt;li&gt;二次探测每次探测的步长是原来的平方，hash( key ) + 0，hash( key ) + 1^2，hash( key ) + 2^2&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;双重散列（Double Hashing）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用一组散列函数，先用第一个散列函数，如果计算得到的存储位置已经被占用，再用第二个散列函数，依此类推，直到找到空闲的存储位置&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;链表法
+&lt;ol&gt;
+&lt;li&gt;在散列表中，每个“桶（bucket）”或者“槽（slot）”会对应一条链表，所有散列值相同的元素放在相同槽位对应的链表中&lt;/li&gt;
+&lt;li&gt;插入：通过散列函数计算出对应的散列槽位，将其插入到对应链表中，时间复杂度为 O（1）&lt;/li&gt;
+&lt;li&gt;查找、删除：通过散列函数计算得出对应的散列槽位，遍历链表查找或删除，时间复杂度跟链表的长度 k 成正比，O（k），对于散列比较均匀的散列函数来说，k = n / m，n 为散列表中数据的个数，m 为散列表中“槽”的个数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;设计工业级散列表&#34;&gt;设计工业级散列表&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;设计要求
+&lt;ul&gt;
+&lt;li&gt;避免在散列冲突的情况下，性能急剧下降&lt;/li&gt;
+&lt;li&gt;能抵抗散列碰撞攻击&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;散列函数的设计
+&lt;ul&gt;
+&lt;li&gt;散列函数的设计不能太复杂&lt;/li&gt;
+&lt;li&gt;散列函数生成的值要尽可能随机并且均匀分布&lt;/li&gt;
+&lt;li&gt;需要综合考虑各种因素，如 关键字的长度、特点、分布、散列表的大小等&lt;/li&gt;
+&lt;li&gt;散列函数的常见设计：数据分析法、直接寻址法、平方取中法、折叠法、随机数法 等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;装载因子，动态扩容策略
+&lt;ol&gt;
+&lt;li&gt;装载因子越大，说明散列表中元素越多，空闲位置越少，散列冲突的概率越大&lt;/li&gt;
+&lt;li&gt;对于没有频繁插入和删除的静态数据集合，根据数据的特点、分布等，很容易设计出极少冲突的散列函数&lt;/li&gt;
+&lt;li&gt;对于动态散列表，数据集合是频繁变动的，当装载因子过大时，可以进行动态扩容，重新申请一个更大的散列表，将数据搬移到新散列表中
+&lt;ul&gt;
+&lt;li&gt;插入操作，最好时间复杂为 O（1），最坏时间复杂度为 O（n），均摊时间复杂度为 O（1）&lt;/li&gt;
+&lt;li&gt;如果对空间消耗比较敏感，可以在装载因子小于某个值后，启动动态缩容&lt;/li&gt;
+&lt;li&gt;如果对效率比较敏感，可以容忍多消耗一点内存空间，就不需要缩容&lt;/li&gt;
+&lt;li&gt;装载因子阈值的设置要权衡时间、空间复杂度
+&lt;ul&gt;
+&lt;li&gt;内存空间不紧张，对执行效率要就很高，可以降低装载因子的阈值&lt;/li&gt;
+&lt;li&gt;内存空间紧张，对执行效率要求不高，可以增加装载因子的阈值，甚至可以大于 1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如何避免低效地扩容
+&lt;ul&gt;
+&lt;li&gt;当极个别非常慢的插入操作（扩容并搬移数据）不能被容忍时，“一次性”扩容机制不能满足要求&lt;/li&gt;
+&lt;li&gt;可以将扩容操作穿插在插入操作的过程中，分批完成&lt;/li&gt;
+&lt;li&gt;当装载因子达到阈值时，只申请新空间，并不将老的数据搬移至新散列表中&lt;/li&gt;
+&lt;li&gt;当有新数据要插入时，将新数据插入新散列表中，并且从老的散列表中拿出一个数据放入到新散列表中&lt;/li&gt;
+&lt;li&gt;对于查询操作，为了兼容新、老散列表中的数据，先从新散列表中查找，如果没有找到，再去老的散列表中查找&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;如何选择冲突解决方法
+&lt;ul&gt;
+&lt;li&gt;开放寻址法
+&lt;ol&gt;
+&lt;li&gt;优点
+&lt;ul&gt;
+&lt;li&gt;散列表中的数据都存储在数组中，可以有效地利用 CPU 缓存加快查询速度&lt;/li&gt;
+&lt;li&gt;序列化简单&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;缺点
+&lt;ul&gt;
+&lt;li&gt;删除数据时，需要特殊标记已经删除掉的数据&lt;/li&gt;
+&lt;li&gt;所有的数据都存储在一个数组中，冲突的代价更高&lt;/li&gt;
+&lt;li&gt;在使用开放寻址法解决冲突的散列表中，装载因子的上限不能太大，更浪费内存空间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;适合场景
+&lt;ul&gt;
+&lt;li&gt;数据量比较小、装载因子小&lt;/li&gt;
+&lt;li&gt;例如 Java 中的 ThreadLocalMap&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;链表法
+&lt;ol&gt;
+&lt;li&gt;优点
+&lt;ul&gt;
+&lt;li&gt;对大装载因子的容忍度更高&lt;/li&gt;
+&lt;li&gt;可以对链表法中的链表改造为其他更为高效的动态数据结构，如 跳表、红黑树，即便出现散列冲突，在极端情况下，所有的数据都散列到一个桶内，最终退化成的散列表的查询时间为 O（logn），有效地避免了散列碰撞攻击&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;缺点
+&lt;ul&gt;
+&lt;li&gt;链表需要存储指针，对于比较小的对象的存储，比较消耗内存&lt;/li&gt;
+&lt;li&gt;链表中的节点是零散分布在内存中的，不是连续的，对 CPU 缓存不友好，如果是存储大对象的话，指针的内存消耗可以忽略不计&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;适用场景
+&lt;ul&gt;
+&lt;li&gt;存储大对象、大数据量，更为灵活，可以支持更多的优化策略&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;工业级散列表-java-hashmap-分析&#34;&gt;工业级散列表 Java HashMap 分析&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;初始大小
+&lt;ul&gt;
+&lt;li&gt;默认是 16，如果事先知道数据量的大概范围，可以通过修改默认初始值，减少动态扩容的次数，提高 HashMap 的性能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;装载因子和动态扩容
+&lt;ul&gt;
+&lt;li&gt;最大装载因子默认是 0.75，当 HashMap 中元素个数超过 0.75 x capacity，就会启动扩容，每次扩容都会扩容原来的两倍&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;散列冲突解决方法
+&lt;ul&gt;
+&lt;li&gt;采用链表法来解决冲突&lt;/li&gt;
+&lt;li&gt;当链表长度太长（默认超过 8）时，链表就转换成红黑树&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;散列函数
+&lt;ul&gt;
+&lt;li&gt;简单高效、分布均匀&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;特性
+&lt;ul&gt;
+&lt;li&gt;支持快速的查询、插入、删除操作&lt;/li&gt;
+&lt;li&gt;内存占用合理，不能浪费过多的内存空间&lt;/li&gt;
+&lt;li&gt;性能稳定，极端情况下，散列表的性能也不会退化到无法接受的情况&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;散列表和链表的组合使用&#34;&gt;散列表和链表的组合使用&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;LRU 缓存淘汰算法（Least Recently Used）
+&lt;ol&gt;
+&lt;li&gt;借助散列表，将 LRU 缓存淘汰算法的时间复杂度降低为 O（1）&lt;/li&gt;
+&lt;li&gt;使用双向链表存储数据，链表中每个节点处理存储数据 data、前驱指针 prev、后继指针 next、散列表的拉链指针 hnext，前驱和后继指针是为了将节点串在双向链表中，hnext 指针是为了将结点串在散列表的拉链中&lt;/li&gt;
+&lt;li&gt;查找数据：在散列表中查找，当找到数据后，将它移动到双向链表的尾部&lt;/li&gt;
+&lt;li&gt;删除数据：查找数据并将结点删除&lt;/li&gt;
+&lt;li&gt;添加数据：先看下数据是否存在缓存中，如果已经存在，则将它移动到双向链表的尾部，如果不在其中，查看缓存是否已经满了，如果满了，则将双向链表的头结点删除，再将数据放到链表的尾部，如果没有满，则直接将数据放到链表的尾部&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Redis 有序集合
+&lt;ol&gt;
+&lt;li&gt;按照分值将成员对象组织成跳表的结构&lt;/li&gt;
+&lt;li&gt;按照键值构建一个散列表&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;Java LinkedHashMap
+&lt;ol&gt;
+&lt;li&gt;通过双向链表和散列表两种数据结构组合实现&lt;/li&gt;
+&lt;li&gt;LinkedHashMap 中的 “Linked”实际上指的是双向链表，并非用链表法解决散列冲突&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;散列表和链表经常一起使用的原因
+&lt;ol&gt;
+&lt;li&gt;散列表的数据结构支持非常高效的插入、删除、查找操作，但是无法支持按照某种顺序快速地遍历数据&lt;/li&gt;
+&lt;li&gt;为了能够按照顺序遍历散列表中的数据时，将散列表和链表（或者跳表）结合在一起使用&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;哈希算法&#34;&gt;哈希算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;将任意长度的二进制值串映射为固定长度的二进制值串，其中映射的规则就是哈希算法，通过原始数据映射之后得到的二进制值串就是哈希值&lt;/li&gt;
+&lt;li&gt;哈希算法的要求
+&lt;ol&gt;
+&lt;li&gt;从哈希值不能反向推导出原始数据，即单向&lt;/li&gt;
+&lt;li&gt;对输入数据非常敏感，哪怕原始数据的改动微小，最后得到的哈希值也大不相同&lt;/li&gt;
+&lt;li&gt;散列冲突的概率要很小&lt;/li&gt;
+&lt;li&gt;哈希算法的执行效率要尽量高效，针对较长的文本，也能快速地计算出哈希值&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;哈希算法的应用&#34;&gt;哈希算法的应用&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;安全加密
+&lt;ol&gt;
+&lt;li&gt;MD5（Message-Digest Algorithm，MD5 信息摘要算法）&lt;/li&gt;
+&lt;li&gt;SHA（Secure Hash Algorithm，安全散列算法）&lt;/li&gt;
+&lt;li&gt;DES（Data Encryption Standard，数据加密标准）&lt;/li&gt;
+&lt;li&gt;AES（Advanced Encryption Standard，高级加密标准）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;着重注意点&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;单向推导，不能根据哈希值反向推导出原始数据&lt;/li&gt;
+&lt;li&gt;散列冲突的概率很小&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;唯一标识
+&lt;ul&gt;
+&lt;li&gt;图片的信息摘要，将图片的二进制码串的开头取一百个字节，中间一百个字节，结尾再取一百个字节，将这三百个字节通过哈希算法（例如 MD5），得到一个哈希字符串，用它作为图片的唯一标识&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;数据校验
+&lt;ul&gt;
+&lt;li&gt;下载的文件块校验，对文件块分别取哈希值，并且保存在种子文件中。当文件块下载完成之后，可以通过相同的哈希算法，对下载好的文件块逐一求哈希值，跟种子文件中保存的哈希值对比&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;散列函数
+&lt;ol&gt;
+&lt;li&gt;散列函数更注重数据能否均匀地散列在各个槽中和散列函数执行的效率、性能&lt;/li&gt;
+&lt;li&gt;对于散列冲突，使用开放寻址法或者链表法解决&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;负载均衡
+&lt;ul&gt;
+&lt;li&gt;会话粘滞的负载均衡算法
+&lt;ol&gt;
+&lt;li&gt;在同一个客户端上，再一次会话中的所有请求都路由到同一个服务器上&lt;/li&gt;
+&lt;li&gt;简单粗暴法
+&lt;ul&gt;
+&lt;li&gt;维护一张映射关系表，客户端 IP 地址或者会话 ID 与服务器编号的映射关系&lt;/li&gt;
+&lt;li&gt;弊端
+&lt;ul&gt;
+&lt;li&gt;客户端很多，映射表会很大，浪费内存空间&lt;/li&gt;
+&lt;li&gt;客户端上下线、服务器扩容缩容都会导致映射失效，维护映射表的成本会增大&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;哈希算法
+&lt;ul&gt;
+&lt;li&gt;对客户端 IP 地址或者会话 ID 计算哈希值&lt;/li&gt;
+&lt;li&gt;将取得的哈希值与服务器列表的大小进行取模运算，得到应该被路由到的服务器编号&lt;/li&gt;
+&lt;li&gt;将同一个 IP 过来的所有请求，都路由到同一个后端服务器上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;数据分片
+&lt;ul&gt;
+&lt;li&gt;如何统计“搜索关键字”
+&lt;ol&gt;
+&lt;li&gt;难点
+&lt;ul&gt;
+&lt;li&gt;搜索日志很大，没办法放在一台机器的内存中&lt;/li&gt;
+&lt;li&gt;如果只用一台机器处理，处理时间会很长&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;解决方法（MapReduce）
+&lt;ul&gt;
+&lt;li&gt;对数据进行分片，采用 n 台机器处理&lt;/li&gt;
+&lt;li&gt;从搜索日志中依次读出每个搜索关键词，通过哈希函数计算哈希值，对 n 取模，最终得到的值，就是被分配到的机器编号&lt;/li&gt;
+&lt;li&gt;哈希值相同的搜索关键词被分配到了同一台机器上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;如何快速判断图片是否在图库中
+&lt;ol&gt;
+&lt;li&gt;难点
+&lt;ul&gt;
+&lt;li&gt;图片的数量达到一定规模后，没办法在单台机器上构建散列表&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;解决方法
+&lt;ul&gt;
+&lt;li&gt;对数据进行分片，采用 n 台机器处理，每台机器只维护某部分图片对应的散列表&lt;/li&gt;
+&lt;li&gt;从图库中读取一个图片，计算唯一标识，与 n 求余取模，得到对应要分配的机器编号，然后将图片的唯一标识和图片路径发送到对应的机器上构建散列表&lt;/li&gt;
+&lt;li&gt;当要判断图片是否在图库中时，首先通过哈希算法，计算图片的唯一标识，然后与 n 求余取模，到对应机器上构建的散列表中查找&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;分布式存储
+&lt;ol&gt;
+&lt;li&gt;使用数据分片的思想，即通过哈希算法对数据取哈希值，然后对机器个数取模，这个最终值就是应该存储的缓存机器编号&lt;/li&gt;
+&lt;li&gt;考虑到数据会持续增多，当需要扩容时，需要一种方法，在新加入一台机器后，不需要做大量的数据搬移&lt;/li&gt;
+&lt;li&gt;使用一致性哈希算，n 台机器，数据的哈希值范围是 [0, MAX]。将整个范围划分为 m 个小区间，m 远大于 n，每个机器负责 m / n 个小区间。这样当有新机器加入时，将某几个小区间的数据，从原来的机器上搬移到新的机器中。&lt;/li&gt;
+&lt;li&gt;参考资料
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://en.wikipedia.org/wiki/Consistent_hashing&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://en.wikipedia.org/wiki/Consistent_hashing&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.zsythink.net/archives/1182&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://www.zsythink.net/archives/1182&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（五）排序算法对比</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/</link>
+        <pubDate>Thu, 24 Aug 2023 12:02:21 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/</guid>
+        <description>&lt;h2 id=&#34;各个排序算法间的比较&#34;&gt;各个排序算法间的比较&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/sort_all.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/sort_all.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;排序算法&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;排序算法&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;如何优化快速排序&#34;&gt;如何优化快速排序&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;快速排序的最坏时间复杂度是 O（n^2），出现最坏时间复杂度的原因是分区点选择的不够合理&lt;/li&gt;
+&lt;li&gt;最理想的分区点：被分区点分开的两个分区中，数据的数量差不多
+&lt;ul&gt;
+&lt;li&gt;比较常见的分区算法
+&lt;ol&gt;
+&lt;li&gt;三数取中法
+&lt;ul&gt;
+&lt;li&gt;取区间的首、尾、中间 三个数的中间值作为分区点&lt;/li&gt;
+&lt;li&gt;如果排序的数组比较大，“三数取中法”可能不够，需要“五数取中”或者“十数取中”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;随机法
+&lt;ul&gt;
+&lt;li&gt;每次从要排序的区间中，随机选择一个元素作为分区点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;快速排序使用递归实现，要警惕堆栈溢出
+&lt;ol&gt;
+&lt;li&gt;限制递归深度，一旦递归过深，停止递归&lt;/li&gt;
+&lt;li&gt;在堆上模拟实现一个函数调用栈，手动模拟递归压栈、出栈的过程&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（四）排序 O(n)：桶排序、计数排序、基数排序</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/</link>
+        <pubDate>Thu, 24 Aug 2023 11:59:04 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/</guid>
+        <description>&lt;h2 id=&#34;桶排序-bucket-sort&#34;&gt;桶排序 Bucket Sort&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;思想说明
+&lt;ol&gt;
+&lt;li&gt;桶排序只包含一种操作，元素的移动，不涉及元素之间的比较操作&lt;/li&gt;
+&lt;li&gt;将要排序的数据分到几个有序的桶里，每个桶里的数据单独进行排序&lt;/li&gt;
+&lt;li&gt;桶内排序完成后（归并排序），把每个桶里的数据按照顺序依次取出&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（n），不是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（n），最坏时间复杂度 O（nlog(n)）&lt;/li&gt;
+&lt;li&gt;是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;应用场景分析
+&lt;ol&gt;
+&lt;li&gt;排序的数据需要很容易的划分成 m 个桶&lt;/li&gt;
+&lt;li&gt;桶和桶之间有天然的大小关系&lt;/li&gt;
+&lt;li&gt;数据在各个桶之间的分布比较均匀&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;比较适合用在外部排序中，因数据量较大，内存有限而无法全部加载在内存中&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;计数排序-counting-sort&#34;&gt;计数排序 Counting Sort&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;思想说明
+&lt;ol&gt;
+&lt;li&gt;计数排序只包含一种操作，元素的移动，不涉及元素之间的比较操作&lt;/li&gt;
+&lt;li&gt;排序的数据划分成 m 个桶，每个数据对应的值为一个桶，每个桶中存放的是这个值对应的数据个数&lt;/li&gt;
+&lt;li&gt;将桶中存放的数据个数依次相加，得到位置数组&lt;/li&gt;
+&lt;li&gt;创建和原数据大小一致的数组，&lt;strong&gt;从后到前&lt;/strong&gt;遍历原数据，将数据对应的值的桶中存放的数据个数取出（x），放在创建数组 x-1 的位置上，并将桶中的值 - 1&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（n），不是原地排序算法&lt;/li&gt;
+&lt;li&gt;时间复杂度 O（n）&lt;/li&gt;
+&lt;li&gt;是稳定的排序算法（&lt;strong&gt;从后到前&lt;/strong&gt;遍历原数据）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;应用场景分析
+&lt;ol&gt;
+&lt;li&gt;排序的数据范围比较小&lt;/li&gt;
+&lt;li&gt;只能给非负整数排序，如果要排序的数据是其他类型，要在不改变相对大小的情况下，转化为非负整数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;基数排序-radix-sort&#34;&gt;基数排序 Radix Sort&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;思想说明
+&lt;ol&gt;
+&lt;li&gt;将要排序的数据按“位”分割&lt;/li&gt;
+&lt;li&gt;从后往前的按照“位”来排序数据，排序数据的算法必须是稳定的&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（1），是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（n）（“位”次桶排序或计数排序）&lt;/li&gt;
+&lt;li&gt;是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;应用场景分析
+&lt;ol&gt;
+&lt;li&gt;要排序的数据可以分割出独立的“位”来比较，&lt;/li&gt;
+&lt;li&gt;“位”之间有递进的关系，若 a 数据的高位比 b 数据的大，则剩下的低位不用比较&lt;/li&gt;
+&lt;li&gt;每一“位”的数据范围不能过大，要可以用线性排序算法来排序&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（三）排序 O(nlogn)：归并排序、快速排序、堆排序</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/</link>
+        <pubDate>Thu, 24 Aug 2023 11:31:06 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/</guid>
+        <description>&lt;h2 id=&#34;归并排序merge-sort&#34;&gt;归并排序（Merge Sort）&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/merge_sort.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/merge_sort.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;归并排序&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;归并排序&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;思想说明
+&lt;ol&gt;
+&lt;li&gt;归并排序包含两种操作，一种是元素的比较，一种是元素的移动&lt;/li&gt;
+&lt;li&gt;使用分治思想，分而治之，将一个大问题分解成小的字问题来解决&lt;/li&gt;
+&lt;li&gt;将数组从中间分成前后两部分，并对前后两部分分别排序&lt;/li&gt;
+&lt;li&gt;不断重复 b，直到数组分解完成（归）&lt;/li&gt;
+&lt;li&gt;将排好序的两部分合并在一起（并）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（n log(n)），不是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好、最坏、平均时间复杂度均为 O（n log(n)）&lt;/li&gt;
+&lt;li&gt;不是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;快速排序quick-sort&#34;&gt;快速排序（Quick Sort）&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/quick_sort.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/quick_sort.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;快速排序&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;快速排序&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;思想说明
+&lt;ol&gt;
+&lt;li&gt;快速排序包含两种操作，一种是元素的比较，一种是元素的移动&lt;/li&gt;
+&lt;li&gt;选择数组中的任意一个元素作为 pivot（分区点）&lt;/li&gt;
+&lt;li&gt;遍历数组，将小于 pivot 的元素放在左边，将大于 pivot 的元素放在右边，pivot 放在中间，此时数组分成了三个部分&lt;/li&gt;
+&lt;li&gt;不断重复 2，直到区间缩小为 1&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（1），是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（n log(n)），最坏时间复杂度 O（n^2）（概率很小），平均时间复杂度 O（n log(n)）&lt;/li&gt;
+&lt;li&gt;是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/merge_quick.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/merge_quick.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;归并 vs 快排&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;归并 vs 快排&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;堆排序&#34;&gt;堆排序&lt;/h2&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/#堆-heap&#34; &gt;堆 Heap&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（二）排序 O(n^2)：冒泡排序、插入排序、选择排序</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</link>
+        <pubDate>Thu, 24 Aug 2023 11:25:44 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</guid>
+        <description>&lt;h2 id=&#34;冒泡排序-bubble-sort&#34;&gt;冒泡排序 Bubble Sort&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bubble_sort.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bubble_sort.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;冒泡排序&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;冒泡排序&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;思想说明&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;冒泡排序中包含两种操作，一种是元素的比较，一种是元素的移动&lt;/li&gt;
+&lt;li&gt;冒泡排序只会操作相邻的两个数据，每次冒泡排序操作都会对相邻的两个元素进行比较，若不满足大小关系要求，则互换&lt;/li&gt;
+&lt;li&gt;一次冒泡至少会让一个元素移动到它应该在的位置，重复 n 次，就完成了 n 个数据的排序工作&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;分析&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（1），是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（n），最坏时间复杂度 O（n^2），平均时间复杂度 O（n^2）&lt;/li&gt;
+&lt;li&gt;是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;插入排序-insertion-sort&#34;&gt;插入排序 Insertion Sort&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/insert_sort.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/insert_sort.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;插入排序&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;插入排序&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;思想说明&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;插入排序包含两种操作，一种是元素的比较，一种是元素的移动&lt;/li&gt;
+&lt;li&gt;将数组中的数据分为两个区间，已排序区和未排序区，动态地往有序集合中添加数据&lt;/li&gt;
+&lt;li&gt;取未排序区间中的元素，在已排序区间中找到合适的插入位置将其插入，并保证已排序区间数据一直有序&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;分析&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（1），是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（n），最坏时间复杂度 O（n^2），平均时间复杂度 O（n^2）&lt;/li&gt;
+&lt;li&gt;是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;选择排序-selection-sort&#34;&gt;选择排序 Selection Sort&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/select_sort.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/select_sort.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;选择排序&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;选择排序&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;思想说明
+&lt;ol&gt;
+&lt;li&gt;选择排序包含两种操作，一种是元素的比较，一种是元素的移动&lt;/li&gt;
+&lt;li&gt;将数组中的数据，分为已排序区间和未排序区间&lt;/li&gt;
+&lt;li&gt;每次从未排序区间中找到最小的元素，放在已排序区间的末尾&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;分析
+&lt;ol&gt;
+&lt;li&gt;空间复杂度 O（1），是原地排序算法&lt;/li&gt;
+&lt;li&gt;最好时间复杂度 O（n^2），最坏时间复杂度 O（n^2），平均时间复杂度 O（n^2）&lt;/li&gt;
+&lt;li&gt;不是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>常见算法类型（一）排序</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/</link>
+        <pubDate>Thu, 24 Aug 2023 10:25:22 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/</guid>
+        <description>&lt;h2 id=&#34;如何分析一个排序算法&#34;&gt;如何分析一个排序算法&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;排序算法的执行效率
+&lt;ol&gt;
+&lt;li&gt;最好情况、最坏情况、平均情况时间复杂度&lt;/li&gt;
+&lt;li&gt;时间复杂度的系数、常数、低阶&lt;/li&gt;
+&lt;li&gt;比较次数交换（或移动）次数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;排序算法的内存消耗
+&lt;ul&gt;
+&lt;li&gt;原地排序，特指空间复杂度是 O（1）的排序算法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;排序算法的稳定性
+&lt;ul&gt;
+&lt;li&gt;如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变，则此排序算法是稳定的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;平均情况时间复杂度的计算&#34;&gt;平均情况时间复杂度的计算&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;有序度
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;数组中具有有序关系的元素对的个数&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/sort.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/sort.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;有序度&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;有序度&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;完全有序的数组的有序度叫做满有序度，n*(n-1)/2，如 1，2，3，4，5&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;逆序度
+&lt;ul&gt;
+&lt;li&gt;逆序度 = 满有序度 - 有序度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;排序算法&#34;&gt;排序算法&lt;/h2&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/&#34; &gt;O(n^2)：冒泡排序、插入排序、选择排序&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/&#34; &gt;O(nlogn)：归并排序、快速排序、堆排序&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/&#34; &gt;O(n)：桶排序、计数排序、基数排序&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/&#34; &gt;排序算法对比&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/#拓扑排序-topological-sorting&#34; &gt;Topological Sorting 拓扑排序&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

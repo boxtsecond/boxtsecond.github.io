@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Bo&#39;s Blog</title>
+    <link>https://boxtsecond.github.io/zh-cn/post/</link>
+    <description>Recent content in Posts on Bo&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>de-DE</language>
+    <lastBuildDate>Tue, 07 Nov 2023 18:25:28 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>数据结构与算法总览</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
+      <pubDate>Thu, 24 Aug 2023 13:28:17 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</guid>
+      <description>BE BEST 思维导图 数据结构与算法总览 文章列表 如何学习算法 数据结构 线性表 - 数组、链表 线性表 - 栈、队列 树 — 二叉树、递归树 树 — 红黑树、堆 树 — B+树 图 图的</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（六）VLAN</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/</link>
+      <pubDate>Tue, 07 Nov 2023 18:25:28 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/</guid>
+      <description>本文概览 VLAN Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（五）STP 协议</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/</link>
+      <pubDate>Mon, 30 Oct 2023 11:50:47 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/</guid>
+      <description>本文概览 本文概览 为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（四）ARP、RARP 协议</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/</link>
+      <pubDate>Thu, 28 Sep 2023 10:22:17 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/</guid>
+      <description>本文概览 本文概览 ARP 协议过程解析 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Clie</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/</link>
+      <pubDate>Tue, 05 Sep 2023 20:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/</link>
+      <pubDate>Tue, 05 Sep 2023 18:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（二）DR、TUN 模型原理</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Tue, 05 Sep 2023 16:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</link>
+      <pubDate>Tue, 05 Sep 2023 14:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/</guid>
+      <description>深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地</description>
+    </item>
+    
+    <item>
+      <title>常见应用（六）短网址服务</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/</link>
+      <pubDate>Thu, 24 Aug 2023 13:17:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/</guid>
+      <description>短网址服务 生成短网址，将原始的长网址转化为短网址 访问短网址，当用户点击短网址时，重定向到原始网址 短网址服务 生成短网址 哈希算法 使用哈希算法，将</description>
+    </item>
+    
+    <item>
+      <title>常见应用（五）鉴权与限流</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/</link>
+      <pubDate>Thu, 24 Aug 2023 13:09:34 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/</guid>
+      <description>鉴权 1.精确匹配规则 - 使用散列表存储，不同应用对应的不同规则关系 - 当需要匹配时 - 暴力匹配：可以将请求 URL 和字符串数组中逐一匹配，使用字符串匹配</description>
+    </item>
+    
+    <item>
+      <title>常见应用（四）Disruptor 内存消息队列</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</link>
+      <pubDate>Thu, 24 Aug 2023 13:06:42 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</guid>
+      <description>Disruptor 内存消息队列 Disruptor 内存消息队列是线程之间用于消息传递的队列 消息队列的实现 “生产者 - 消费者模型”，需要先进先出，选择队列作为底层的数据结构 基于链</description>
+    </item>
+    
+    <item>
+      <title>常见应用（三）搜索引擎</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/</link>
+      <pubDate>Thu, 24 Aug 2023 12:58:25 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/</guid>
+      <description>搜索引擎主要构成部分 搜索 通过爬虫爬取网页 分析 将网页内容抽取、分词，构建临时索引，计算 PageRank 索引 通过分析阶段构建的临时索引，构建倒排索引 查询 根据倒</description>
+    </item>
+    
+    <item>
+      <title>常见应用（二）Redis 常用数据类型对应的数据结构</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%8Credis-%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+      <pubDate>Thu, 24 Aug 2023 12:55:04 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%8Credis-%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+      <description>Redis 常用的数据类型 列表 list 当列表中保存的单个数据小于 64 字节，且列表中数据个数少于 512 个，将会使用压缩列表，否则使用的是双向循环链表 压缩列表 zipl</description>
+    </item>
+    
+    <item>
+      <title>常见应用（一）索引底层的数据结构</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%80%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+      <pubDate>Thu, 24 Aug 2023 12:50:44 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%80%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+      <description>为什么需要索引 实际软件开发中，需求的本质是对数据的存储和计算 数据的存储，需要的是“数据结构” 数据的计算，需要的是“算法” 对数据存储的需求 增删</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（九）基本算法思想</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</link>
+      <pubDate>Thu, 24 Aug 2023 12:40:26 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/</guid>
+      <description>贪心算法 Greedy Algorithm 适用场景明确包含期望值和限制值 一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大 确定是否可以使用贪心算法 每次选择</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（八）相似</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/</link>
+      <pubDate>Thu, 24 Aug 2023 12:33:23 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/</guid>
+      <description>字符串相似度 字符串相似度 推荐系统 Recommendation System 解析推荐系统 找到偏好相似的用户，推荐他们喜欢的内容 找到特征相似的内容，推荐这些内容 基于相似用户推荐 需要有</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（七）过滤</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/</link>
+      <pubDate>Thu, 24 Aug 2023 12:17:11 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/</guid>
+      <description>过滤器 过滤重复的数据 位图 布隆过滤器 过滤、拦截数据（如 短信、邮件等） 基于黑名单的过滤器 基于规则的过滤器 基于概率统计的过滤器 布隆过滤器 Bloom Filter 位图 Bit</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（六）查找</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/</link>
+      <pubDate>Thu, 24 Aug 2023 12:06:40 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/</guid>
+      <description>二分查找 思想说明 针对有序数据集合的查找算法，依赖于顺序表结构，即数组 每次通过和区间的中间元素对比，将待查找的区间缩小为之前的一半，直到找到要</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（五）排序算法对比</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/</link>
+      <pubDate>Thu, 24 Aug 2023 12:02:21 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/</guid>
+      <description>各个排序算法间的比较 排序算法 如何优化快速排序 快速排序的最坏时间复杂度是 O（n^2），出现最坏时间复杂度的原因是分区点选择的不够合理 最理想的分</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（四）排序 O(n)：桶排序、计数排序、基数排序</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 11:59:04 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/</guid>
+      <description>桶排序 Bucket Sort 思想说明 桶排序只包含一种操作，元素的移动，不涉及元素之间的比较操作 将要排序的数据分到几个有序的桶里，每个桶里的数据单独进行排序 桶内</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（三）排序 O(nlogn)：归并排序、快速排序、堆排序</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 11:31:06 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/</guid>
+      <description>归并排序（Merge Sort） 归并排序 思想说明 归并排序包含两种操作，一种是元素的比较，一种是元素的移动 使用分治思想，分而治之，将一个大问题分</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（二）排序 O(n^2)：冒泡排序、插入排序、选择排序</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 11:25:44 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/</guid>
+      <description>冒泡排序 Bubble Sort 冒泡排序 思想说明 冒泡排序中包含两种操作，一种是元素的比较，一种是元素的移动 冒泡排序只会操作相邻的两个数据，每次冒泡排序操作都会对</description>
+    </item>
+    
+    <item>
+      <title>常见算法类型（一）排序</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/</link>
+      <pubDate>Thu, 24 Aug 2023 10:25:22 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/</guid>
+      <description>如何分析一个排序算法 排序算法的执行效率 最好情况、最坏情况、平均情况时间复杂度 时间复杂度的系数、常数、低阶 比较次数交换（或移动）次数 排序算法的</description>
+    </item>
+    
+    <item>
+      <title>数据结构（十）字符串相似度</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+      <pubDate>Thu, 24 Aug 2023 10:20:14 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+      <description>字符串的相似度 编辑距离（Edit Distance） 将一个字符串转化成另一个字符串，需要的最少编辑次数（增加、删除、替换 一个字符） 编辑距离越大</description>
+    </item>
+    
+    <item>
+      <title>数据结构（九）字符串匹配</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/</link>
+      <pubDate>Wed, 23 Aug 2023 23:19:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/</guid>
+      <description>Brute Force 暴力匹配算法/朴素匹配算法 思想 在主串中，匹配模式串。若主串的长度是 n，模式串的长度是 m，则 n &amp;gt;= m。主串可以按照模式串的长度 m，得出 n - m</description>
+    </item>
+    
+    <item>
+      <title>数据结构（八）基于图的其它算法</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 23 Aug 2023 22:45:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/</guid>
+      <description>拓扑排序 Topological Sorting 当一组数据间存在两两依赖关系，并且数据间不存在循环依赖的关系。如果要对这组数据进行排序，则可以使用拓扑排序 拓扑排序是基于有向无环</description>
+    </item>
+    
+    <item>
+      <title>数据结构（七）图的搜索</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/</link>
+      <pubDate>Wed, 23 Aug 2023 22:39:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/</guid>
+      <description>应用背景 广度、深度优先搜索，都是应用于图的搜索算法，是一种暴力搜索的算法。 其他应用于图的搜索算法 A* IDA* 广度优先搜索 BFS（Breadth First Se</description>
+    </item>
+    
+    <item>
+      <title>数据结构（六）图</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/</link>
+      <pubDate>Wed, 23 Aug 2023 22:33:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/</guid>
+      <description>图 Graph 相关概念 顶点 Vertex：图中的元素 边 Edge：图中的一个顶点与任意其他顶点建立的连接关系 度 Degree：与顶点相连接的边的条数 入度 In</description>
+    </item>
+    
+    <item>
+      <title>数据结构（五）树 — B&#43;树</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/</link>
+      <pubDate>Wed, 23 Aug 2023 22:25:43 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/</guid>
+      <description>树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数</description>
+    </item>
+    
+    <item>
+      <title>数据结构（四）树 — 红黑树、堆</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/</link>
+      <pubDate>Wed, 23 Aug 2023 22:22:42 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/</guid>
+      <description>树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数</description>
+    </item>
+    
+    <item>
+      <title>数据结构（三）树 — 二叉树、递归树</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/</link>
+      <pubDate>Wed, 23 Aug 2023 22:19:41 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/</guid>
+      <description>树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数</description>
+    </item>
+    
+    <item>
+      <title>数据结构（二）线性表 — 栈、队列</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/</link>
+      <pubDate>Wed, 23 Aug 2023 22:12:18 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/</guid>
+      <description>线性表 每个线性表上的数据最多只有前和后两个方向，如 数组、链表、队列、栈 等 非线性表，数据之间不是简单的前后关系，如 二叉树、堆、图 等 栈 Stack “栈”数</description>
+    </item>
+    
+    <item>
+      <title>数据结构（一）线性表 — 数组、链表</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%80%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%95%B0%E7%BB%84%E9%93%BE%E8%A1%A8/</link>
+      <pubDate>Wed, 23 Aug 2023 19:02:18 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%80%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%95%B0%E7%BB%84%E9%93%BE%E8%A1%A8/</guid>
+      <description>线性表 每个线性表上的数据最多只有前和后两个方向，如 数组、链表、队列、栈 等 非线性表，数据之间不是简单的前后关系，如 二叉树、堆、图 等 数组 Array 线性表</description>
+    </item>
+    
+    <item>
+      <title>如何学习算法</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</link>
+      <pubDate>Wed, 23 Aug 2023 18:44:08 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</guid>
+      <description>学习的步骤 这个东西是什么，重点是什么 为什么需要学这个东西 怎么学这个东西 数据结构与算法 是什么 数据结构：一组数据的存储结构 算法：操作数据的一组方</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（三）MAC 层</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/</link>
+      <pubDate>Wed, 23 Aug 2023 17:16:32 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/</guid>
+      <description>本文概览 本文概览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际的物理链接。物理层</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（二）TCP/IP 协议模型</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/</link>
+      <pubDate>Wed, 23 Aug 2023 14:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%8Ctcp/ip-%E5%8D%8F%E8%AE%AE%E6%A8%A1%E5%9E%8B/</guid>
+      <description>本文概览 本文概览 TCP/IP 协议模型 TCP/IP 协议模型 我们从下往上依次介绍这些层级，有一个很重要的原因是，在网络中传输的数据包，会按照这些层级来封装报文，一个</description>
+    </item>
+    
+    <item>
+      <title>快速理解网络协议（一） IP 地址、MAC 地址</title>
+      <link>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/</link>
+      <pubDate>Wed, 23 Aug 2023 14:52:03 +0800</pubDate>
+      
+      <guid>https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%80-ip-%E5%9C%B0%E5%9D%80mac-%E5%9C%B0%E5%9D%80/</guid>
+      <description>本文概览 快速理解网络协议（一），基础知识的补充 本文概览 IP 地址 IP 地址中的 “IP” 代表Internet Protocol（互联网协议），IP 地址是</description>
+    </item>
+    
+  </channel>
+</rss>

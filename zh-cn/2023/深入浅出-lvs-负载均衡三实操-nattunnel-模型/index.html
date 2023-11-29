@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="de-DE">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地'><title>深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型'>
+<meta property='og:description' content='深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地'>
+<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络' /><meta property='article:tag' content='四层负载均衡' /><meta property='article:published_time' content='2023-09-05T18:52:03&#43;08:00'/><meta property='article:modified_time' content='2023-09-05T18:52:03&#43;08:00'/>
+<meta name="twitter:title" content="深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型">
+<meta name="twitter:description" content="深入浅出 LVS 负载均衡系列： 深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理 两台计算机如何在互联网中通信 LVS 负载均衡 通过修改数据包的「源 IP 地">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/zh-cn">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/%E7%BD%91%E7%BB%9C/" >
+                网络
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%89%E5%AE%9E%E6%93%8D-nattunnel-%E6%A8%A1%E5%9E%8B/">深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    2265字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>深入浅出 LVS 负载均衡系列：</p>
+<ul>
+<li>深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理
+<ul>
+<li>两台计算机如何在互联网中通信</li>
+<li>LVS 负载均衡
+<ul>
+<li>通过修改数据包的「源 IP 地址」或 「目标 IP 地址」
+<ul>
+<li>NAT 模式</li>
+<li>FULLNAT 模式</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>深入浅出 LVS 负载均衡（二）DR、TUN 模型原理
+<ul>
+<li>LVS 负载均衡
+<ul>
+<li>通过修改数据包的「目标 MAC 地址」
+<ul>
+<li>DR 模式</li>
+</ul>
+</li>
+<li>通过二次封装数据包的「IP 报文」
+<ul>
+<li>TUN 模式</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>深入浅出 LVS 负载均衡（三）实操 NAT、TUNNEL 模型、深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用
+<ul>
+<li>使用 UCloud 云主机实操各个模型</li>
+<li>使用 Keepalived 实现 LVS-DR 的高可用</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>LVS（Linux Virtual Server）是一个虚拟服务器集群系统。工作在 OSI 模型的传输层，即四层负载均衡。LVS 本身实现了 NAT、DR、TUN 模型，这些模型仅做数据包的转发，而不会与客户端建立连接，成本低效率高。FULLNAT 基于 NAT 实现，LVS 本身不支持，需要额外对内核打补丁后才能使用。</p>
+</blockquote>
+<aside>
+📌 本系列按照负载均衡器对数据包的处理方式分类，从计算机间通信的角度出发，浅谈 NAT、FULLNAT、DR、TUN 模型的实现原理。
+</aside>
+<p>之前介绍了 LVS 负载均衡 NAT、FULLNAT、DR、TUN 模型的实现原理。现在来动手实践一下～</p>
+<h2 id="实验环境">实验环境</h2>
+<p>LVS 目前已经是 Linux 内核中的一部分，在内核中的模块叫做 ipvs，支持 NAT、DR、TUNNEL 模型。用户不能直接操作 ipvs 模块，需要安装交互软件 ipvsadm，使用 ipvsadm 和 ipvs 进行交互。</p>
+<hr>
+<p>我使用 3 台 UCloud 云主机来搭建实验环境，创建云主机的时候选择分时购买，更划算一点。</p>
+<ul>
+<li>实验机器及环境
+<ul>
+<li>3 台 UCloud 云主机，CentOS 7.9 64位，1 核 1 G，需要注意一下防火墙规则，我选择的是【Web服务器推荐】，开放 22、3389、80、443 的端口号，这个可以自行配置
+<ul>
+<li>两台 Real Server：RS01、RS02，一台负载均衡服务器：LB01</li>
+<li>RS01：10.23.190.76、RS02：10.23.122.152、LB01：10.23.21.184</li>
+</ul>
+</li>
+<li>RS01、RS02 安装 httpd，快速启动 http 服务器，且配置不同的请求响应</li>
+<li>LB01 安装 ipvsadm，并启动 ipvsadm</li>
+</ul>
+</li>
+<li>实验机器展示
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_1.png" >
+		<img src="/post/networks/img/lb4_m_1.png"
+			
+			
+			
+			loading="lazy"
+			alt="实验机器"
+			width="85%">
+	</a>
+	
+	<figcaption>实验机器</figcaption>
+	
+</figure></li>
+</ul>
+<hr>
+<h2 id="nat-模式实操">NAT 模式实操</h2>
+<p>回顾一下 NAT 模式的特点</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_2.svg" >
+		<img src="/post/networks/img/lb4_2.svg"
+			
+			
+			
+			loading="lazy"
+			alt="NAT"
+			width="85%">
+	</a>
+	
+	<figcaption>NAT</figcaption>
+	
+</figure></p>
+<ul>
+<li><strong>NAT 模式修改数据包的「目标 IP 地址」或 「源 IP 地址」，所有的请求数据包、响应数据包都要经过负载均衡器，所以 NAT 模式支持对端口的转换</strong></li>
+<li><strong>真实服务器的默认网关是负载均衡器，所以真实服务器和负载均衡器必须在同一个网段</strong></li>
+</ul>
+<p>实操开始，首先我们要做一些前置的准备工作，即把该安装的软件和服务，安装和启动起来。</p>
+<ul>
+<li>
+<p>RS01、RS02 安装 httpd，快速启动 http 服务</p>
+<ul>
+<li>yum install httpd -y &amp;&amp; service httpd start</li>
+<li>echo &ldquo;Hello From RS01/RS02&rdquo; &gt; /var/www/html/index.html</li>
+<li>验证：curl 0.0.0.0，返回对应的信息
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_2.png" >
+		<img src="/post/networks/img/lb4_m_2.png"
+			
+			
+			
+			loading="lazy"
+			alt="curl 0.0.0.0"
+			width="85%">
+	</a>
+	
+	<figcaption>curl 0.0.0.0</figcaption>
+	
+</figure></li>
+</ul>
+</li>
+<li>
+<p>LB01 安装 ipvsadm，并启动 ipvsadm</p>
+<ul>
+<li>
+<p>yum install ipvsadm &amp;&amp; ipvsadm &ndash;save&gt; /etc/sysconfig/ipvsadm &amp;&amp; service ipvsadm start</p>
+<p>看到下图就表示成功启动了 ipvsadm
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_3.png" >
+		<img src="/post/networks/img/lb4_m_3.png"
+			
+			
+			
+			loading="lazy"
+			alt="ipvsadm"
+			width="85%">
+	</a>
+	
+	<figcaption>ipvsadm</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+</ul>
+<p>做完这些前置准备工作之后，接下来我们来对照 NAT 模式来配置具体的负载规则。</p>
+<ul>
+<li>
+<p>RS01、RS02</p>
+<ul>
+<li>设置默认网关为 DIP，即 LB01 的内网 IP - 10.23.21.184
+<ul>
+<li>
+<p>查看 RS01、RS02 当前的默认网关</p>
+<ul>
+<li>
+<p>route -n
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_4.png" >
+		<img src="/post/networks/img/lb4_m_4.png"
+			
+			
+			
+			loading="lazy"
+			alt="route -n"
+			width="85%">
+	</a>
+	
+	<figcaption>route -n</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>可以看到当前的默认网关是 10.23.0.1</p>
+</li>
+</ul>
+</li>
+<li>
+<p>设置默认网关为 10.23.21.184</p>
+<ul>
+<li>
+<p>route add default gw 10.23.21.184</p>
+</li>
+<li>
+<p>输入命令并按下回车之后，会很长时间没有响应，是正常的。我们等它连接断掉之后，再通过 LB01 登陆到 RS01、RS02 上
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_5.png" >
+		<img src="/post/networks/img/lb4_m_5.png"
+			
+			
+			
+			loading="lazy"
+			
+			width="85%">
+	</a>
+	
+</figure></p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_m_6.png" >
+		<img src="/post/networks/img/lb4_m_6.png"
+			
+			
+			
+			loading="lazy"
+			
+			width="85%">
+	</a>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+<li>
+<p>删除之前的默认网关</p>
+<ul>
+<li>route del default gw 10.23.0.1
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_7.png" >
+		<img src="/post/networks/img/lb4_m_7.png"
+			
+			
+			
+			loading="lazy"
+			
+			width="85%">
+	</a>
+	
+</figure></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>LB01</p>
+<ul>
+<li>
+<p>配置路由入口规则，使用 -A 参数</p>
+<ul>
+<li>因为实验使用的是云主机，而云主机的 EIP 或者说外网 IP 地址，本身就是通过 NAT 方式映射到了绑定的云主机上，所以不能将 EIP 当作 VIP 绑定端口。这里就直接将内网 IP  当作 DIP 使用。</li>
+<li>ipvsadm -A -t 10.23.21.184:8000 -s rr</li>
+</ul>
+</li>
+<li>
+<p>配置路由入口规则，使用 -a 参数</p>
+<ul>
+<li>ipvsadm -a -t 10.23.21.184:8000 -r 10.23.190.76:80 -m</li>
+<li>ipvsadm -a -t 10.23.21.184:8000 -r 10.23.122.152:80 -m</li>
+</ul>
+</li>
+<li>
+<p>验证配置</p>
+<ul>
+<li>ipvsadm -ln
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_8.png" >
+		<img src="/post/networks/img/lb4_m_8.png"
+			
+			
+			
+			loading="lazy"
+			
+			width="85%">
+	</a>
+	
+</figure></li>
+</ul>
+</li>
+<li>
+<p>开启路由转发</p>
+<ul>
+<li>echo 1 &gt;/proc/sys/net/ipv4/ip_forward</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>这里大概解释下对 ipvsadm 的配置信息</br></p>
+</blockquote>
+<ul>
+<li>-A 添加一条新的虚拟服务器记录，即添加一台新的虚拟服务器</td></br></li>
+<li>-a 添加一条新的真实服务器记录，即在虚拟服务器中添加一台真实服务器</br></li>
+<li>-t 真实服务器提供的是 TCP 服务</br></li>
+<li>-s 负载均衡使用的调度算法，rr 表示轮询</br></li>
+<li>-w 设置权重</br></li>
+<li>-r 指定真实服务器</br></li>
+<li>-m 指定 LVS 使用 NAT 模式</br></li>
+<li>-g 指定 LVS 使用 DR 模式</br></li>
+<li>-i 指定 LVS 使用 TUNNEL 模式</br></li>
+</ul>
+<p>可以看到，我们配置的是使用 NAT 模式，调度算法为轮询。</p>
+<p>到这里我们的配置就全部完成了，接下来让我们验证一下 LB01 能不能按照预期负载到 RS01、RS02 。使用浏览器直接打开 LB01 的外网 IP 地址。</p>
+<div class="table-wrapper"><table>
+    <tr>
+        <td ><center><img src="/post/networks/img/lb4_m_9.png" ></center></td>
+        <td ><center><img src="/post/networks/img/lb4_m_10.png"  ></center></td>
+    </tr>
+</table></div>
+<p>由于浏览器的缓存机制，在短时间内刷新的时候，返回可能不会发生变化。可以使用 curl 更准确的查看。</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_m_11.png" >
+		<img src="/post/networks/img/lb4_m_11.png"
+			
+			
+			
+			loading="lazy"
+			alt="验证"
+			width="85%">
+	</a>
+	
+	<figcaption>验证</figcaption>
+	
+</figure></p>
+<p>验证成功～</p>
+<h2 id="tunnel-模式实操">TUNNEL 模式实操</h2>
+<p>回顾一下 TUNNEL 模式的特点</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_tunnel.png" >
+		<img src="/post/networks/img/lb4_tunnel.png"
+			
+			
+			
+			loading="lazy"
+			alt="TUN"
+			width="85%">
+	</a>
+	
+	<figcaption>TUN</figcaption>
+	
+</figure></p>
+<ul>
+<li><strong>TUNNEL 模式不改变原数据包，而是在原数据包上新增一层 IP 首部信息。所以 TUNNEl 模式不支持对端口的转换，且真实服务器必须能够支持解析两层 IP 首部信息</strong></li>
+<li><strong>真实服务器和负载均衡器可以不在同一个网段中</strong></li>
+<li><strong>真实服务器需要更改 ARP 协议，“隐藏” lo 接口上的 VIP</strong></li>
+</ul>
+<p>TUNNEL 模式和其他模式有点不同，不能像之前那样直接使用 VIP 来充当 DIP。所以我们需要额外一个 DIP：10.23.21.180。</p>
+<p>开始配置具体的负载规则～</p>
+<ul>
+<li>
+<p>RS01、RS02</p>
+<ul>
+<li>
+<p>安装 ipip 模块</p>
+<ul>
+<li>modprobe ipip</li>
+</ul>
+</li>
+<li>
+<p>验证 ipip 模块是否加载成功</p>
+<ul>
+<li>
+<p>lsmod | grep ipip</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_m_12.png" >
+		<img src="/post/networks/img/lb4_m_12.png"
+			
+			
+			
+			loading="lazy"
+			alt="ipip"
+			width="85%">
+	</a>
+	
+	<figcaption>ipip</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+<li>
+<p>修改 ARP 协议</p>
+<ul>
+<li>echo 1 &gt; /proc/sys/net/ipv4/conf/tunl0/arp_ignore</li>
+<li>echo 2 &gt; /proc/sys/net/ipv4/conf/tunl0/arp_announce</li>
+<li>echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore</li>
+<li>echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce</li>
+</ul>
+<p>rp_filter 表示是否开启对数据包源地址的校验，这里我们直接关闭校验即可。</p>
+<ul>
+<li>echo 0 &gt; /proc/sys/net/ipv4/conf/tunl0/rp_filter</li>
+<li>echo 0 &gt; /proc/sys/net/ipv4/conf/all/rp_filter</li>
+</ul>
+</li>
+<li>
+<p>配置 DIP</p>
+<ul>
+<li>ifconfig tunl0 10.23.21.180 broadcast 10.23.21.180 netmask 255.255.255.255 up</li>
+<li>route add -host 10.23.21.180 tunl0</li>
+</ul>
+</li>
+<li>
+<p>验证配置</p>
+<ul>
+<li>
+<p>ifconfig
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_13.png" >
+		<img src="/post/networks/img/lb4_m_13.png"
+			
+			
+			
+			loading="lazy"
+			alt="ifconfig"
+			width="85%">
+	</a>
+	
+	<figcaption>ifconfig</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>route -n
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_14.png" >
+		<img src="/post/networks/img/lb4_m_14.png"
+			
+			
+			
+			loading="lazy"
+			alt="route -n"
+			width="85%">
+	</a>
+	
+	<figcaption>route -n</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>LB01</p>
+<ul>
+<li>配置路由入口规则
+<ul>
+<li>ipvsadm -A -t 10.23.21.180:80 -s wrr</li>
+</ul>
+</li>
+<li>配置路由出口规则，由于在不同的网段，这里需要配置 RS01、RS02 的外网地址
+<ul>
+<li>ipvsadm -a -t 10.23.21.180:80 -r 10.23.190.76 -i -w 1</li>
+<li>ipvsadm -a -t 10.23.21.180:80 -r 10.23.122.152 -i -w 1</li>
+</ul>
+</li>
+<li>配置 DIP
+<ul>
+<li>安装 ipip 模块
+<ul>
+<li>modprobe ipip</li>
+</ul>
+</li>
+<li>ifconfig tunl0 10.23.21.180 broadcast 10.23.21.180 netmask 255.255.255.255 up</li>
+<li>route add -host 10.23.21.180 tunl0</li>
+</ul>
+</li>
+<li>验证配置
+<ul>
+<li>
+<p>ipvsadm -ln
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_15.png" >
+		<img src="/post/networks/img/lb4_m_15.png"
+			
+			
+			
+			loading="lazy"
+			alt="ipvsadm"
+			width="85%">
+	</a>
+	
+	<figcaption>ipvsadm</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>route -n
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_16.png" >
+		<img src="/post/networks/img/lb4_m_16.png"
+			
+			
+			
+			loading="lazy"
+			alt="route -n"
+			width="85%">
+	</a>
+	
+	<figcaption>route -n</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>配置完成，我们再申请一台云主机来验证实操结果。</p>
+<p>DIP 是我们虚拟出来的 IP 地址，所以实际在网络中是找不到的，我们需要先手动将访问 DIP 的路由，访问到 LB01 上。</p>
+<ul>
+<li>route add -host 10.23.21.180 gw 10.23.21.184</li>
+<li>验证一下
+<ul>
+<li>route -n
+<figure 
+	>
+	<a href="/post/networks/img/lb4_m_17.png" >
+		<img src="/post/networks/img/lb4_m_17.png"
+			
+			
+			
+			loading="lazy"
+			alt="route -n"
+			width="85%">
+	</a>
+	
+	<figcaption>route -n</figcaption>
+	
+</figure></li>
+</ul>
+</li>
+</ul>
+<p>现在让我们来验证一下 TUNNEL 模型是否成功。</p>
+<p><figure 
+	>
+	<a href="/post/networks/img/lb4_m_18.png" >
+		<img src="/post/networks/img/lb4_m_18.png"
+			
+			
+			
+			loading="lazy"
+			alt="验证"
+			width="85%">
+	</a>
+	
+	<figcaption>验证</figcaption>
+	
+</figure></p>
+<p>验证成功～</p>
+<p>下篇继续 DR 模型的实操，及使用 Keepalived 实现 DR 模型的高可用。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C/">网络</a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">四层负载均衡</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">相关文章</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%9B%9B%E5%AE%9E%E6%93%8D-dr-%E6%A8%A1%E5%9E%8Bkeepalived-dr-%E6%A8%A1%E5%9E%8B%E7%9A%84%E9%AB%98%E5%8F%AF%E7%94%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">深入浅出 LVS 负载均衡（四）实操 DR 模型、Keepalived DR 模型的高可用</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%BA%8Cdrtun-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">深入浅出 LVS 负载均衡（二）DR、TUN 模型原理</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/2023/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BA-lvs-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E4%B8%80natfullnat-%E6%A8%A1%E5%9E%8B%E5%8E%9F%E7%90%86/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">深入浅出 LVS 负载均衡（一）NAT、FULLNAT 模型原理</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了67.8k字·共 37篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+         <br />
+        <br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+<i class="powerby">
+<span id="busuanzi_container_site_pv">
+    访问量&nbsp;:&nbsp;<span id="busuanzi_value_site_pv"></span>
+</span>&nbsp;
+<span id="busuanzi_container_site_uv">
+    访客数&nbsp;:&nbsp;<span id="busuanzi_value_site_uv"></span>人次
+  </span>
+</i>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/zh-cn/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#实验环境">实验环境</a></li>
+    <li><a href="#nat-模式实操">NAT 模式实操</a></li>
+    <li><a href="#tunnel-模式实操">TUNNEL 模式实操</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E7%BD%91%E7%BB%9C/" class="category-list-link">网络<span class="category-list-count">4</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">37</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
+                网络协议
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C/" class="font_size_4">
+                网络
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

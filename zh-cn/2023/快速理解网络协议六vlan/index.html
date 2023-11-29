@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="de-DE">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 VLAN Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的'><title>快速理解网络协议（六）VLAN</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（六）VLAN'>
+<meta property='og:description' content='本文概览 VLAN Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的'>
+<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-11-07T18:25:28&#43;08:00'/><meta property='article:modified_time' content='2023-11-07T18:25:28&#43;08:00'/>
+<meta name="twitter:title" content="快速理解网络协议（六）VLAN">
+<meta name="twitter:description" content="本文概览 VLAN Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/zh-cn">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/zh-cn/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" >
+                快速理解网络协议
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/">快速理解网络协议（六）VLAN</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Nov 07, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    1950字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="本文概览">本文概览</h2>
+<h2 id="vlan">VLAN</h2>
+<p><strong>Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的网络设备可以直接通信，跨 VLAN 不能直接通信，必须经由路由器等路由设备,从而将广播报文限制在单个广播域内。</strong></p>
+<h3 id="vlan-出现的背景">VLAN 出现的背景</h3>
+<p>随着以太网的迅猛发展，网络接入设备呈指数级增长。而<a class="link" href="https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/#mac-层-link-layer" ><strong>以太网在节点间传输数据基于共享物理介质</strong></a>，局域网中的网络设备越多，冲突的概率就会越高，性能会显著下降。其次，广播帧传递的范围太大，导致局域网的带宽资源、网络设备处理广播帧的 CPU 资源等资源的无谓消耗，影响整个局域网的性能。除此之外，在企业管理中，随着人员的变动，添加新设备时常常需要重新布线。而且通常会将不同部门划分不同的网络，以提高安全性。
+虽然路由器也可以分割广播域，但由于路由器设备的价格较贵，而且分割的局域网个数受限于路由器的端口，而路由器本身的端口数量较少。在这种环境下，用于在交换机（特指二层交换机）上分割局域网的 VLAN 技术应运而生。</p>
+<p><strong>总结一下局域网物理拓扑的缺点：</strong></p>
+<ol>
+<li><strong>网络设备越多，冲突概率越高，导致性能下降</strong></li>
+<li><strong>广播风暴消耗资源，影响局域网的整体性能</strong></li>
+<li><strong>扩展性低，无法灵活的分割网络</strong></li>
+</ol>
+<h3 id="vlan-的作用">VLAN 的作用</h3>
+<p>VLAN 的出现解决了局域网物理拓扑带来的限制，其作用说白了只有一点，<strong>按需分割广播域。将一个物理网络划分成多个逻辑网络，可以理解为将一台真实的交换机在逻辑上分为了多个交换机。</strong></p>
+<h3 id="vlan-数据帧格式">VLAN 数据帧格式</h3>
+<p>重新复习一遍<a class="link" href="https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/#mac-层的传输单位-frame" ><strong>传统以太网帧的格式</strong></a>的解析
+<figure 
+	>
+	<a href="/post/network_protocol/img/mac_frame.png" >
+		<img src="/post/network_protocol/img/mac_frame.png"
+			
+			
+			
+			loading="lazy"
+			alt="传统以太网帧"
+			width="85%">
+	</a>
+	
+	<figcaption>传统以太网帧</figcaption>
+	
+</figure></p>
+<p>IEEE 802.1Q 标准协议<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>的 VLAN 数据帧格式，是在传统以太网帧的目的 MAC 地址和源 MAC 地址字段之后，协议类型字段之前加入 4 个字节的 VLAN 标签（VLAN Tag 简称 Tag），用于标识数据帧所属的 VLAN。下图中的红色部分表示 VLAN 标签。</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/6-vlan.png" >
+		<img src="/post/network_protocol/img/6-vlan.png"
+			
+			
+			
+			loading="lazy"
+			alt="VLAN 帧"
+			width="85%">
+	</a>
+	
+	<figcaption>VLAN 帧</figcaption>
+	
+</figure></p>
+<p><em>以下仅对 VLAN 标签作出解释，其他字段的含义可查看<a class="link" href="https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/#mac-层的传输单位-frame" ><strong>传统以太网帧的格式</strong></a></em></p>
+<ul>
+<li>TPID：Tag protocol identifier 标签协议标识符，表示数据帧类型，0x8100 表示 IEEE 802.1Q 帧，长度为 2 个字节</li>
+<li>TCI：Tag control information，包含了数据帧控制信息，同样由 2 个字节组成
+<ul>
+<li>PCP（PRI）：Priority code point，表示数据帧的优先级。之前的名称为 PRI，具体含义没变。PCP 占 3 bits，所以取值范围为 0 ～ 8，值越大表示优先级越高。如果发生拥塞，交换机首先发送优先级最高的数据包</li>
+<li>DEI（CFI）：Drop eligible indicator 丢弃资格标识符，表示 MAC 地址封装是否符合规范格式，之前的名称为 CFI。DEI 占 1 bit，0 表示 MAC 地址以标准格式进行封装</li>
+<li><strong>VID：VLAN identifier，表示帧所属的 VLAN。一般情况下在 TCI 中，只关心 VID。VID 占 12 bits，取值范围为 0 ～ 4095，总计可以标识 4096 个 VLAN</strong></li>
+</ul>
+</li>
+</ul>
+<p>在一个 VLAN 网络中，数据帧由两种类型，有标记帧（tagged frame）和无标记帧（untagged frame）。交换设备的端口按照处理数据帧的能力，分为 Access 接口、Trunk 接口和 Hybrid 接口。每个接口都可以配置一个默认的 VLAN ID，用于为 untagged frame 添加 VLAN Tag。称为缺省 VLAN ID，即 PVID（Port Default VLAN ID）。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center">接口类型</th>
+<th style="text-align:center">作用</th>
+<th style="text-align:center">可处理的数据帧</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Access</td>
+<td style="text-align:center">连接终端设备，如计算机或 IP 电话</td>
+<td style="text-align:center">单个 VLAN 的数据帧，即 untagged frame。</td>
+</tr>
+<tr>
+<td style="text-align:center">Trunk</td>
+<td style="text-align:center">连接交换机之间或交换机与路由器之间</td>
+<td style="text-align:center">多个 VLAN 的数据帧，通过 VLAN 标签区分。</br>即可同时收发 tagged、untagged frame。</br> untagged frame 仅存在于发送数据帧时剥离 VLAN 标签，转发给特定 VLAN</td>
+</tr>
+<tr>
+<td style="text-align:center">Hybrid</td>
+<td style="text-align:center">结合 Access 和 Trunk 的功能，可连接终端设备，同时处理多个 VLAN</td>
+<td style="text-align:center">单个或多个 VLAN 的数据帧，根据配置确定</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="vlan-的优缺点">VLAN 的优缺点</h3>
+<ol>
+<li>优点
+<ul>
+<li>按需分割广播域</li>
+<li>减少广播流量</li>
+<li>提高安全性</li>
+<li>简化管理成本</li>
+</ul>
+</li>
+<li>缺点
+<ul>
+<li>VLAN ID 仅有 4096 个，在大型网络中不够用</li>
+<li>虽然可以从逻辑上划分成多个网络，但<strong>真实的数据帧无法脱离物理网络，即全部是 underlay 网络</strong>，会带来以下问题
+<ul>
+<li>交换机需要学习转发多个 VLAN 的数据帧，而交换机的内存有限且比较宝贵。当交换机 MAC 地址表不足以支持存储网络中的所有设备时，未存储 MAC 地址的设备的数据帧的转发，需要泛洪</li>
+<li>不同的 VLAN ID 通常会分配不同的 IP 地址段，当业务集中在某个 IP 段内时，会导致网络资源分配不均</li>
+<li>若局域网内使用 STP/RSTP 协议避免环路，则整个网络中的<a class="link" href="https://boxtsecond.github.io/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/#stp-协议的缺点" ><strong>多个 VLAN 仅构造一颗树</strong></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="vlan-通信过程解析">VLAN 通信过程解析</h2>
+<p>为了更好的理解 VLAN 的实际通信过程，我们将分别从 VLAN 内通信、跨 VLAN 通信两个方面来详细描述及实践，其中又分别包括了同设备和跨设备两种类型。</p>
+<h3 id="vlan-内通信">VLAN 内通信</h3>
+<h4 id="同设备">同设备</h4>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/vlan_in_one_switch.png" >
+		<img src="/post/network_protocol/img/vlan_in_one_switch.png"
+			
+			
+			
+			loading="lazy"
+			alt="同设备同 VLAN"
+			width="85%">
+	</a>
+	
+	<figcaption>同设备同 VLAN</figcaption>
+	
+</figure></p>
+<p>同设备同 VLAN 内通信，交换机与设备的连接如上图所示。设备 A 想要与设备 B 通信。</p>
+<h4 id="同设备-vlan-内抓包实践">同设备 VLAN 内抓包实践</h4>
+<ol>
+<li>
+<p>gns3 网络拓扑及配置</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/vlan_gns3_in_one_switch_topo.png" >
+		<img src="/post/network_protocol/img/vlan_gns3_in_one_switch_topo.png"
+			
+			
+			
+			loading="lazy"
+			alt="GNS3"
+			width="85%">
+	</a>
+	
+	<figcaption>GNS3</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>按照图中所示分别配置 A、B 的 IP 地址为 10.1.1.10、10.1.1.20</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/vlan_gns3_in_one_switch_a.png" >
+		<img src="/post/network_protocol/img/vlan_gns3_in_one_switch_a.png"
+			
+			
+			
+			loading="lazy"
+			alt="配置 A"
+			width="85%">
+	</a>
+	
+	<figcaption>配置 A</figcaption>
+	
+</figure>
+<figure 
+	>
+	<a href="/post/network_protocol/img/vlan_gns3_in_one_switch_b.png" >
+		<img src="/post/network_protocol/img/vlan_gns3_in_one_switch_b.png"
+			
+			
+			
+			loading="lazy"
+			alt="配置 B"
+			width="85%">
+	</a>
+	
+	<figcaption>配置 B</figcaption>
+	
+</figure></p>
+<ul>
+<li>A：ip 10.1.1.10/24 10.1.1.1</li>
+<li>B：ip 10.1.1.20/24 10.1.1.1</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="跨设备">跨设备</h4>
+<h4 id="跨设备-vlan-内抓包实践">跨设备 VLAN 内抓包实践</h4>
+<h3 id="跨-vlan-通信">跨 VLAN 通信</h3>
+<h4 id="同设备-1">同设备</h4>
+<h4 id="同设备跨-vlan-抓包实践">同设备跨 VLAN 抓包实践</h4>
+<h4 id="跨设备-1">跨设备</h4>
+<h4 id="跨设备跨-vlan-抓包实践">跨设备跨 VLAN 抓包实践</h4>
+<h2 id="vlan-的应用">VLAN 的应用</h2>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>除了 IEEE 802.1Q 还有 ISL，两者都可在数据帧中附加 VLAN 信息。唯一的区别是 ISL 是 Cisco 产品独有的，仅能在 Cisco 网络设备间使用。&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">网络协议</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">相关文章</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（五）STP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（四）ARP、RARP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（三）MAC 层</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了67.8k字·共 37篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+         <br />
+        <br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+<i class="powerby">
+<span id="busuanzi_container_site_pv">
+    访问量&nbsp;:&nbsp;<span id="busuanzi_value_site_pv"></span>
+</span>&nbsp;
+<span id="busuanzi_container_site_uv">
+    访客数&nbsp;:&nbsp;<span id="busuanzi_value_site_uv"></span>人次
+  </span>
+</i>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/zh-cn/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#本文概览">本文概览</a></li>
+    <li><a href="#vlan">VLAN</a>
+      <ol>
+        <li><a href="#vlan-出现的背景">VLAN 出现的背景</a></li>
+        <li><a href="#vlan-的作用">VLAN 的作用</a></li>
+        <li><a href="#vlan-数据帧格式">VLAN 数据帧格式</a></li>
+        <li><a href="#vlan-的优缺点">VLAN 的优缺点</a></li>
+      </ol>
+    </li>
+    <li><a href="#vlan-通信过程解析">VLAN 通信过程解析</a>
+      <ol>
+        <li><a href="#vlan-内通信">VLAN 内通信</a>
+          <ol>
+            <li><a href="#同设备">同设备</a></li>
+            <li><a href="#同设备-vlan-内抓包实践">同设备 VLAN 内抓包实践</a></li>
+            <li><a href="#跨设备">跨设备</a></li>
+            <li><a href="#跨设备-vlan-内抓包实践">跨设备 VLAN 内抓包实践</a></li>
+          </ol>
+        </li>
+        <li><a href="#跨-vlan-通信">跨 VLAN 通信</a>
+          <ol>
+            <li><a href="#同设备-1">同设备</a></li>
+            <li><a href="#同设备跨-vlan-抓包实践">同设备跨 VLAN 抓包实践</a></li>
+            <li><a href="#跨设备-1">跨设备</a></li>
+            <li><a href="#跨设备跨-vlan-抓包实践">跨设备跨 VLAN 抓包实践</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#vlan-的应用">VLAN 的应用</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E7%BD%91%E7%BB%9C/" class="category-list-link">网络<span class="category-list-count">4</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">37</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
+                网络协议
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C/" class="font_size_4">
+                网络
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

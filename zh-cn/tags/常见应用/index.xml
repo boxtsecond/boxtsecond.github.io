@@ -1,0 +1,778 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>常见应用 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/</link>
+        <description>Recent content in 常见应用 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Thu, 24 Aug 2023 13:17:41 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>常见应用（六）短网址服务</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/</link>
+        <pubDate>Thu, 24 Aug 2023 13:17:41 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/</guid>
+        <description>&lt;h2 id=&#34;短网址服务&#34;&gt;短网址服务&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;生成短网址，将原始的长网址转化为短网址&lt;/li&gt;
+&lt;li&gt;访问短网址，当用户点击短网址时，重定向到原始网址&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_short_link.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_short_link.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;短网址服务&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;短网址服务&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;生成短网址&#34;&gt;生成短网址&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;哈希算法
+&lt;ul&gt;
+&lt;li&gt;使用哈希算法，将长网址转化成一个固定长度的哈希值&lt;/li&gt;
+&lt;li&gt;哈希算法的选择，不需要考虑反向解密，只需要关心哈希算法的计算和冲突概率，选用 MurmurHash 算法，可以得到 32 bits 或 128 bits 长度的哈希值&lt;/li&gt;
+&lt;li&gt;如何让短网址更短
+&lt;ul&gt;
+&lt;li&gt;将 MurmurHash 算法得到的哈希值，转化为更高进制的哈希值，如 62 进制，即包含了 0～9、a～z、A～Z 的 62 个字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;解决哈希冲突
+&lt;ul&gt;
+&lt;li&gt;当新的原始网址需要生成短网址的时候，先通过哈希算法得到短网址&lt;/li&gt;
+&lt;li&gt;在存储数据库中查找是否已经存在此短网址，如果存在，且原始网址一样，则返回短网址，如果存在，且原始网址不一样，可以将原始网址后拼接一个特殊字符串，再计算哈希值，如果仍旧冲突，则换一个拼接字符串继续尝试&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;优化
+&lt;ul&gt;
+&lt;li&gt;可以借助数据库的唯一索引，来减少从数据库中获取原始网址的次数，当出现唯一索引冲突时，再去执行“查询、写入”的过程&lt;/li&gt;
+&lt;li&gt;使用布隆过滤器来判断短网址是否有冲突&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;ID 生成器
+&lt;ul&gt;
+&lt;li&gt;通过维护一个 ID 自增生成器，生成原始网址对应的自增 ID，再转化为 62 进制，并将短网址和对应的原始网址存储在数据库中&lt;/li&gt;
+&lt;li&gt;优化
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;相同的原始网址可能会对应不同的短网址&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;不做处理&lt;/li&gt;
+&lt;li&gt;当需要生成短网址时，现在数据库中查找原始网址是否已经存在，如果存在则直接返回之前生成的短网址，在数据库中对原始网址、短网址都添加索引&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;提高 ID 生成器的性能&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;利用数据库的自增字段&lt;/li&gt;
+&lt;li&gt;ID 生成器添加多个前置发号器，给多个前置发号器发送 ID 号码，当接收到短网址生成请求时，选择某一个前置发号器来生成号码&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_short_link_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_short_link_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ID 生成器&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ID 生成器&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;多个 ID 生成器同时服务，每个 ID 生成器按照一定的规则生成 ID 号码&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_short_link_2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_short_link_2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ID 生成器&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ID 生成器&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见应用（五）鉴权与限流</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/</link>
+        <pubDate>Thu, 24 Aug 2023 13:09:34 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/</guid>
+        <description>&lt;h2 id=&#34;鉴权&#34;&gt;鉴权&lt;/h2&gt;
+&lt;p&gt;1.精确匹配规则
+- 使用散列表存储，不同应用对应的不同规则关系
+- 当需要匹配时
+- 暴力匹配：可以将请求 URL 和字符串数组中逐一匹配，使用字符串匹配算法 KMP、BM、BF 等
+- 快速匹配：将所有规则按照字符串大小排序，存储成一个有序数组，当要匹配时，使用二分查找，在有序数组中匹配
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;精确匹配规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;精确匹配规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;前缀匹配规则&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用散列表存储，不同应用对应的不同规则关系&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当需要匹配时&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;暴力匹配&lt;/li&gt;
+&lt;li&gt;快速匹配：使用 Trie 树来存储所有字符串规则，Trie 树中的每个节点不是存储单个字符串，而是存储接口被“/”分割之后的子目录，并且将每个节点的子节点存储成有序数组，在匹配的过程中，可以利用二分查找算法，决定下一个节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;前缀匹配规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;前缀匹配规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;前缀匹配规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;前缀匹配规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;模糊匹配规则&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用散列表存储，不同应用对应的不同规则关系&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当需要匹配时&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;暴力匹配：使用回溯的思想来匹配通配符&lt;/li&gt;
+&lt;li&gt;快速匹配：将包含通配符和不包含通配符的规则分开处理，不包含通配符的规则，存成有序数组或 Trie 树，剩余的包含通配符的规则，存储在数组中。当收到请求时，先在不包含通配符的有序数组或 Trie 树中匹配，如果可以匹配成功，则返回，如果不能匹配，则继续在通配符规则中匹配&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_3.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_3.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;模糊匹配规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;模糊匹配规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;限流&#34;&gt;限流&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;固定时间窗口限流算法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;思想&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;选定一个时间起点，之后收到请求时将计数器加一&lt;/li&gt;
+&lt;li&gt;根据限流规则，如果在当前时间窗口内，累计访问次数超过限流值，则拒绝后续的访问请求&lt;/li&gt;
+&lt;li&gt;当进入下一个时间窗口时，计数器清零重新计数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_4.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_4.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;固定时间窗口&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;固定时间窗口&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;缺点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;限流策略过于粗略，无法应对两个时间窗口临界时间内的突发流量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_5.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_5.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;缺点&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;缺点&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;滑动时间窗口限流算法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;假设限流的规则为，在任意 1s 内，接口的请求次数都不能大于 K 次&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;维护一个 K + 1 的循环队列，用来记录 1s 内到来的请求&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当收到新的请求时，将与这个新请求的时间间隔超过 1s 的请求，从队列里删除&lt;/li&gt;
+&lt;li&gt;查看循环队列中是否有空闲位置，如果有的话，把新请求存储在队尾位置，如果没有，说明这 1s 内的请求次数已经达到了 K 次，拒绝此次请求&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_6.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_auth_6.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;滑动时间窗口&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;滑动时间窗口&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;更多的平滑算法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;令牌桶算法&lt;/li&gt;
+&lt;li&gt;漏桶算法&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://mp.weixin.qq.com/s?__biz=MzI4MTY5NTk4Ng==&amp;amp;mid=2247488993&amp;amp;idx=1&amp;amp;sn=4b9d5deedd0e626c456744f04b499bbb&amp;amp;source=41#wechat_redirect&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://mp.weixin.qq.com/s?__biz=MzI4MTY5NTk4Ng==&amp;mid=2247488993&amp;idx=1&amp;sn=4b9d5deedd0e626c456744f04b499bbb&amp;source=41#wechat_redirect&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见应用（四）Disruptor 内存消息队列</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</link>
+        <pubDate>Thu, 24 Aug 2023 13:06:42 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</guid>
+        <description>&lt;h2 id=&#34;disruptor-内存消息队列&#34;&gt;Disruptor 内存消息队列&lt;/h2&gt;
+&lt;p&gt;Disruptor 内存消息队列是线程之间用于消息传递的队列&lt;/p&gt;
+&lt;h2 id=&#34;消息队列的实现&#34;&gt;消息队列的实现&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;“生产者 - 消费者模型”，需要先进先出，选择队列作为底层的数据结构&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;基于链表实现的无界队列
+&lt;ul&gt;
+&lt;li&gt;优点，快速动态扩容&lt;/li&gt;
+&lt;li&gt;缺点，占用内存多&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;基于数组实现的有界队列循环队列
+&lt;ul&gt;
+&lt;li&gt;优点，限制队列的大小，限制内存的持续增长，防止 Out of Memory 错误&lt;/li&gt;
+&lt;li&gt;缺点，搬移数据时性能变差，使用循环队列解决此问题&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;选用顺序队列中的循环队列&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;加锁的“生产者 - 消费者模型”&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;普通的“生产者 - 消费者模型”会出现的问题
+&lt;ul&gt;
+&lt;li&gt;多个生产者并发地往队列中写入数据，可能会出现互相覆盖的情况&lt;/li&gt;
+&lt;li&gt;多个消费者并发地从队列中消费数据，可能会出现重复读取的情况&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;解决上述问题
+&lt;ul&gt;
+&lt;li&gt;加锁，同一时间只允许一个线程执行，将并行改为串行&lt;/li&gt;
+&lt;li&gt;串行会导致多个生产者同一时间生产数据时，效率的下降，可以使用 CAS（Compare And Swap）优化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;无锁的“生产者 - 消费者模型”，Disruptor 使用的方式&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;生产者生产数据&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在队列中添加数据前，申请可用空闲存储空间，批量地申请连续的 n 个（n &amp;gt;= 1）存储单元&lt;/li&gt;
+&lt;li&gt;申请到 n 个存储单元之后，后续往队列中添加元素时，就可以不用加锁了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;申请存储单元的过程是需要加锁的&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;消费者消费数据&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;申请一批连续可读的 n 个存储单元&lt;/li&gt;
+&lt;li&gt;申请到 n 个存储单元之后，后续的读取操作就可以不用加锁了&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;申请连续可读的存储单元是需要加锁的&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;当多个生产者申请了多块连续的存储单元时，若前一个存储单元没有完全写入数据，在这个存储单元的后续存储单元，无法被消费者读取&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_disruptor.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_disruptor.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;disruptor&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;disruptor&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;源码地址： &lt;a class=&#34;link&#34; href=&#34;https://github.com/LMAX-Exchange/disruptor&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/LMAX-Exchange/disruptor&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见应用（三）搜索引擎</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/</link>
+        <pubDate>Thu, 24 Aug 2023 12:58:25 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/</guid>
+        <description>&lt;h2 id=&#34;搜索引擎主要构成部分&#34;&gt;搜索引擎主要构成部分&lt;/h2&gt;
+&lt;h3 id=&#34;搜索&#34;&gt;搜索&lt;/h3&gt;
+&lt;p&gt;通过爬虫爬取网页&lt;/p&gt;
+&lt;h3 id=&#34;分析&#34;&gt;分析&lt;/h3&gt;
+&lt;p&gt;将网页内容抽取、分词，构建临时索引，计算 PageRank&lt;/p&gt;
+&lt;h3 id=&#34;索引&#34;&gt;索引&lt;/h3&gt;
+&lt;p&gt;通过分析阶段构建的临时索引，构建倒排索引&lt;/p&gt;
+&lt;h3 id=&#34;查询&#34;&gt;查询&lt;/h3&gt;
+&lt;p&gt;根据倒排索引获取相关网页，计算网页排名，返回查询结果&lt;/p&gt;
+&lt;h2 id=&#34;搜集&#34;&gt;搜集&lt;/h2&gt;
+&lt;h3 id=&#34;实现要点&#34;&gt;实现要点&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;将整个互联网当作一个非常庞大的有向图，把每一个页面当作一个顶点，如果某个页面包含另一个页面的链接，则在这两个页面（顶点）之间，连出一条有向边&lt;/li&gt;
+&lt;li&gt;利用图的遍历算法（广度、深度优先搜索算法），来遍历整个互联网中的网页
+&lt;ul&gt;
+&lt;li&gt;采用广度优先搜索算法&lt;/li&gt;
+&lt;li&gt;先爬取一些知名（权重较高）的网页，作为种子网页链接，放入到队列中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;技术细节&#34;&gt;技术细节&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;待爬取网页链接文件 links.bin
+&lt;ul&gt;
+&lt;li&gt;将 links.bin 作为爬虫待爬取页面的队列，即广度优先搜索中的队列&lt;/li&gt;
+&lt;li&gt;每次从 links.bin 中取出网页链接爬取对应的内容&lt;/li&gt;
+&lt;li&gt;将爬取网页内容中的链接存储到 links.bin 中，实现断点续爬&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;网页判重文件 bloom_filter.bin
+&lt;ul&gt;
+&lt;li&gt;使用布隆过滤器，来对已经爬取过的网页进行判重处理&lt;/li&gt;
+&lt;li&gt;定时地将布隆过滤器存储在磁盘上，写入 bloom_filter.bin 中，实现断点续爬不会重复爬取&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;原始网页存储文件 doc_raw.bin
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;将多个网页存储在一个文件中，每个网页之间用标识符分割，方便后续读取&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  ![网页存储](zh-cn/dev/algorithm/img/usage_search_engine_save.jpg)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ul&gt;
+&lt;li&gt;对每个文件的大小做限制，当文件大小超过限制时，创建新的文件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;网页链接及其编号的对应文件 doc_id.bin&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;对每个网页分配一个唯一的 ID，可以按照网页被爬取的先后顺序，从小到大依次编号&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;links.bin、bloom_filter.bin 供爬虫使用，doc_raw.bin、doc_id.bin 为搜集阶段的成果，供后续使用&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;分析-1&#34;&gt;分析&lt;/h2&gt;
+&lt;h3 id=&#34;抽取网页文本信息&#34;&gt;抽取网页文本信息&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;根据 HTML 标签抽取网页中的文本信息
+&lt;ul&gt;
+&lt;li&gt;去掉不需要的标签，如 JavaScript 代码、&lt;style&gt;&lt;/style&gt;、&lt;script&gt;&lt;/script&gt;、&lt;option&gt;&lt;/option&gt; 标签中的内容&lt;/li&gt;
+&lt;li&gt;去掉所有的 HTML 标签&lt;/li&gt;
+&lt;li&gt;使用 AC 自动机多模式匹配算法，在整个网页的字符串中，一次性的查找多个关键词&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;分词并创建临时索引&#34;&gt;分词并创建临时索引&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;确定分词的规则，如 基于字典（词库）和规则的分词方法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;字典中包含大量常用的词语（可以直接从网上 download）&lt;/li&gt;
+&lt;li&gt;基于词库，采取最长匹配规则，对文本进行分词&lt;/li&gt;
+&lt;li&gt;可以将词库中的单词构建成 Trie 树&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;构建临时索引 tem_index.bin&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;分词之后，得到网页对应的一组单词列表，将网页和对应的单词列表之间的对应关系，写入到一个临时索引文件中，其中单词列表使用单词编号（为了节省存储空间）&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;  ![t.jpg](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/f78f3f3c-7445-4745-8348-7cab85f5c29f/t.jpg)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将单词编号和单词的对应关系，存储到文件 term_id.bin 中&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用给网页编号类似的方法给单词编号&lt;/li&gt;
+&lt;li&gt;使用散列表来记录已经编过号的单词&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;tmp_index.bin、term_id.bin 供后续构建索引使用&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;索引-1&#34;&gt;索引&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;使用&lt;strong&gt;多路归并排序&lt;/strong&gt;的方式，将分析阶段产生的临时索引，构建成倒排索引 （Inverted Index） index.bin&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;对临时索引，按照单词编号的大小进行排序，由于临时索引的文件大小一般都很大，所以使用“归并排序”的处理思想，先把临时索引文件分割成多个小文件，在对每个小文件独立排序，最后合并在一起（实际应用中可以直接使用 MapReduce 处理）&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;临时索引文件排序后，相同的单词被排列到了一起，顺序地遍历排好序的临时索引文件，将每个单词对应的网页编号列表存储在倒排索引文件中 index.bin&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_search_engine_index.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_search_engine_index.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;临时索引&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;临时索引&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;倒排索引中记录了每个单词以及包含它的网页列表&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_search_engine_index_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_search_engine_index_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;倒排索引&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;倒排索引&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;生成每个单词编号在倒排索引文件中的偏移位置 term_offset.bin，快速地查找某个单词编号在倒排索引中存储的位置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_search_engine_offset.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_search_engine_offset.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;偏移位置&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;偏移位置&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;index.bin、term_offset.bin 供后续查询使用&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;查询-1&#34;&gt;查询&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;经过上面三个阶段之后，得到以下文件
+&lt;ul&gt;
+&lt;li&gt;doc_id.bin，记录网页链接和编号之间的对应关系&lt;/li&gt;
+&lt;li&gt;term_id.bin，记录单词和编号之间的对应关系&lt;/li&gt;
+&lt;li&gt;index.bin，倒排索引文件，记录每个单词编号及对应包含它的网页编号列表&lt;/li&gt;
+&lt;li&gt;term_offset.bin，记录每个单词编号在倒排索引中的偏移位置&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;将 doc_id.bin、term_id.bin、term_offset.bin 文件中的内容，以散列表的结构加载在内存中&lt;/li&gt;
+&lt;li&gt;当用户输入搜索文本时，先对用户的输入文本进行分词处理，得到 k 个单词&lt;/li&gt;
+&lt;li&gt;在 term_id.bin 对应的散列表中查找这 k 个单词对应的单词编号，k_ids&lt;/li&gt;
+&lt;li&gt;在 term_offset.bin 对应的散列表中查找 k_ids 对应在倒排索引文件中的偏移位置，k_offsets&lt;/li&gt;
+&lt;li&gt;在 index.bin 文件中，查找 k 个单词对应的包含它们的网页编号列表，k_web_ids&lt;/li&gt;
+&lt;li&gt;使用散列表统计 k_web_ids 每个网页编号出现的次数，次数越多说明包含越多的用户查询单词&lt;/li&gt;
+&lt;li&gt;按照出现次数的倒序，在 doc_id.bin 中查找对应的网页链接，分页展示&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;相关算法&#34;&gt;相关算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;计算网页权重，PageRank 算法， &lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/PageRank&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zh.wikipedia.org/wiki/PageRank&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;计算查询结果排名，tf-idf 模型， &lt;a class=&#34;link&#34; href=&#34;https://zh.wikipedia.org/wiki/Tf-idf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://zh.wikipedia.org/wiki/Tf-idf&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见应用（二）Redis 常用数据类型对应的数据结构</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%8Credis-%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+        <pubDate>Thu, 24 Aug 2023 12:55:04 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%8Credis-%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+        <description>&lt;h2 id=&#34;redis-常用的数据类型&#34;&gt;Redis 常用的数据类型&lt;/h2&gt;
+&lt;h3 id=&#34;列表-list&#34;&gt;列表 list&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;当列表中保存的单个数据小于 64 字节，且列表中数据个数少于 512 个，将会使用压缩列表，否则使用的是双向循环链表&lt;/li&gt;
+&lt;li&gt;压缩列表 ziplist，Redis 自己设计的一种数据结构
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;类似于数组，通过一片连续的内存空间来存储数据，允许存储的数据大小不同&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_redis.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/usage_redis.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;压缩列表&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;压缩列表&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;压缩列表相比于数组，节省内存，而且能够支持不同类型数据的存储&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;双向循环链表
+&lt;ul&gt;
+&lt;li&gt;Redis 中会额外定义一个 list 结构体，包含链表的首、尾指针、长度等信息，使用起来十分方便&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;字典-hash&#34;&gt;字典 hash&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;当字典中柏村的键和值的大小都小于 64 字节，且键值对的个数小于 512 个，将会使用压缩列表，否则使用的是散列表&lt;/li&gt;
+&lt;li&gt;散列表 MurmurHash2
+&lt;ul&gt;
+&lt;li&gt;使用 MurmurHash2 哈希算法作为哈希函数，运行速度快、随机性好&lt;/li&gt;
+&lt;li&gt;出现哈希冲突时，使用链表法解决&lt;/li&gt;
+&lt;li&gt;支持散列表的动态扩容、缩容
+&lt;ul&gt;
+&lt;li&gt;当装载因子大于 1 时，触发扩容，将散列表扩大为原来的 2 倍左右，具体的值通过计算得到&lt;/li&gt;
+&lt;li&gt;当装载因子小于 0.1 时，触发缩容，将散列表缩小为原来的 1/2 左右，具体的值也是通过计算得到的&lt;/li&gt;
+&lt;li&gt;参考 &lt;a class=&#34;link&#34; href=&#34;https://github.com/antirez/redis/blob/unstable/src/dict.c&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://github.com/antirez/redis/blob/unstable/src/dict.c&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;在扩容、缩容的过程中，需要做大量的数据搬移和哈希值的重新计算，会比较耗时，所以 Redis 使用渐进式扩容缩容策略，将数据的搬移分批进行&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;集合-set&#34;&gt;集合 set&lt;/h3&gt;
+&lt;p&gt;当存储的数据都是整数，且存储的数据元素个数不超过 512 个时，将会使用有序数组，否则使用的是散列表&lt;/p&gt;
+&lt;h3 id=&#34;有序集合-sortedset&#34;&gt;有序集合 sortedset&lt;/h3&gt;
+&lt;p&gt;当存储的所有数据的大小都小于 64 字节，且元素个数少于 128 个时，将会使用压缩列表，否则使用的是跳表&lt;/p&gt;
+&lt;h2 id=&#34;redis-的数据持久化数据结构的持久化&#34;&gt;Redis 的数据持久化（数据结构的持久化）&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;清除原有的存储结构，只将数据存储到磁盘中。当需要从磁盘读取到内存中时，再重新将数据组织成原来的数据结构
+&lt;ul&gt;
+&lt;li&gt;从磁盘读取到内存中，将数据组织成原来的数据结构，可能会消耗不少的时间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;保留原来的数据格式，将数据按照原有的格式存储在磁盘中&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>常见应用（一）索引底层的数据结构</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%80%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</link>
+        <pubDate>Thu, 24 Aug 2023 12:50:44 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%80%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/</guid>
+        <description>&lt;h2 id=&#34;为什么需要索引&#34;&gt;为什么需要索引&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;实际软件开发中，需求的本质是对数据的存储和计算
+&lt;ul&gt;
+&lt;li&gt;数据的存储，需要的是“数据结构”&lt;/li&gt;
+&lt;li&gt;数据的计算，需要的是“算法”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;对数据存储的需求
+&lt;ul&gt;
+&lt;li&gt;增删改查，以及提高这些操作的执行效率&lt;/li&gt;
+&lt;li&gt;节省存储空间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;索引的需求分析&#34;&gt;“索引”的需求分析&lt;/h2&gt;
+&lt;h3 id=&#34;功能性需求&#34;&gt;功能性需求&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;构建索引的原始数据的格式
+&lt;ul&gt;
+&lt;li&gt;结构化数据，如 MySQL 中的数据&lt;/li&gt;
+&lt;li&gt;非结构化数据，如搜索引擎中的网页等，需要做预处理，提取出查询关键词，对关键词构建索引&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;操作数据的类型
+&lt;ul&gt;
+&lt;li&gt;静态数据，构建索引时只需要考虑数据查询时的效率&lt;/li&gt;
+&lt;li&gt;动态数据，构建索引时，需要考虑数据查询、数据更新（动态的更新索引）的效率&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;数据存储的位置
+&lt;ul&gt;
+&lt;li&gt;内存，查询数据的速度快，但是存储的数据量有限&lt;/li&gt;
+&lt;li&gt;硬盘，查询数据的速度慢，支持大量数据的存储&lt;/li&gt;
+&lt;li&gt;内存 + 硬盘&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;数据的查找方式
+&lt;ul&gt;
+&lt;li&gt;单值查找，根据某个关键词等于某个值的数据查找&lt;/li&gt;
+&lt;li&gt;区间查找，查找关键词处于某个区间值内的数据&lt;/li&gt;
+&lt;li&gt;单关键词查找&lt;/li&gt;
+&lt;li&gt;多关键词组合查找
+&lt;ul&gt;
+&lt;li&gt;如果是结构化数据，如 MySQL，可以针对多个关键词的组合建立联合索引&lt;/li&gt;
+&lt;li&gt;如果是非结构化数据，如 网页内容，可以对多个关键词分别建立索引，在查询的时候取交集、并集等，计算出多个关键词组合的查询结果&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;非功能性需求&#34;&gt;非功能性需求&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;索引不能消耗过多的存储空间，或者远超过原始数据，否则本末倒置&lt;/li&gt;
+&lt;li&gt;在考虑索引的查询效率的同时，也要考虑到索引的维护成本&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;构建索引常用的数据结构&#34;&gt;构建索引常用的数据结构&lt;/h2&gt;
+&lt;h3 id=&#34;散列表&#34;&gt;散列表&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;增删改查的时间复杂度为 O（1）&lt;/li&gt;
+&lt;li&gt;常用于键值数据库中，如 Redis、Memcache&lt;/li&gt;
+&lt;li&gt;常构建在内存中&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;红黑树&#34;&gt;红黑树&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;数据的插入、删除、查找的时间复杂度为 O（logn）&lt;/li&gt;
+&lt;li&gt;常构建在内存中&lt;/li&gt;
+&lt;li&gt;Ext 文件系统中，对磁盘块的索引，使用的是红黑树&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;b-树&#34;&gt;B+ 树&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;B+ 树需要操作的磁盘 IO 更少&lt;/li&gt;
+&lt;li&gt;常构建在硬盘上&lt;/li&gt;
+&lt;li&gt;大部分关系型数据库的索引都是用 B+ 树来实现的，如 MySQL、Oracle&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;跳表&#34;&gt;跳表&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;通过调整索引结点个数和数据个数之间的比例，可以很好地平衡索引对内存的消耗及查询效率&lt;/li&gt;
+&lt;li&gt;常构建在内存中&lt;/li&gt;
+&lt;li&gt;Redis 中，有序集合的底层实现，使用的是跳表&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;辅助类数据结构快速判断数据是否在索引中&#34;&gt;辅助类数据结构，快速判断数据是否在索引中&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;位图&lt;/li&gt;
+&lt;li&gt;布隆过滤器，利用“不存在的一定不存在”规则&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

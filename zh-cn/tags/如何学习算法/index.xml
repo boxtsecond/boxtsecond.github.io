@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>如何学习算法 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</link>
+        <description>Recent content in 如何学习算法 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Wed, 23 Aug 2023 18:44:08 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>如何学习算法</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</link>
+        <pubDate>Wed, 23 Aug 2023 18:44:08 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/</guid>
+        <description>&lt;h2 id=&#34;学习的步骤&#34;&gt;学习的步骤&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;这个东西是什么，重点是什么&lt;/li&gt;
+&lt;li&gt;为什么需要学这个东西&lt;/li&gt;
+&lt;li&gt;怎么学这个东西&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;数据结构与算法&#34;&gt;数据结构与算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;是什么
+&lt;ul&gt;
+&lt;li&gt;数据结构：一组数据的存储结构&lt;/li&gt;
+&lt;li&gt;算法：操作数据的一组方法&lt;/li&gt;
+&lt;li&gt;数据结构为算法服务，算法要作用在特定的数据结构之上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;重点是什么
+&lt;ul&gt;
+&lt;li&gt;复杂度分析&lt;/li&gt;
+&lt;li&gt;10 个数据结构：数组、链表、栈、队列、散列表、二叉树、堆、跳表、图、Trie 树&lt;/li&gt;
+&lt;li&gt;10 个算法：递归、排序、二分查找、搜索、哈希算法、贪心算法、分治算法、回溯算法、动态规划、字符串匹配算法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;为什么要学
+&lt;ul&gt;
+&lt;li&gt;修炼自己的内功、锻炼自己的逻辑思维能力&lt;/li&gt;
+&lt;li&gt;成为 top 程序员&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;怎么学
+&lt;ul&gt;
+&lt;li&gt;边学边练，适度刷题（python、java、c++、js）&lt;/li&gt;
+&lt;li&gt;多思考、多互动&lt;/li&gt;
+&lt;li&gt;坚持学会、掌握，练习&lt;/li&gt;
+&lt;li&gt;反复三遍&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;衡量算法的优劣----复杂度分析&#34;&gt;衡量算法的优劣 &amp;ndash; 复杂度分析&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;时间复杂度分析，衡量执行算法消耗的时间&lt;/li&gt;
+&lt;li&gt;空间复杂度分析，衡量执行算法消耗的存储空间&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;为什么要复杂度分析&#34;&gt;为什么要复杂度分析&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;与普通的事后统计法相比较
+&lt;ol&gt;
+&lt;li&gt;测试结果非常依赖测试环境&lt;/li&gt;
+&lt;li&gt;测试结果受数据规模的影响很大&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;需要一种衡量标准来描述算法的优劣，并且跟测试数据、测试环境无关&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;怎么做复杂度分析&#34;&gt;怎么做复杂度分析&lt;/h2&gt;
+&lt;h3 id=&#34;时间复杂度分析&#34;&gt;时间复杂度分析&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;执行算法的时间随数据规模增长的变化趋势&lt;/li&gt;
+&lt;li&gt;T(n) = O(f(n))
+&lt;ul&gt;
+&lt;li&gt;T(n) 代码的执行时间&lt;/li&gt;
+&lt;li&gt;f(n) 代码的执行次数总和&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;只关注循环执行次数最多的一段代码&lt;/li&gt;
+&lt;li&gt;加法法则：总复杂度等于量级最大的那段代码的复杂度
+&lt;ul&gt;
+&lt;li&gt;T(n)=T1(n)+T2(n)=max(O(f(n)), O(g(n))) =O(max(f(n), g(n)))&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;乘法法则：嵌套代码的复杂度等于嵌套内外代码复杂度的乘积
+&lt;ul&gt;
+&lt;li&gt;T(n)=T1(n)*T2(n)=O(f(n))*O(g(n))=O(f(n)*g(n))&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;常见的时间复杂度
+&lt;ul&gt;
+&lt;li&gt;多项式量级
+&lt;ul&gt;
+&lt;li&gt;O(1)，代码中不存在循环、递归语句&lt;/li&gt;
+&lt;li&gt;O(logn)、O(nlogn)，对数阶时间复杂度，以步长做循环&lt;/li&gt;
+&lt;li&gt;O(m+n)、O(m*n)，两个数据的规模决定时间复杂度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;非多项式量级：O(2n) 和 O(n!)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/analysis.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/analysis.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;复杂度量级&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;复杂度量级&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&#34;空间复杂度分析&#34;&gt;空间复杂度分析&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;算法的存储空间与数据规模之间的增长关系&lt;/li&gt;
+&lt;li&gt;常见的空间复杂度：O(1)、O(n)、O(n ^ 2)&lt;/li&gt;
+&lt;li&gt;除了原本的数据存储空间外，算法运行需要额外的存储空间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;更全面的复杂度分析&#34;&gt;更全面的复杂度分析&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;最好情况时间复杂度（best case time complexity）➡️  最理想的情况&lt;/li&gt;
+&lt;li&gt;最坏情况时间复杂度（worst case time complexity）➡️  最糟糕的情况&lt;/li&gt;
+&lt;li&gt;平均情况时间复杂度（average case time complexity）
+&lt;ul&gt;
+&lt;li&gt;加权平均时间复杂度、期望时间复杂度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;均摊时间复杂度（amortized time complexity）
+&lt;ul&gt;
+&lt;li&gt;有一定的前后时序关系&lt;/li&gt;
+&lt;li&gt;大部分情况下时间复杂度都相同，个别情况不同&lt;/li&gt;
+&lt;li&gt;一般情况下，均摊时间复杂度等于最好情况时间复杂度&lt;/li&gt;
+&lt;li&gt;是一种特殊的平均时间复杂度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;解决方案的思考过程&#34;&gt;解决方案的思考过程&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;定义清楚问题
+&lt;ul&gt;
+&lt;li&gt;调研问题&lt;/li&gt;
+&lt;li&gt;对模糊的需求进行假设，限定要解决的问题的范围&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;理解隐藏需求
+&lt;ul&gt;
+&lt;li&gt;需求一般可以分为功能性需求和非功能性需求&lt;/li&gt;
+&lt;li&gt;功能性需求一般来讲是和业务逻辑紧密相关的&lt;/li&gt;
+&lt;li&gt;非功能性需求包括安全、性能、用户体验等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;尝试用学过的数据结构解决这个问题
+&lt;ul&gt;
+&lt;li&gt;尝试对比多种数据结构&lt;/li&gt;
+&lt;li&gt;如果不能直接使用基本数据结构解决，尝试改造数据结构，可以结合多个数据结构的不同特点，使用多个数据结构尝试解决&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;计算时间、空间复杂度，包括对内存、磁盘的访问&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;合理地选择数据结构和算法&#34;&gt;合理地选择数据结构和算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;熟知每种数据结构和算法的功能、特点、时间空间复杂度&lt;/li&gt;
+&lt;li&gt;时间、空间复杂度不能跟性能划等号
+&lt;ul&gt;
+&lt;li&gt;复杂度不是执行时间和内存消耗的精确值，会忽略低阶、常数、系数&lt;/li&gt;
+&lt;li&gt;处理小规模数据时，代码的执行时间有时不跟时间复杂度成正比&lt;/li&gt;
+&lt;li&gt;对于处理不同问题的不同算法，复杂度没有可比性&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;算法的选择，一定要根据数据规模来抉择。数据规模小的时候，不必选择高级算法，而是选择简单、易维护、易实现的算法&lt;/li&gt;
+&lt;li&gt;解决问题的重点在于对需求的调研、理解，理清楚要处理数据的特征与访问方式&lt;/li&gt;
+&lt;li&gt;区别对待 IO 密集、内存密集、计算密集
+&lt;ul&gt;
+&lt;li&gt;数据在磁盘上，代码的性能瓶颈可能在磁盘 IO，要尽可能地减少磁盘 IO 的次数&lt;/li&gt;
+&lt;li&gt;数据在内存中，判断代码是内存密集型还是 CPU 密集型
+&lt;ul&gt;
+&lt;li&gt;CPU 密集型，CPU 计算耗时占大部分，在选择数据结构和算法的时候，要尽量减少逻辑计算的复杂度，如 用位运算代替加减乘除等&lt;/li&gt;
+&lt;li&gt;内存密集型，内存数据的读取耗时占大部分，可以考虑是否能减少数据的读取量，数据是否在内存中连续存储，是否能利用 CPU 缓存预读&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用现有算法，避免重复造轮子&lt;/li&gt;
+&lt;li&gt;不要漫无目的地过度优化&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;学习书单&#34;&gt;学习书单&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;《大话数据结构》&lt;/li&gt;
+&lt;li&gt;《算法图解》&lt;/li&gt;
+&lt;li&gt;《数据结构和算法分析》&lt;/li&gt;
+&lt;li&gt;《剑指 offer》&lt;/li&gt;
+&lt;li&gt;《编程珠玑》&lt;/li&gt;
+&lt;li&gt;《编程之美》&lt;/li&gt;
+&lt;li&gt;《算法》&lt;/li&gt;
+&lt;li&gt;《算法导论》&lt;/li&gt;
+&lt;li&gt;《计算机程序设计艺术》&lt;/li&gt;
+&lt;li&gt;《算法帝国》&lt;/li&gt;
+&lt;li&gt;《数学之美》&lt;/li&gt;
+&lt;li&gt;《算法之美》&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

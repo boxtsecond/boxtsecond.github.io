@@ -1,0 +1,46 @@
+{{< notice notice-warning >}}
+你好。
+{{< /notice >}}
+{{< notice notice-info >}}
+你好。
+{{< /notice >}}
+{{< notice notice-note >}}
+你好。
+{{< /notice >}}
+{{< notice notice-tip >}}
+你好。
+{{< /notice >}}
+
+
+
+
+{{< detail "点这里看隐藏内容！" >}}
+这里是隐藏内容！🥰
+{{< /detail >}}
+
+{{< chat position="left" name="John Doe" timestamp="2023-09-12 14:30">}}
+这是左边的消息内容。
+{{< /chat >}}
+
+{{< chat position="right" name="Alice" timestamp="2023-09-12 14:45" >}} 
+这是右边的消息内容，测试长长长长长长长长长长长长长长长长长长长长长长长长度。
+{{< /chat >}}
+
+{{< timeline date="2023-10-01" title="国庆节" description="祖国生日快乐" tags="节日" url="" >}}
+
+{{< neodb "https://neodb.social/book/5SJvkuHNGL4XhBddW2J4EJ(条目链接)" >}}
+
+
+``` html
+{
+    "ho": "ha"
+}
+```
+
+<code>let a = 100</code>
+
+
+{{< quote author="            bobo" source="？？？" url="链接（可选）" >}}
+**Virtual Local Area Network，即虚拟局域网，用于将局域网的物理拓扑与逻辑拓扑解耦。将一个物理的局域网在逻辑上划分成多个广播域，VLAN 内的网络设备可以直接通信，跨 VLAN 不能直接通信，必须经由路由器等路由设备,从而将广播报文限制在单个广播域内。**
+
+{{< /quote >}}

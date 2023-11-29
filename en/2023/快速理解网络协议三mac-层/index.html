@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 本文概览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际的物理链接。物理层'><title>快速理解网络协议（三）MAC 层</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（三）MAC 层'>
+<meta property='og:description' content='本文概览 本文概览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际的物理链接。物理层'>
+<meta property='og:url' content='https://boxtsecond.github.io/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/'>
+<meta property='og:site_name' content='Project Documentation'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-08-23T17:16:32&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T17:16:32&#43;08:00'/>
+<meta name="twitter:title" content="快速理解网络协议（三）MAC 层">
+<meta name="twitter:description" content="本文概览 本文概览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1 物理层，顾名思义，表示实际的物理链接。物理层">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>Back</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/en/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/en">Project Documentation</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/en/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/about-me/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About Me</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>Dark Mode</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/en/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" >
+                快速理解网络协议
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/">快速理解网络协议（三）MAC 层</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 23, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    2373字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="本文概览"><strong>本文概览</strong></h2>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/3-mac.png" >
+		<img src="/post/network_protocol/img/3-mac.png"
+			
+			
+			
+			loading="lazy"
+			alt="本文概览"
+			width="85%">
+	</a>
+	
+	<figcaption>本文概览</figcaption>
+	
+</figure></p>
+<h2 id="物理层-physical-layer">物理层 Physical Layer</h2>
+<p>虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>物理层，顾名思义，表示实际的物理链接。物理层利用物理传输介质为通信的两端建立链接，实现比特流的传输，如铜线、光缆或无线通道，保证比特流正确的传输到对端。常见设备包括<strong>中继器、集线器</strong>等。其中集线器 Hub，完全在物理层工作，会将自己收到的每一个字节，都复制到其他端口上去，即广播模式。</p>
+<h2 id="mac-层-link-layer"><strong>MAC 层 Link Layer</strong></h2>
+<p>链路层，又称 MAC 层。MAC 的全称为 Medium Access Control，即媒体访问控制，主要有两个功能，<strong>寻址和控制</strong>。</p>
+<ol>
+<li><strong>寻址，即如何找到数据帧接收方</strong></li>
+<li><strong>控制，即谁先发、谁后发，发送出现问题如何处理</strong></li>
+</ol>
+<h3 id="解决控制问题"><strong>解决“控制”问题</strong></h3>
+<p>在以太网中，两个节点间传输的数据最终都会转换成电信号，在物理传输介质上发送出去。物理传输介质肯定是共享的，在发送数据时需要考虑谁先发、谁后发、同时发送时怎么避免冲突、出现问题怎么处理等。<strong>这就是多路访问问题，即如何协调多个发送和接收节点对单一共享广播信道的访问。</strong> 计算机网络使用多路访问协议来规范它们在共享的广播信道上的传输行为。</p>
+<h4 id="多路访问协议"><strong>多路访问协议</strong></h4>
+<p>我们可以先来思考一下，理想情况下在共享信道上期望怎么传输数据。</p>
+<ol>
+<li>如果只有一个节点需要发送数据，那么我们期望它可以以整个信道的速率 R 发送数据</li>
+<li>如果有 M 个节点需要同时发送数据，那么我们期望它可以以信道的传输速率 R / M来发送数据</li>
+</ol>
+<ul>
+<li>
+<p><strong>规划车道 ➡️ 信道划分协议 Channel Partitioning Protocol</strong></p>
+<p>采用多路复用技术，将链路、网络资源（如带宽）划分为“资源片”，将“资源片”分配给各路通信，每路通信<strong>独占</strong>其分配到的资源片进行通信。这样的划分方式，可以满足理想情况 2。</p>
+</li>
+<li>
+<p><strong>依次排队</strong> ➡️ <strong>轮转协议 Taking-turns Protocol</strong></p>
+<p>多个节点轮流发送数据。当只有一个结点活跃时，以信道的全部发送速率 R 发送；当有M个结点活跃时，每个活跃结点的吞吐量接近 R/M。完全满足理想情况 1，几乎满足理想情况 2。</p>
+</li>
+<li>
+<p><strong>随机应变</strong> ➡️ <strong>随机访问协议 Random Access Protocol</strong></p>
+<p>节点总是以信道的全部速率发送数据，传输时可能且允许出现冲突。当检测到冲突时通过延时重传等方式恢复，<strong>这也是以太网使用的方式。</strong> 完全满足理想情况 1，几乎满足理想情况 2。</p>
+</li>
+</ul>
+<p>在轮转协议和随机访问协议中，好像都可以满足理想情况。为什么以太网使用的是随机访问协议而不是轮转协议？主要有以下三个原因</p>
+<ol>
+<li><strong>网络架构更简单</strong>，所有设备都可以同时发送和接收数据，不需要等待其他设备的轮转时机</li>
+<li><strong>更加灵活和高效</strong>，随机访问协议允许多个设备同时发送数据，不需要进行时间调度或协调</li>
+<li><strong>可扩展性高</strong>，新设备可以随时连接到网络，并立即开始发送和接收数据，不需要调度或配置</li>
+</ol>
+<h3 id="解决寻址问题"><strong>解决“寻址”问题</strong></h3>
+<p>MAC 地址是指网络设备的硬件地址，是由网络设备的制造商烧录在设备的网卡中的一个全球唯一的地址，如果一台设备有多个网卡，则每个网卡都需要并会有一个唯一的 MAC 地址。MAC 地址共 48 位（6个字节），以十六进制表示。</p>
+<p>当数据传输时，源设备会根据目标设备的 MAC 地址 “寻址” ，确保数据能够被正确地传送到目标设备。当设备接收到数据后，如果发现目的地址与本地 MAC 地址不一致，则会丢弃，只有真正的目标设备才会接收并处理收到的数据。</p>
+<p>MAC 地址是一个局域网（LAN）范围内的地址，它只在局域网中起作用，不能直接进行跨网络通信。在局域网中，可以通过交换机（Switch）来完成数据的传输。交换机通过学习和记录连接到它的设备的 MAC 地址，根据 MAC 地址来决定数据的转发。而在互联网中，数据通常是通过路由器（Router）等设备进行转发，而不是根据 MAC 地址进行直接传输。</p>
+<h4 id="获取-mac-地址"><strong>获取 MAC 地址</strong></h4>
+<p>在网络通信中，使用 MAC 地址直接进行通信是不可行的，我们借助 IP 地址作为中间桥梁来实现通信。在局域网中，知道了要发送的 IP 地址，该如何获得目标设备的 MAC 地址呢？</p>
+<p>每个设备的网卡的 MAC 地址都是固定的，我们可以手动一个个添加局域网中其他设备的 MAC 地址，随着局域网中的主机越来越多，这种方式难以为继。我们需要自动获取、更新和维护各个设备的 MAC 地址，这就是 Address Resolution Protocol。</p>
+<p><strong>ARP 协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址</strong>。而手动配置 MAC 地址的方式，一般是出于安全考虑，为了防止非法用户访问，由网络管理员手动在 MAC 地址表中添加合法用户的 MAC 地址表项，当手动配置的数量比较大时，难以人工维护，可以使用端口安全功能实现 MAC 地址和接口的动态绑定。</p>
+<p>具体的 ARP 协议内容，查看<a class="link" href="https://boxtsecond.github.io/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/" ><strong>快速理解网络协议（四）ARP、RARP 协议</strong></a>。</p>
+<h3 id="mac-层的传输单位-frame"><strong>MAC 层的传输单位 Frame</strong></h3>
+<p><strong>以太网帧 Ethernet frame 是 MAC 层传输数据的基本单位</strong>。其中 MAC 头部包含 目标 MAC 地址、源 MAC 地址 和 类型。类型标识了传输数据的封装协议<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>。常见的类型有，0x0800 表示 IPv4 数据报，0x0806 表示 ARP 数据报，0x86DD 表示 IPv6 数据报<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>。</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/mac_frame.png" >
+		<img src="/post/network_protocol/img/mac_frame.png"
+			
+			
+			
+			loading="lazy"
+			alt="frame"
+			width="85%">
+	</a>
+	
+	<figcaption>frame</figcaption>
+	
+</figure></p>
+<ul>
+<li>目标 MAC 地址：表示数据帧应该被发送到哪个网络设备，由 6 个字节组成</li>
+<li>源 MAC 地址：表示数据帧是从哪个网络设备发送的，同样由 6 个字节组成</li>
+<li>类型：表示数据帧类型，0800 表示 IP 数据包，0806 表示 ARP 数据包</li>
+<li>数据：实际的数据内容，长度可变</li>
+<li>CRC：Cyclic Redundancy Check 循环冗余检测，通过 XOR 异或的算法，计算整个数据帧在发送的过程中是否出现了错误</li>
+</ul>
+<h2 id="小测验"><strong>小测验</strong></h2>
+<ol>
+<li>在物理层工作的常见设备有哪些？</li>
+<li>在 MAC 层工作的常见设备有哪些？</li>
+<li>MAC 层传输数据的基本是什么？它的头的格式是什么？每个字段的含义和作用是什么？</li>
+<li>如何通过 IP 地址获取 MAC 地址？</li>
+</ol>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>有些文章描述 TCP/IP 模型有五层，其中包括了物理层 Physical Layer。但在 RFC 1122 中未指定物理层，我还是倾向于四层。详情可参考：https://datatracker.ietf.org/doc/html/rfc1122#page-8&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>以太网II帧：https://en.wikipedia.org/wiki/Ethernet_frame#Ethernet_II&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>更多类型含义：https://en.wikipedia.org/wiki/EtherType#Values&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/en/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">网络协议</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">Related contents</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（六）VLAN</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（五）STP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（四）ARP、RARP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了67.8k字·共 37篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.2.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a><br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+<i class="powerby">
+<span id="busuanzi_container_site_pv">
+    访问量&nbsp;:&nbsp;<span id="busuanzi_value_site_pv"></span>
+</span>&nbsp;
+<span id="busuanzi_container_site_uv">
+    访客数&nbsp;:&nbsp;<span id="busuanzi_value_site_uv"></span>人次
+  </span>
+</i>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/en/search/" class="search-form widget" >
+        <p>
+            <label>Search</label>
+            <input name="keyword" required placeholder="Type something..." />
+        
+            <button title="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#本文概览"><strong>本文概览</strong></a></li>
+    <li><a href="#物理层-physical-layer">物理层 Physical Layer</a></li>
+    <li><a href="#mac-层-link-layer"><strong>MAC 层 Link Layer</strong></a>
+      <ol>
+        <li><a href="#解决控制问题"><strong>解决“控制”问题</strong></a>
+          <ol>
+            <li><a href="#多路访问协议"><strong>多路访问协议</strong></a></li>
+          </ol>
+        </li>
+        <li><a href="#解决寻址问题"><strong>解决“寻址”问题</strong></a>
+          <ol>
+            <li><a href="#获取-mac-地址"><strong>获取 MAC 地址</strong></a></li>
+          </ol>
+        </li>
+        <li><a href="#mac-层的传输单位-frame"><strong>MAC 层的传输单位 Frame</strong></a></li>
+      </ol>
+    </li>
+    <li><a href="#小测验"><strong>小测验</strong></a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/en/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/en/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/en/categories/%E7%BD%91%E7%BB%9C/" class="category-list-link">网络<span class="category-list-count">4</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Archives</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/en/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">37</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">Tags</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/en/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/en/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/en/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/en/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
+                网络协议
+            </a>
+        
+            <a href="/en/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/en/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/en/tags/%E7%BD%91%E7%BB%9C/" class="font_size_4">
+                网络
+            </a>
+        
+            <a href="/en/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/en/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/en/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

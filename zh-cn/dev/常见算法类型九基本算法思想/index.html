@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='贪心算法 Greedy Algorithm 适用场景明确包含期望值和限制值 一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大 确定是否可以使用贪心算法 每次选择'><title>常见算法类型（九）基本算法思想</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/'>
+
+<link rel="stylesheet" href="/scss/style.min.4da60824240567b039cf33c6b4aefd247d22a34bb8a58653cb3948fb57f5cdc6.css"><meta property='og:title' content='常见算法类型（九）基本算法思想'>
+<meta property='og:description' content='贪心算法 Greedy Algorithm 适用场景明确包含期望值和限制值 一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大 确定是否可以使用贪心算法 每次选择'>
+<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='常见算法类型' /><meta property='article:tag' content='基本算法思想' /><meta property='article:published_time' content='2023-08-24T12:40:26&#43;08:00'/><meta property='article:modified_time' content='2023-08-24T12:40:26&#43;08:00'/>
+<meta name="twitter:title" content="常见算法类型（九）基本算法思想">
+<meta name="twitter:description" content="贪心算法 Greedy Algorithm 适用场景明确包含期望值和限制值 一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大 确定是否可以使用贪心算法 每次选择">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/zh-cn">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+            
+            
+            
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/dev/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="2" y="6" width="20" height="12" rx="2" />
+  <line x1="6" y1="10" x2="6" y2="10" />
+  <line x1="10" y1="10" x2="10" y2="10" />
+  <line x1="14" y1="10" x2="14" y2="10" />
+  <line x1="18" y1="10" x2="18" y2="10" />
+  <line x1="6" y1="14" x2="6" y2="14.01" />
+  <line x1="18" y1="14" x2="18" y2="14.01" />
+  <line x1="10" y1="14" x2="14" y2="14" />
+</svg>
+                
+                <span>技术文章</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/workout/' >
+                
+                
+                
+                    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M6 7.5H7.5V11.25V12.75V16.5H6V7.5ZM9 12.75V18H4.5V16.5H1.5V7.5H4.5V6H9V11.25L15 11.25V6H19.5V7.5L22.5 7.5V16.5H19.5V18H15V12.75L9 12.75ZM16.5 12.75L16.5 16.5H18L18 7.5L16.5 7.5L16.5 11.25V12.75ZM4.5 9H3V15H4.5V9ZM19.5 15H21V9H19.5V15Z" fill="#C2C2C3"/> </g>
+</svg>
+                
+                <span>健身</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/invest/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="2" y="6" width="20" height="12" rx="2" />
+  <line x1="6" y1="10" x2="6" y2="10" />
+  <line x1="10" y1="10" x2="10" y2="10" />
+  <line x1="14" y1="10" x2="14" y2="10" />
+  <line x1="18" y1="10" x2="18" y2="10" />
+  <line x1="6" y1="14" x2="6" y2="14.01" />
+  <line x1="18" y1="14" x2="18" y2="14.01" />
+  <line x1="10" y1="14" x2="14" y2="14" />
+</svg>
+                
+                <span>投资</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/thoughts/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-writing-sign" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 19c3.333 -2 5 -4 5 -6c0 -3 -1 -3 -2 -3s-2.032 1.085 -2 3c.034 2.048 1.658 2.877 2.5 4c1.5 2 2.5 2.5 3.5 1c.667 -1 1.167 -1.833 1.5 -2.5c1 2.333 2.333 3.5 4 3.5h2.5" />
+  <path d="M20 17v-12c0 -1.121 -.879 -2 -2 -2s-2 .879 -2 2v12l2 2l2 -2z" />
+  <path d="M16 7h4" />
+</svg>
+                
+                <span>生活有感</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+        
+            
+            
+            
+                
+                
+                    
+                
+                    
+                        
+                        
+                        
+                    
+                
+            
+        
+
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" >
+                数据结构与算法
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/">常见算法类型（九）基本算法思想</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 24, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    2090字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="贪心算法-greedy-algorithm">贪心算法 Greedy Algorithm</h2>
+<ol>
+<li>适用场景明确包含期望值和限制值
+<ul>
+<li>一组数据中定义了限制值和期望值，求满足限制值的情况下，令期望值最大</li>
+</ul>
+</li>
+<li>确定是否可以使用贪心算法
+<ul>
+<li>每次选择当前情况下，在<strong>对限制值同等贡献量</strong>的情况下，对期望值贡献最大</li>
+</ul>
+</li>
+<li>初步验证贪心算法求得的结果是否是最优
+<ul>
+<li>尝试举几个例子</li>
+</ul>
+</li>
+<li>不能使用贪心算法的问题的特征
+<ul>
+<li>前面的选择，会影响后面的选择，例如 地图的最短路径</li>
+</ul>
+</li>
+</ol>
+<h3 id="贪心算法的常见示例">贪心算法的常见示例</h3>
+<ol>
+<li>霍夫曼编码 Huffman Coding
+<ul>
+<li><strong>给字符进行编码，字符出现的频率越高，则编码后的符号越短</strong>
+<ul>
+<li>任何字符的编码都不是另一个的前缀</li>
+<li>解压缩时，尽可能长地读取二进制串</li>
+</ul>
+</li>
+<li>按照字符出现的频率，放入优先级队列中从小到大排列，若频率相同则按照出现次序排列</li>
+<li>构建霍夫曼树
+<ul>
+<li>每次从队列中取出前两个元素（最小的两个元素），将它们的频率相加后，放入优先级队列中，仍旧保证优先级队列是有序的</li>
+</ul>
+</li>
+<li>根据霍夫曼树进行编码
+<ul>
+<li>给霍夫曼树中的所有左链接 0，右链接 1</li>
+<li>从根结点开始，依次记录所有字母的编码</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Prim 最小生成树算法、Kruskal 最小生成树算法</li>
+<li>Dijkstra 单源最短路径算法</li>
+<li>分糖果
+<ul>
+<li>每次从剩下的孩子中找到需求最小的孩子</li>
+<li>从剩下的糖果中找到能满足他的最小的糖果</li>
+</ul>
+</li>
+<li>钱币找零
+<ul>
+<li>如果钱币的面额分布较为均匀，如 100、50、20，则可以使用贪心算法。每次找出最大面额的钱币支付</li>
+<li>如果钱币的面额分布不均匀，如 100、99、1，则贪心算法不再适用，需要使用动态规划
+6.区间覆盖</li>
+<li>n 个区间的最左端点为 lmin，最右端点为 rmax</li>
+<li>n 个区间按照起始端点从小到大排序</li>
+<li>每次选择左端点和已经覆盖的区间不重合，右端点尽量小的</li>
+</ul>
+</li>
+</ol>
+<h2 id="分治算法-divide-and-conquer">分治算法 Divide and Conquer</h2>
+<ol>
+<li>原问题可以分解成一系列的子问题，且原问题与分解成的小问题有相同的模式</li>
+<li>原问题分解成的子问题可以独立求解，子问题之间没有相关性</li>
+<li>具有分解终止条件，在问题足够小时，可以直接求解</li>
+<li>可以将子问题合并成原问题，合并操作的复杂度不高</li>
+</ol>
+<h3 id="分治算法-递归操作">分治算法-递归操作</h3>
+<ol>
+<li>分解，将原问题分解成一系列子问题</li>
+<li>解决，递归地求解各个子问题，若子问题足够小，则直接求解</li>
+<li>合并，将子问题的结果合并成原问题</li>
+</ol>
+<h3 id="分治算法的常见示例">分治算法的常见示例</h3>
+<ol>
+<li>一组数据的有序对个数或者逆序对个数
+<ul>
+<li>将数组分成前后两段 A1、A2，则数组的逆序对个数等于 A1 的逆序对个数 K1 与 A2 的逆序对个数 K2、A1 A2 的逆序对个数 K3 之和，即 K1 + K2 + K3</li>
+<li>借助归并排序，当 A1、A2 两个有序数组合并时，找出 A1 中比 A2 大的元素个数</li>
+<li>最后将结果全部相加，得到总的逆序对个数</li>
+</ul>
+</li>
+<li>求平面内的最近点对</li>
+<li>矩阵计算</li>
+</ol>
+<h2 id="回溯算法-backtracking-algorithm">回溯算法 Backtracking Algorithm</h2>
+<p>枚举搜索的思想，有规律地枚举所有可能的解</p>
+<h3 id="回溯算法的常见示例">回溯算法的常见示例</h3>
+<ol>
+<li>八皇后</li>
+<li>0 - 1 背包</li>
+<li>正则表达式</li>
+<li>图的着色</li>
+<li>旅行商问题</li>
+<li>数独</li>
+<li>全排列</li>
+</ol>
+<h2 id="动态规划-dynamic-programming">动态规划 Dynamic Programming</h2>
+<ol>
+<li>适用场景
+<ul>
+<li>用于求解最优问题，如最大值、最小值等</li>
+</ul>
+</li>
+<li>思路
+<ul>
+<li>把问题分解为多个阶段，每个阶段对应一个决策</li>
+<li>记录每个阶段可达的状态集合（去掉重复的）</li>
+<li>通过当前阶段的状态集合，来推导下一个阶段的状态集合，动态地向前推进</li>
+</ul>
+</li>
+</ol>
+<h3 id="动态规划适用的问题">动态规划适用的问题</h3>
+<ol>
+<li>动态规划适合解决的问题的模型（一个模型），即<strong>多阶段决策最优解模型</strong>
+<ol>
+<li>解决问题的过程中，需要经历多个决策阶段</li>
+<li>每个决策阶段都对应着一组状态</li>
+<li>求解最优解时，可以经过某组决策序列来找到</li>
+</ol>
+</li>
+<li>三个特征
+<ul>
+<li>最优子结构
+<ul>
+<li>问题的最优解包含子问题的最优解，即可以通过子问题的最优解，推导出问题的最优解</li>
+<li>后面阶段的状态可以通过前面阶段的状态推导出来</li>
+</ul>
+</li>
+<li>无后效性
+<ul>
+<li>推到后面阶段的状态时，只需要关心前面阶段的状态值，而不需要关心这个状态值是怎么得到的</li>
+<li>某阶段的状态确定后，不受后面阶段的决策影响</li>
+</ul>
+</li>
+<li>重复子问题
+<ul>
+<li>不同的决策序列，到达某个相同的阶段时，可能会产生重复的状态</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="动态规划解决思路">动态规划解决思路</h3>
+<ol>
+<li>状态转移表法
+<ul>
+<li>先建立一个状态表（一般都是二维的，如果问题的状态比较复杂的话，可能是多维）</li>
+<li>状态表的每个状态包含三个变量，行、列、数组值</li>
+<li>根据决策的过程，从前往后递推地填充状态表</li>
+</ul>
+</li>
+<li>状态转移方程法
+<ul>
+<li>递归 + 缓存、迭代递推</li>
+<li>找到最优子结构</li>
+<li>推导出状态转移方程</li>
+</ul>
+</li>
+</ol>
+<h3 id="动态规划-和-回溯算法-的关系">动态规划 和 回溯算法 的关系</h3>
+<ol>
+<li>根据回溯算法画出递归树</li>
+<li>如果存在子问题，则可以考虑是否能用动态规划实现</li>
+<li>如果不存在子问题，则回溯算法就是最优解</li>
+</ol>
+<h2 id="并行算法">并行算法</h2>
+<h3 id="并行处理的常见示例">并行处理的常见示例</h3>
+<ol>
+<li>并行排序
+<ul>
+<li>处理思想：先将数据进行分片，然后并行处理</li>
+<li>并行执行归并排序，先随意地对数据分片，排序之后再合并</li>
+<li>并行执行快速排序，先对数据按照大小划分区间，然后再排序，排完序后不需要合并</li>
+</ul>
+</li>
+<li>并行查找
+<ul>
+<li>使用散列表存储一定量的数据，当需要对散列表动态扩容时，会耗费很多不必要的内存</li>
+<li>将数据随机分割成 k 份，每份中的数据只有原来的 1/k，针对这 k 个小数据集合分别构建散列表</li>
+<li>当某个散列表的装载因子过大时，可以单独对这个小散列表进行扩容，这样不仅从内存的利用率或扩容的执行效率上，都比只使用一个大的散列表高效</li>
+</ul>
+</li>
+<li>并行匹配字符串
+<ul>
+<li>将一个大文本分割成 k 个小文本，并行地在这些小文本中查找关键词</li>
+<li>在相邻的两个小文本中，将前一个小文本的结尾取 m 个字符，后一个小文本的开始取 m 个字符，在这个 2m 的字符串中再查找一遍需要匹配的字符串</li>
+</ul>
+</li>
+<li>并行搜索
+<ul>
+<li>并行化广度优先搜索算法</li>
+<li>广度优先搜索是一种逐层搜索的搜索策略，可以基于当前结点，启动多个线程并行地搜索下一个层的顶点</li>
+<li>使用两个队列 A、B，多个线程并行地处理队列 A 中的顶点，并将扩展得到的顶点存储在队列 B 中。队列 A 中的顶点都遍历过之后，队列 A 被清空。再遍历队列 B 中的顶点，将扩展得到的顶点存储在队列 A 中。A、B 循环使用。</li>
+</ul>
+</li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/">常见算法类型</a>
+        
+            <a href="/zh-cn/tags/%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/">基本算法思想</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css"integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js"integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js"integrity="sha384-vZTG03m&#43;2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.querySelector(`.article-content`), {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ]
+        });})
+</script>
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title"></h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">常见算法类型（八）相似</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">常见算法类型（七）过滤</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">常见算法类型（六）查找</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了70.5k字·共 45篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+        
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+
+var s1 = '2023-04-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+        
+        
+        
+            
+            
+                
+            
+                
+                    
+                    
+                    
+                
+            
+        
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/zh-cn/p/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#贪心算法-greedy-algorithm">贪心算法 Greedy Algorithm</a>
+      <ol>
+        <li><a href="#贪心算法的常见示例">贪心算法的常见示例</a></li>
+      </ol>
+    </li>
+    <li><a href="#分治算法-divide-and-conquer">分治算法 Divide and Conquer</a>
+      <ol>
+        <li><a href="#分治算法-递归操作">分治算法-递归操作</a></li>
+        <li><a href="#分治算法的常见示例">分治算法的常见示例</a></li>
+      </ol>
+    </li>
+    <li><a href="#回溯算法-backtracking-algorithm">回溯算法 Backtracking Algorithm</a>
+      <ol>
+        <li><a href="#回溯算法的常见示例">回溯算法的常见示例</a></li>
+      </ol>
+    </li>
+    <li><a href="#动态规划-dynamic-programming">动态规划 Dynamic Programming</a>
+      <ol>
+        <li><a href="#动态规划适用的问题">动态规划适用的问题</a></li>
+        <li><a href="#动态规划解决思路">动态规划解决思路</a></li>
+        <li><a href="#动态规划-和-回溯算法-的关系">动态规划 和 回溯算法 的关系</a></li>
+      </ol>
+    </li>
+    <li><a href="#并行算法">并行算法</a>
+      <ol>
+        <li><a href="#并行处理的常见示例">并行处理的常见示例</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">37</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
+                网络协议
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/zh-cn/tags/lvs/" class="font_size_4">
+                LVS
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script type="text/javascript" src="/ts/custom.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

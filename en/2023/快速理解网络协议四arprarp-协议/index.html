@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 本文概览 ARP 协议过程解析 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Clie'><title>快速理解网络协议（四）ARP、RARP 协议</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/'>
+
+<link rel="stylesheet" href="/scss/style.min.dfc84ae4dd1970c2fdbc27bf0dbe0576d0e9b4043380b7d1ef74c221f91e6711.css"><meta property='og:title' content='快速理解网络协议（四）ARP、RARP 协议'>
+<meta property='og:description' content='本文概览 本文概览 ARP 协议过程解析 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Clie'>
+<meta property='og:url' content='https://boxtsecond.github.io/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/'>
+<meta property='og:site_name' content='Project Documentation'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-09-28T10:22:17&#43;08:00'/><meta property='article:modified_time' content='2023-09-28T10:22:17&#43;08:00'/>
+<meta name="twitter:title" content="快速理解网络协议（四）ARP、RARP 协议">
+<meta name="twitter:description" content="本文概览 本文概览 ARP 协议过程解析 Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。 同一子网中 ARP 假设 Client A 和 Client D 在同一个子网中，Clie">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>Back</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/en/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/en">Project Documentation</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+        
+        
+        
+
+        <li >
+            <a href='/en/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/about-me/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>About Me</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+
+        <li >
+            <a href='/en/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>Dark Mode</span>
+            </li>
+        
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/en/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" >
+                快速理解网络协议
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%9B%9Barprarp-%E5%8D%8F%E8%AE%AE/">快速理解网络协议（四）ARP、RARP 协议</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 28, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    2834字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="本文概览"><strong>本文概览</strong></h2>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/4-arp.png" >
+		<img src="/post/network_protocol/img/4-arp.png"
+			
+			
+			
+			loading="lazy"
+			alt="本文概览"
+			width="85%">
+	</a>
+	
+	<figcaption>本文概览</figcaption>
+	
+</figure></p>
+<h2 id="arp-协议过程解析">ARP 协议过程解析</h2>
+<p><strong>Address Resolution Protocol 地址解析协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址。</strong></p>
+<h3 id="同一子网中">同一子网中</h3>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp.png" >
+		<img src="/post/network_protocol/img/arp.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP</figcaption>
+	
+</figure></p>
+<p>假设 Client A 和 Client D 在<strong>同一个子网</strong>中，Client A 要向 Client D 发送一个 IP 数据包（IP Packet）</p>
+<ol>
+<li>
+<p>Client A 查看自己的 ARP 缓存表，判断是否包含 Client D 对应的 ARP 表项。如果有，则直接利用 ARP 缓存表中的 MAC 地址，对 IP 数据包进行帧封装，发送数据帧给 Client D</p>
+</li>
+<li>
+<p>若 Client A 的 ARP 缓存表中，没有包含 Client D 的信息，则 Client A 先将此数据帧缓存，以<strong>广播</strong>的形式发送 ARP 请求报文，交换机收到广播包时，会原样复制该包到除源端口外的所有端口，具体包格式如下图</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_detail.png" >
+		<img src="/post/network_protocol/img/arp_detail.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Request Packet"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Request Packet</figcaption>
+	
+</figure></p>
+<ul>
+<li>dMAC 目标 MAC 地址 ff:ff:ff:ff:ff:ff ，即广播包</li>
+<li>sMAC 源 MAC 地址，即 Client A 的 MAC 地址</li>
+<li>type 数据帧类型为 ARP</li>
+<li>ARP 数据报文内容 <sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>
+<ul>
+<li>HType（Hardware Type）硬件类型，标识链路层协议，当为 1 时表示以太网</li>
+<li>PType（Protocol Type）协议类型，标识网络层协议，当为 0x0800 时表示 IPv4 协议</li>
+<li>HLen（Hardware Length），硬件地址长度，以太网的长度为 6</li>
+<li>PLen（Protocol Length），协议地址长度，IPv4 的长度为 4</li>
+<li>Opcode 操作码，1 表示 ARP 请求（“Request”）</li>
+<li>Sender MAC、Sender IP，为 Client A 的 MAC 地址 和 IP 地址</li>
+<li>Target MAC 为 00:00:00:00:00:00，说明此时 Client A 还不知道 Client D 的 MAC 地址</li>
+<li>Target IP 为 Client D 的 IP 地址</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Client D 比较自己的 IP 地址和 ARP 请求报文中的 Target IP 地址，若二者相同，将 ARP 请求报文中的 Sender MAC、Sender IP 地址信息存入自己的 ARP 缓存表中，以<strong>单播</strong>的形式返回 ARP 响应报文 <strong>（Client C 也会将 Client A 的 IP、MAC 地址缓存在自己的 ARP 缓存表中，但并不响应 ARP 请求）。</strong></p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_detail_1.png" >
+		<img src="/post/network_protocol/img/arp_detail_1.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Reply Packet"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Reply Packet</figcaption>
+	
+</figure></p>
+<ul>
+<li>dMAC 目标 MAC 地址，即 Client A 的 MAC 地址</li>
+<li>sMAC 源 MAC 地址，即 Client D 的 MAC 地址</li>
+<li>type 数据帧类型为 ARP</li>
+<li>ARP 数据报文内容
+<ul>
+<li>HType、PType、HLen、PLen 与 ARP 包请求相似</li>
+<li>Opcode 为 “Reply”，即 ARP 响应包</li>
+<li>Sender MAC、Sender IP，为 Client D 的 MAC 地址 和 IP 地址</li>
+<li>Target MAC、Target IP， 为 Client A 的 MAC 地址 和 IP 地址</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="同一子网内-arp-抓包实践">同一子网内 ARP 抓包实践</h4>
+<ol>
+<li>
+<p>申请在同一个 VPC 下的 2 台云主机，内网地址分别为 10.23.139.22、10.23.197.59</p>
+</li>
+<li>
+<p>登陆到 10.23.139.22，使用命令 arp -n 查看已经存在的 arp 缓存表项。</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_n.png" >
+		<img src="/post/network_protocol/img/arp_n.png"
+			
+			
+			
+			loading="lazy"
+			alt="arp -n"
+			width="85%">
+	</a>
+	
+	<figcaption>arp -n</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>如果这里发现已经有了 10.23.197.59 的缓存，使用命令 arp -d 10.23.197.59 删掉缓存，删完之后再 check 下，如果没有的话就继续下一步。</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_d.png" >
+		<img src="/post/network_protocol/img/arp_d.png"
+			
+			
+			
+			loading="lazy"
+			alt="arp -d"
+			width="85%">
+	</a>
+	
+	<figcaption>arp -d</figcaption>
+	
+</figure></p>
+</li>
+</ul>
+</li>
+<li>
+<p>使用 tcpdump -i eth0 arp -w arp.pcap 命令开始抓包</p>
+</li>
+<li>
+<p>再开一个 tab，还是登陆到 10.23.139.22，执行命令 ping 10.23.197.59，对 10.23.197.59 发送一个 ICMP 报文</p>
+</li>
+<li>
+<p>结束抓包，将 arp.pcap 下载到本地，用 wireshark 打开 arp.pcap</p>
+<ul>
+<li>
+<p>ARP Request</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_req.png" >
+		<img src="/post/network_protocol/img/arp_req.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Request"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Request</figcaption>
+	
+</figure></p>
+<ul>
+<li>可以看到 ARP 报文中的目标 MAC 地址是 00:00:00:00:00:00，而外层的目标 MAC 地址是 ff:ff:ff:ff:ff:ff，即广播</li>
+</ul>
+</li>
+<li>
+<p>ARP Reply</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_rep.png" >
+		<img src="/post/network_protocol/img/arp_rep.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Reply"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Reply</figcaption>
+	
+</figure></p>
+<ul>
+<li>ARP Reply 报文中，由于已经知道目标 MAC 地址，直接以单播的形式返回</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="跨网段">跨网段</h3>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/arp_wan.png" >
+		<img src="/post/network_protocol/img/arp_wan.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP</figcaption>
+	
+</figure>
+假设 Client A 和 Client D 不在同一个子网中，Client A 要向 Client D 发送一个 IP 数据包（IP Packet），还会像在同一子网内那样发送 ARP 报文吗？答案是否定的，这里要分两种情况，Client A 本身是否存在网关。由于之前已经解析过 ARP 报文中的具体字段，之后的 ARP 报文我们就只关注于字段的值而不再赘述字段含义。</p>
+<h4 id="普通-arp跨子网有网关">普通 ARP（跨子网有网关）</h4>
+<p><strong>Client A 和 Client D 不在同一个子网中且 Client A 存在网关</strong></p>
+<ol>
+<li>Client A 首先发现目标 IP 是跨网段的，并且 Client A 此时有网关，那么 Client A 就会发送 ARP 报文去查找网关的 MAC 地址，而不是跨网段的目标 IP 的 MAC 地址（本地无网关 MAC 地址缓存）</li>
+<li>Client A 以<strong>广播</strong>的形式发送 ARP 请求报文</li>
+<li>网关以单播的形式返回 ARP 响应报文</li>
+</ol>
+<h4 id="跨子网有网关的-arp-抓包实践">跨子网有网关的 ARP 抓包实践</h4>
+<ol>
+<li>
+<p>gns3 网络拓扑及配置</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_topo.png" >
+		<img src="/post/network_protocol/img/gns3_topo.png"
+			
+			
+			
+			loading="lazy"
+			alt="GNS3"
+			width="85%">
+	</a>
+	
+	<figcaption>GNS3</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>路由器配置地址 192.168.1.1 和 10.10.10.1</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_router_conf.png" >
+		<img src="/post/network_protocol/img/gns3_router_conf.png"
+			
+			
+			
+			loading="lazy"
+			alt="Router 配置"
+			width="85%">
+	</a>
+	
+	<figcaption>Router 配置</figcaption>
+	
+</figure></p>
+<ul>
+<li>进入配置模式 configure terminal</li>
+<li>配置接口 int e0/0
+<ul>
+<li>ip add 192.168.1.1 255.255.255.0</li>
+<li>no shut</li>
+<li>exit</li>
+</ul>
+</li>
+<li>e1/0 与 e0/0 相同</li>
+</ul>
+</li>
+<li>
+<p>Client D-ARP 配置地址 10.10.10.20</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_d_arp_conf.png" >
+		<img src="/post/network_protocol/img/gns3_d_arp_conf.png"
+			
+			
+			
+			loading="lazy"
+			alt="Client D-ARP 配置"
+			width="85%">
+	</a>
+	
+	<figcaption>Client D-ARP 配置</figcaption>
+	
+</figure></p>
+<ul>
+<li>ip 10.10.10.20/24 10.10.10.1</li>
+</ul>
+</li>
+<li>
+<p>Client A 配置地址 192.168.1.100 和 网关地址 192.168.1.1</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_a_conf.png" >
+		<img src="/post/network_protocol/img/gns3_a_conf.png"
+			
+			
+			
+			loading="lazy"
+			alt="Client A 配置"
+			width="85%">
+	</a>
+	
+	<figcaption>Client A 配置</figcaption>
+	
+</figure></p>
+<ul>
+<li>注意这里的 Client A 是由路由器模拟的，为了方便后续的 proxy arp 实验</li>
+<li>进入配置模式 configure terminal</li>
+<li>配置接口 int e0/0
+<ul>
+<li>ip add 192.168.1.100 255.255.255.0</li>
+<li>no shut</li>
+<li>exit</li>
+</ul>
+</li>
+<li>关闭路由功能 no ip routing</li>
+<li>设置默认网关 ip default-gateway 192.168.1.1</li>
+<li>退出配置模式后，检查下是否配置成功 show ip route</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>开始抓包</p>
+</li>
+<li>
+<p>在 Client A 上 ping 10.10.10.20
+<figure 
+	>
+	<a href="/post/network_protocol/img/gns3_arp_ping.png" >
+		<img src="/post/network_protocol/img/gns3_arp_ping.png"
+			
+			
+			
+			loading="lazy"
+			alt="ping 10.10.10.20"
+			width="85%">
+	</a>
+	
+	<figcaption>ping 10.10.10.20</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>ARP Request</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_arp.png" >
+		<img src="/post/network_protocol/img/gns3_arp.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Request"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Request</figcaption>
+	
+</figure></p>
+<ul>
+<li>仍旧是广播的形式</li>
+<li><strong>可以看到 Target IP 是 192.168.1.1 即网关的地址，而不是 10.10.10.20</strong></li>
+</ul>
+</li>
+<li>
+<p>ARP Reply</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_arp_rep.png" >
+		<img src="/post/network_protocol/img/gns3_arp_rep.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Reply"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Reply</figcaption>
+	
+</figure></p>
+<ul>
+<li>网关单播回复 ARP Reply，附上自己的 MAC 地址</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h4 id="proxy-arp跨子网无网关">Proxy ARP（跨子网无网关）</h4>
+<p><strong>Client A 和 Client D 不在同一个子网中且 Client A 不存在网关</strong></p>
+<ol>
+<li>先来看看什么是 Proxy ARP
+<ul>
+<li>当局域网内部主机发起跨网段的 ARP 请求，<strong>网关设备开启 ARP 代理功能且知道目标的路由信息时</strong>，会使用自身的 MAC 地址回复该请求</li>
+<li>这里有两个非常重要的点，一个是 Proxy ARP 需要网关设备支持且开启 ARP 代理功能，这说明 <strong>Proxy ARP 依赖且受限于网关设备</strong>，因此必定会来可扩展性差和不可靠的缺点。另一个是<strong>网关设备会用自身的 MAC 地址回复 ARP 请求报文</strong>。</li>
+</ul>
+</li>
+<li>Proxy ARP 和普通 ARP 的请求路径类似，唯一不同的是 ARP 请求报文中的 Target IP Address 中的值是目标 IP（而不是网关 IP）</li>
+</ol>
+<h4 id="跨子网无网关的-arp-抓包实践">跨子网无网关的 ARP 抓包实践</h4>
+<ol>
+<li>
+<p>gns3 网络拓扑及配置</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_topo.png" >
+		<img src="/post/network_protocol/img/gns3_topo.png"
+			
+			
+			
+			loading="lazy"
+			alt="GNS3"
+			width="85%">
+	</a>
+	
+	<figcaption>GNS3</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>路由器和上述相同</p>
+</li>
+<li>
+<p>Client D-ProxyARP 类似，配置地址换为 10.10.10.10</p>
+</li>
+<li>
+<p>Client A 这里要关闭路由功能（上述已关闭）且去掉默认网关</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_a_proxyarp_conf.png" >
+		<img src="/post/network_protocol/img/gns3_a_proxyarp_conf.png"
+			
+			
+			
+			loading="lazy"
+			alt="Client A 配置"
+			width="85%">
+	</a>
+	
+	<figcaption>Client A 配置</figcaption>
+	
+</figure></p>
+<ul>
+<li>no ip default-gateway</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>开始抓包</p>
+</li>
+<li>
+<p>在 Client A 上 ping 10.10.10.10</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_proxyarp_ping.png" >
+		<img src="/post/network_protocol/img/gns3_proxyarp_ping.png"
+			
+			
+			
+			loading="lazy"
+			alt="ping 10.10.10.10"
+			width="85%">
+	</a>
+	
+	<figcaption>ping 10.10.10.10</figcaption>
+	
+</figure></p>
+<ul>
+<li>
+<p>ARP Request</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_proxyarp.png" >
+		<img src="/post/network_protocol/img/gns3_proxyarp.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Request"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Request</figcaption>
+	
+</figure></p>
+<ul>
+<li>仍旧是广播的形式</li>
+<li><strong>可以看到 Target IP 是 10.10.10.10 即目标地址，而不是网关地址</strong></li>
+</ul>
+</li>
+<li>
+<p>ARP Reply</p>
+<p><figure 
+	>
+	<a href="/post/network_protocol/img/gns3_proxyarp_rep.png" >
+		<img src="/post/network_protocol/img/gns3_proxyarp_rep.png"
+			
+			
+			
+			loading="lazy"
+			alt="ARP Reply"
+			width="85%">
+	</a>
+	
+	<figcaption>ARP Reply</figcaption>
+	
+</figure></p>
+<ul>
+<li><strong>仍旧是网关单播回复 ARP Reply，附上自己的 MAC 地址</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="arp-缓存">ARP 缓存</h2>
+<h3 id="arp-动态表项">ARP 动态表项</h3>
+<p>由 ARP 协议通过 ARP 报文自动生成和维护，可以被 ARP 静态表项覆盖，可以被 ARP 报文更新，可以过期</p>
+<h3 id="arp-静态表项">ARP 静态表项</h3>
+<p>手动配置和维护，不会被 ARP 动态表项覆盖，不会被 ARP 报文更新，不会过期</p>
+<h2 id="gratuitous-arp免费-arp">Gratuitous ARP（免费 ARP）</h2>
+<p><strong>Gratuitous ARP 是一种特殊的 ARP 请求。当主机启动时，发送一个 Gratuitous ARP 请求，即请求自己的 IP 地址和 MAC 地址，即目标 IP 地址为 自己的 IP 地址。</strong></p>
+<p>Gratuitous ARP 的作用</p>
+<ul>
+<li>以广播的形式发送自己的 IP 地址 和 MAC 地址，在网络中宣告自己的信息，可以是宣告新添加的主机或者更新自己的 MAC 地址</li>
+<li>检测 IP 地址冲突，若收到了 ARP 响应报文，则说明网络中已存在使用该 IP 地址的主机</li>
+</ul>
+<h2 id="arp-欺骗及防御">ARP 欺骗及防御</h2>
+<ul>
+<li>由于 ARP 请求不会验证 ARP 响应报文，若此时有主机在收到广播 ARP 请求报文后伪造 ARP 响应报文，则可以欺骗发送方，伪造 IP 地址 - MAC 地址 的映射关系
+<ul>
+<li>劫持通信内容</li>
+<li>广播攻击</li>
+<li>丢弃通信，拒绝服务</li>
+</ul>
+</li>
+<li>防御措施
+<ul>
+<li>建立正确的 ARP 映射关系、检测并过滤伪造的 ARP 报文，保证经过其转发的 ARP报文正确合法</li>
+<li>抑制短时间内大量 ARP 报文的冲击</li>
+</ul>
+</li>
+</ul>
+<h2 id="arp-常见命令">ARP 常见命令</h2>
+<ul>
+<li>查看 arp 表项 arp -a/ arp -e</li>
+<li>删除 arp 表项 arp -d，例：arp -i eth1 -d 192.168.60.1</li>
+<li>添加 arp 表项 arp -s，例：arp -s IP MAC-ADDRESS</li>
+<li>更多：arp -h</li>
+</ul>
+<h2 id="rarp-协议">RARP 协议</h2>
+<p><strong>Reverse Address Resolution Protocol 反向地址转换协议，用于获得已知 MAC 地址的 IP 地址。</strong></p>
+<p>一般在主机刚接入网络时，通过本地 MAC 地址来发送 RARP 请求，如果局域网内有 RARP Server 且 Server 上存在关于此 MAC 地址的映射 IP，则会返回 RARP Reply 响应，此时主机就获取了 IP 地址。</p>
+<ul>
+<li>需要 RARP 服务器，一般用于无法使用 DHCP 或没有任何输入接口的小型嵌入式设备</li>
+<li>主机以广播的形式发送 RARP 请求包，声明自己的 MAC 地址，并请求分配一个 IP 地址</li>
+<li>RARP 服务器收到 RARP 请求包后，检查 RARP 列表，查找该 MAC 地址对应的 IP 地址
+<ul>
+<li>若存在，则返回 RARP 响应包，成功分配 IP 地址</li>
+<li>若不存在，则不做任何响应，分配 IP 地址失败</li>
+</ul>
+</li>
+</ul>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>更多参数值查看：https://www.iana.org/assignments/arp-parameters/arp-parameters.xhtml#arp-parameters-3&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/en/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/">网络协议</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title">Related contents</h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ADvlan/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（六）VLAN</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%BA%94stp-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（五）STP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/en/2023/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%89mac-%E5%B1%82/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（三）MAC 层</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+      共书写了67.8k字·共 37篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.2.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a><br />
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+var s1 = '2022-02-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+<i class="powerby">
+<span id="busuanzi_container_site_pv">
+    访问量&nbsp;:&nbsp;<span id="busuanzi_value_site_pv"></span>
+</span>&nbsp;
+<span id="busuanzi_container_site_uv">
+    访客数&nbsp;:&nbsp;<span id="busuanzi_value_site_uv"></span>人次
+  </span>
+</i>
+
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/en/search/" class="search-form widget" >
+        <p>
+            <label>Search</label>
+            <input name="keyword" required placeholder="Type something..." />
+        
+            <button title="Search">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#本文概览"><strong>本文概览</strong></a></li>
+    <li><a href="#arp-协议过程解析">ARP 协议过程解析</a>
+      <ol>
+        <li><a href="#同一子网中">同一子网中</a>
+          <ol>
+            <li><a href="#同一子网内-arp-抓包实践">同一子网内 ARP 抓包实践</a></li>
+          </ol>
+        </li>
+        <li><a href="#跨网段">跨网段</a>
+          <ol>
+            <li><a href="#普通-arp跨子网有网关">普通 ARP（跨子网有网关）</a></li>
+            <li><a href="#跨子网有网关的-arp-抓包实践">跨子网有网关的 ARP 抓包实践</a></li>
+            <li><a href="#proxy-arp跨子网无网关">Proxy ARP（跨子网无网关）</a></li>
+            <li><a href="#跨子网无网关的-arp-抓包实践">跨子网无网关的 ARP 抓包实践</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#arp-缓存">ARP 缓存</a>
+      <ol>
+        <li><a href="#arp-动态表项">ARP 动态表项</a></li>
+        <li><a href="#arp-静态表项">ARP 静态表项</a></li>
+      </ol>
+    </li>
+    <li><a href="#gratuitous-arp免费-arp">Gratuitous ARP（免费 ARP）</a></li>
+    <li><a href="#arp-欺骗及防御">ARP 欺骗及防御</a></li>
+    <li><a href="#arp-常见命令">ARP 常见命令</a></li>
+    <li><a href="#rarp-协议">RARP 协议</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/en/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/en/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/en/categories/%E7%BD%91%E7%BB%9C/" class="category-list-link">网络<span class="category-list-count">4</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Archives</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/en/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">37</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">Tags</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/en/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/en/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/en/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/en/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
+                网络协议
+            </a>
+        
+            <a href="/en/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/en/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/en/tags/%E7%BD%91%E7%BB%9C/" class="font_size_4">
+                网络
+            </a>
+        
+            <a href="/en/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/en/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/en/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Pages on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/en/page/</link>
+        <description>Recent content in Pages on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en</language>
+        <lastBuildDate>Wed, 23 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://boxtsecond.github.io/en/page/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>About Me</title>
+        <link>https://boxtsecond.github.io/en/p/about-me/</link>
+        <pubDate>Wed, 23 Aug 2023 00:00:00 +0000</pubDate>
+        
+        <guid>https://boxtsecond.github.io/en/p/about-me/</guid>
+        <description>&lt;ol&gt;
+&lt;li&gt;负责过亿级流量的多个云通信产品，了解短信协议和生态。&lt;/li&gt;
+&lt;li&gt;开发过负载均衡产品 LB 系列&lt;/li&gt;
+&lt;li&gt;云联网产品开发中&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;永远 18 的程序员，欢迎关注～&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

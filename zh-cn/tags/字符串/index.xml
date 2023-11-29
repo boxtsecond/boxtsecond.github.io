@@ -1,0 +1,713 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>字符串 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/</link>
+        <description>Recent content in 字符串 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Thu, 24 Aug 2023 10:20:14 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>数据结构（十）字符串相似度</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/</link>
+        <pubDate>Thu, 24 Aug 2023 10:20:14 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/</guid>
+        <description>&lt;h2 id=&#34;字符串的相似度&#34;&gt;字符串的相似度&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;编辑距离（Edit Distance）
+&lt;ul&gt;
+&lt;li&gt;将一个字符串转化成另一个字符串，需要的最少编辑次数（增加、删除、替换 一个字符）&lt;/li&gt;
+&lt;li&gt;编辑距离越大，说明两个字符串的相似程度越小，对于两个完全相同的字符串，它们的编辑距离为 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;编辑距离的常见计算方式
+&lt;ul&gt;
+&lt;li&gt;莱文斯坦距离（Levenshtein Distance）
+&lt;ul&gt;
+&lt;li&gt;允许 添加、删除、替换 字符&lt;/li&gt;
+&lt;li&gt;表示两个字符串差异的大小&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;最长公共子串长度（Longest Common Substring Length）
+&lt;ul&gt;
+&lt;li&gt;允许 添加、删除 字符&lt;/li&gt;
+&lt;li&gt;表示两个字符串相似程度的大小&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;计算莱文斯坦距离&#34;&gt;计算莱文斯坦距离&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;如果 a[i] == b[j]，则继续匹配 a[i+1] 和 b[j+1]&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果 a[i] != b[j]&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;删除 a[i]，匹配 a[i+1] 和 b[j]&lt;/li&gt;
+&lt;li&gt;删除 b[j]，匹配 a[i] 和 b[j+1]&lt;/li&gt;
+&lt;li&gt;在 a[i] 前添加一个和 b[j] 相同的字符，匹配 a[i] 和 b[j+1]&lt;/li&gt;
+&lt;li&gt;在 b[j] 前添加一个和 a[i] 相同的字符，匹配 a[i+1] 和 b[j]&lt;/li&gt;
+&lt;li&gt;将 a[i] 替换成 b[j]，或 b[j] 替换成 a[i] ，匹配 a[i+1] 和 b[j+1]&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;状态转移方程法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;状态 （i，j）可以通过（i-1，j）、（i，j-1）、（i-1，j-1）三个状态中的任意一个转移过来&lt;/li&gt;
+&lt;li&gt;a[i] == b[j]，min_edist（i，j）=min（min_edist（i-1，j）+1，min_edist（i-1，j-1）+1，min_edist（i，j-1）+1）&lt;/li&gt;
+&lt;li&gt;a[i] != b[j]，min_edist（i，j）=min（min_edist（i-1，j）+1，min_edist（i-1，j-1），min_edist（i，j-1）+1）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;状态转移表法&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/dist.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/dist.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;状态转移表法&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;状态转移表法&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;计算最长公共子串长度&#34;&gt;计算最长公共子串长度&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;如果 a[i] == b[j]，则继续匹配 a[i+1] 和 b[j+1]&lt;/li&gt;
+&lt;li&gt;如果 a[i] != b[j]
+&lt;ul&gt;
+&lt;li&gt;删除 a[i]，匹配 a[i+1] 和 b[j]&lt;/li&gt;
+&lt;li&gt;删除 b[j]，匹配 a[i] 和 b[j+1]&lt;/li&gt;
+&lt;li&gt;在 a[i] 前添加一个和 b[j] 相同的字符，匹配 a[i] 和 b[j+1]&lt;/li&gt;
+&lt;li&gt;在 b[j] 前添加一个和 a[i] 相同的字符，匹配 a[i+1] 和 b[j]&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;状态转移方程法
+&lt;ul&gt;
+&lt;li&gt;状态 （i，j）可以通过（i-1，j）、（i，j-1）、（i-1，j-1）三个状态中的任意一个转移过来&lt;/li&gt;
+&lt;li&gt;a[i] == b[j]，max_edist（i，j）=max（max_edist（i-1，j），max_edist（i-1，j-1）+1，max_max（i，j-1））&lt;/li&gt;
+&lt;li&gt;a[i] != b[j]，max_edist（i，j）=max（max_edist（i-1，j），max_edist（i-1，j-1），max_edist（i，j-1））&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;拼写纠错的优化&#34;&gt;拼写纠错的优化&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;取出编辑距离最小的 TOP 10，根据其他参数决策出选择哪个单词作为拼写纠错单词。如 根据搜索热门程度。&lt;/li&gt;
+&lt;li&gt;使用多种编辑距离计算方法，分别求编辑距离最小的 TOP 10，然后求交集。&lt;/li&gt;
+&lt;li&gt;统计用户的搜索日志，得到最常被拼错的单词列表，以及对应的拼写正确的单词。之后在拼写纠错时，先到这个单词列表中查找。&lt;/li&gt;
+&lt;li&gt;针对每个用户都维护此用户的常用搜索关键词。当用户输入错误时，有现在常用的搜索关键词列表中计算编辑距离，查找编辑距离最小的单词。&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>数据结构（九）字符串匹配</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/</link>
+        <pubDate>Wed, 23 Aug 2023 23:19:41 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/</guid>
+        <description>&lt;h2 id=&#34;brute-force-暴力匹配算法朴素匹配算法&#34;&gt;Brute Force 暴力匹配算法/朴素匹配算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;思想
+&lt;ul&gt;
+&lt;li&gt;在主串中，匹配模式串。若主串的长度是 n，模式串的长度是 m，则 n &amp;gt;= m。主串可以按照模式串的长度 m，得出 n - m + 1 个子串。&lt;/li&gt;
+&lt;li&gt;将主串中起始位置为 0，长度为 m 的子串 x，与模式串的每一位字符依次比较。若相等则继续，不相等则进行下一步。&lt;/li&gt;
+&lt;li&gt;若不匹配，则将主串中的起始位置加 1。循坏执行上一步，直到主串的起始位置大于 n - m + 1 或 匹配成功。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;时间复杂度：O（n*m）&lt;/li&gt;
+&lt;li&gt;优点
+&lt;ul&gt;
+&lt;li&gt;思路简单，代码易实现，维护简单，是最常见的处理小规模的字符串匹配算法&lt;/li&gt;
+&lt;li&gt;在实际应用中，时间复杂度往往远低于 O（n*m）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;rabin-karp&#34;&gt;Rabin-Karp&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;思想
+&lt;ul&gt;
+&lt;li&gt;在 BF 算法上进行优化，利用哈希算法减少匹配时的时间复杂度，但是匹配的次数没有减少。&lt;/li&gt;
+&lt;li&gt;将主串中得出的 n - m + 1 个子串分别求哈希值。依次和模式串的哈希值比较。&lt;/li&gt;
+&lt;li&gt;有技巧地计算子串的哈希值
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;假设要匹配的字符串的字符集中包含 k 个字符，使用 k 进制来表示一个子串。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将代表子串的 k 进制数字转换成十进制。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在相邻的两个子串的哈希值计算公式存在以下关系：&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rk.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rk.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;rabin-karp&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;rabin-karp&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;B = （A - 第一位的 k 进制值） * k + 最后一位的 k 进制值&lt;/li&gt;
+&lt;li&gt;第一位的 k 进制 = （km-1）* 此字符表示的 k 进制的数字&lt;/li&gt;
+&lt;li&gt;km 可以提前算好存储在数组中，下标为 m 的值为 km&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;若可能存在哈希冲突，则将哈希值相等的子串和模式串再一次进行比较&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;时间复杂度：O（n），当可能存在大量的哈希冲突时，则退化为 O（n*m）&lt;/li&gt;
+&lt;li&gt;缺点
+&lt;ul&gt;
+&lt;li&gt;可能会有散列冲突&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;boyer-moore-bm-算法&#34;&gt;Boyer-Moore BM 算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;目的
+&lt;ul&gt;
+&lt;li&gt;尽可能地一次性跳过多个字符，&lt;strong&gt;从后往前的比较字符&lt;/strong&gt;，用来减少 BF（暴力匹配）算法的匹配次数，以提升算法的效率&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;思想
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;坏字符规则&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_bad.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_bad.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;坏字符规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;坏字符规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;从后往前&lt;/strong&gt;的将模式串和主串进行匹配&lt;/li&gt;
+&lt;li&gt;找到主串“坏字符”对应下标
+&lt;ul&gt;
+&lt;li&gt;若存在不匹配的字符，将主串中对应的字符标记为“坏字符”，并记录“坏字符”的位置为 si&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;找到模式串中另一个与主串中“坏字符”相等的字符
+&lt;ul&gt;
+&lt;li&gt;在模式串中查找是否存在另一个与主串中的“坏字符”相等的字符&lt;/li&gt;
+&lt;li&gt;若模式串中存在一个或多个与主串中“坏字符”相等的字符，则记录下最后出现的位置为 xi（以免跳过太多字符，导致错过可以正确匹配的字符），跳过 si - xi 个字符&lt;/li&gt;
+&lt;li&gt;若不存在，则直接跳过模式串长度个字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;注意事项&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;si - xi 有可能出现负数的情况&lt;/li&gt;
+&lt;li&gt;例如：主串为 aaaaaa，模式串为 baa，当比较模式串中的 b 时，主串中“坏字符”的位置为 0，模式串中的位置为 2（取最后一个），则跳过字符的个数为 0 - 2 = -2&lt;/li&gt;
+&lt;li&gt;为了避免出现跳跃负数个字符，还需要“好后缀规则”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;好后缀规则&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;从后往前&lt;/strong&gt;的匹配模式串和主串&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;找到主串中的“好后缀”{u}&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;某个不匹配字符之后的字符串，就是“好后缀”{u}&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;找到模式串中另一个与主串中“好后缀”相等的字符串&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;在模式串中查找是否存在与主串中“好后缀”相等的字符串&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果存在一个或多个与主串中“好后缀”相等的字符串，则找到最后一个相等的字符串 {u*}，将 {u*} 跳跃对应到 {u} 的位置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;好后缀规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;好后缀规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果模式串中不存在与“好后缀”相等的字符串，则需要判断匹配到的好后缀中，在模式串中是否存在相等的前缀子串&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果模式串中存在后缀子串和前缀子串相等的字符串，则跳跃到前缀子串最长能匹配到的位置&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果模式串中不存在后缀子串和前缀子串相等的字符串，则跳跃模式串长度个字符&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;好后缀规则&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;好后缀规则&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;注意事项&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当坏字符规则和好后缀规则同时存在时，可判断这两种情况下得出的跳跃字符个数，选择较大的跳过。可以避免坏字符规则出现负数的情况。&lt;/li&gt;
+&lt;li&gt;当内存条件受限时，可只采用好后缀规则。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;应用
+&lt;ul&gt;
+&lt;li&gt;文本中的查找功能&lt;/li&gt;
+&lt;li&gt;linux grep 的功能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;bm-算法的代码分析&#34;&gt;BM 算法的代码分析&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;坏字符规则
+&lt;ul&gt;
+&lt;li&gt;需要找到“坏字符”在模式串中最后出现的位置，即 xi
+&lt;ol&gt;
+&lt;li&gt;每次将“坏字符”在模式串中进行顺序查找（效率太低）&lt;/li&gt;
+&lt;li&gt;使用散列表存储模式串每个字符出现的最后位置，可以使用数组或者对象，默认值是 -1，即在模式串中没有此字符&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;好后缀规则
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;需要找到“好后缀”在模式串中，除本身外最后出现的位置&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用 suffix 数组，数组的下标表示“好后缀”的长度，数组中的值表示除本身外最后出现的位置&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;好后缀&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;好后缀&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;需要找到与模式串的前缀子串与模式串后缀子串重合的位置&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用 prefix 数组，数组的下标表示后缀子串的长度，数组中的值表示是否存在后缀子串与前缀子串相等的字符串&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_3.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_3.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;好后缀&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;好后缀&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果 suffix 对应后缀子串长度的值不为 -1，则表示模式串中存在（除本身之外）与“好后缀”相等的字符串，则将模式串中最后出现的“好后缀”字符串对应到主串中的“好后缀”字符串&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;若主串中“坏字符”位置为 j，模式串的长度为 m&lt;/li&gt;
+&lt;li&gt;主串中“好后缀”字符串的起始位置为 j + 1，“好后缀”长度为 k，k = m - j - 1&lt;/li&gt;
+&lt;li&gt;需要移动的位数为：j + 1 - suffix[k]&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果 suffix 对应后缀子串长度的值为 -1，即模式串中不存在（除本身之外）与“好后缀”相等的字符串，则判断 prefix 数组中，下标为 [ 0～好后缀长度 ] 的值&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;倒序查找下标为 [ 0～好后缀长度 ]，找到符合条件最长的前缀子串&lt;/li&gt;
+&lt;li&gt;如果 prefix 对应后缀子串长度的值为 false，则表示模式串的前缀子串不存在和后缀子串重合的字符串，则移动的位数为：模式串的长度 m&lt;/li&gt;
+&lt;li&gt;如果 prefix 对应后缀子串长度的值为 true，即模式串的前缀子串存在和后缀子串重合的字符串，则移动的位数为：模式串的长度 m - prefix 的下标&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如何填充 suffix 和 prefix 数组&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;模式串的长度为 m，则模式串为 B [ 0，m - 1 ]&lt;/li&gt;
+&lt;li&gt;将 B [ 0，m - 1 ] 分别与 B [ 0，i ] 求公共后缀子串，i 的取值为 0 ～ m - 2
+&lt;ul&gt;
+&lt;li&gt;如果公共后缀子串的长度为 k，则 suffix[k] = j，j 表示公共后缀子串的起始位置&lt;/li&gt;
+&lt;li&gt;如果 j = 0，则表示模式串的后缀子串和前缀子串有重合，prefix[k] = true&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_4.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/bm_good_4.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;好后缀&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;好后缀&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;参考资料&#34;&gt;参考资料&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.cs.jhu.edu/~langmea/resources/lecture_notes/boyer_moore.pdf&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;http://www.cs.jhu.edu/~langmea/resources/lecture_notes/boyer_moore.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;h2 id=&#34;knuth-morris-pratt-kmp-算法&#34;&gt;Knuth Morris Pratt KMP 算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;目的&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;尽可能地一次性跳过多个字符，&lt;strong&gt;从前往后的比较字符&lt;/strong&gt;，用来减少 BF（暴力匹配）算法的匹配次数，以提升算法的效率&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;在已经匹配的前缀子串 A 中，看看 A 的后缀子串有没有和 A 的前缀子串重合，如果有的话，重合的部分可以不用比较&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;思想&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;从前往后&lt;/strong&gt;的将模式串与主串进行匹配&lt;/li&gt;
+&lt;li&gt;当出现不能匹配的“坏字符”时，将之前可以匹配到的字符串称为“好前缀”&lt;/li&gt;
+&lt;li&gt;如果“好前缀”中的后缀子串和模式串的前缀子串有重合，则可以跳过重合的部分，继续依次比较后面的字符。将“好前缀”后缀子串中最长可匹配模式串的前缀子串，称为“最长可匹配后缀子串”，对应的前缀子串称为“最长可匹配前缀子串”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/kmp_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/kmp_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;kmp&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;kmp&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/kmp_2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/kmp_2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;kmp&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;kmp&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;kmp-算法的代码分析&#34;&gt;KMP 算法的代码分析&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;求模式串中前缀子串的“最长可匹配前缀子串”&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;使用 next 数组（失效函数），数组的下标代表模式串的前缀子串的长度，数组中的值为这个前缀子串对应的“最长可匹配前缀子串”的结尾字符下标（或这个前缀子串的“最长可匹配前缀子串”的长度 - 1）&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/kmp_3.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/kmp_3.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;kmp&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;kmp&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;利用动态规划来求 next 数组&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;若 next[i - 1] = k - 1，即 B[0，i - 1] 对应的“最长可匹配好前缀”为 B[0，k - 1]&lt;/li&gt;
+&lt;li&gt;当 B[i] == B[k] 时，则 next[i] = next[i - 1] + 1，即 next[i] = k&lt;/li&gt;
+&lt;li&gt;当 B[i] != B[k] 时
+&lt;ul&gt;
+&lt;li&gt;假设 B[i - 1] 存在一个“可匹配好后缀”（不是“最长可匹配好后缀”）为 B[x，i - 1]，则对应的“可匹配前缀子串”为 B[0，i - 1 - x]。如果 B[i] == B[i - x]，则说明 B[x，i] 是 B[0，i] 的“最长可匹配后缀子串”&lt;/li&gt;
+&lt;li&gt;如果不存在 B[i] == B[i - x]，则说明 next[i] = -1，即不存在“最长可匹配前缀子串”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;将模式串与主串依次匹配，当出现“坏字符”时，获取对应“好前缀”的 next 数组（失效函数）的值 n，主串的匹配位置不变，将模式串移动 n 位，继续匹配&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;trie-树字典树&#34;&gt;Trie 树（字典树）&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;一组字符串复用公共前缀后，所构成的树形结构，当单个字符串结束时，需要将节点标识为结束（下图中的红色节点）&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/trie.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/trie.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;trie&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;trie&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;适用场景&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在确定的一组字符集中，频繁查找或匹配不同的字符串，如 &lt;strong&gt;关键字检测&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;在确定的一组字符集中，查找或匹配符合前缀的字符串，如 &lt;strong&gt;搜索框自动补全&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;字符集要求&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;字符集中，字符串的公共前缀重合较多&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;trie-树-的操作&#34;&gt;Trie 树 的操作&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;构建 Trie 树
+&lt;ul&gt;
+&lt;li&gt;根结点不存放任何字符，仅作为开始节点&lt;/li&gt;
+&lt;li&gt;根据字符集中的字符串，存储为多叉树，相同公共前缀的字符串拥有相同的父节点
+&lt;ul&gt;
+&lt;li&gt;存储为多叉树的方法有很多，如 有序数组、跳表、红黑树等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;将字符串的最后一个字符，标识为结束节点，结束节点可以是叶子结点，也可以是任意一个父节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;在 Trie 树中查找字符串
+&lt;ul&gt;
+&lt;li&gt;当要查找的字符串的最后一个字符在 Trie 树中标识为结束节点时，则匹配成功，否则为匹配失败&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;trie-树的优缺点&#34;&gt;Trie 树的优缺点&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;优点
+&lt;ul&gt;
+&lt;li&gt;在已确定的字符集中，且字符集中的字符串的公共前缀较多。适合频繁的查找能否匹配成功，复杂度为 O（k），k 为要查找的字符串的长度&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;适合查找前缀匹配的字符串&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;缺点
+&lt;ul&gt;
+&lt;li&gt;每个节点需要维护子节点的指针，数据块不连续，对缓存不友好，内存消耗大&lt;/li&gt;
+&lt;li&gt;改进 Trie 树，使其内存消耗减少时，效率降低，且编码难度增大，不如直接使用红黑树
+&lt;ul&gt;
+&lt;li&gt;如 缩点优化
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/trie_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/trie_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;trie&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;trie&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;ac-自动机aho-corasick&#34;&gt;AC 自动机（Aho-Corasick）&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;适用场景
+&lt;ul&gt;
+&lt;li&gt;适用于于多模式串匹配，即在一个主串中查找多个模式串&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;目的
+&lt;ul&gt;
+&lt;li&gt;类似于 KMP 算法，尽可能地一次性跳过多个字符，用于减少匹配次数&lt;/li&gt;
+&lt;li&gt;一次性地寻找多个模式串&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;AC 自动机的本质就是在 Trie 树上添加类似 KMP 的 next 数组，只不过 AC 自动机的 next 数组是构建在 Trie 树上&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;ac-自动机的操作&#34;&gt;AC 自动机的操作&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;构建 Trie 树&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;根结点不存放任何字符，仅作为开始节点&lt;/li&gt;
+&lt;li&gt;根据字符集中的字符串，存储为多叉树，相同公共前缀的字符串拥有相同的父节点
+&lt;ul&gt;
+&lt;li&gt;存储为多叉树的方法有很多，如 有序数组、跳表、红黑树等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;将字符串的最后一个字符，标识为结束节点，结束节点可以是叶子结点，也可以是任意一个父节点&lt;/li&gt;
+&lt;li&gt;在结束节点上记录模式串的长度，匹配时使用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 Trie 树上构建失败指针&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;失败指针的意义&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;输入的字符与当前结点的所有孩子结点都不匹配时，AC 自动机的状态应该转移到的状态&lt;/li&gt;
+&lt;li&gt;从根结点到当前结点所组成的字符串 与 整个 Trie 树 中的所有前缀 的最长公共部分&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;根结点的失败指针为 NULL，指向自己，按层遍历整个 Trie 树&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果当前结点对应的字符和当前结点父节点指向的失败指针的孩子结点对应的字符一致，则当前结点的失败指针指向当前结点父节点的失败指针的孩子结点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;p.fail == q &amp;amp;&amp;amp; pc == qc，则 pc.fail = qc&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/ac.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/ac.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ac&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ac&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;如果当前结点对应的字符和当前结点父节点指向的失败指针的孩子结点对应的字符不一致，比较当前结点对应的字符和父节点的失败指针的失败指针，直到找到失败指针的孩子结点对应的字符与之相等，如果不存在，则当前结点的失败指针指向根结点&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;p.fail = q &amp;amp;&amp;amp; pc != q.children，则令 q = q.fail，继续比较&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/ac_1.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/ac_1.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;ac&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;ac&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;在 AC 自动机中匹配主串&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当前结点的指针从根结点开始，主串字符从 0 开始匹配&lt;/li&gt;
+&lt;li&gt;匹配当前结点的孩子结点和当前主串字符
+&lt;ul&gt;
+&lt;li&gt;如果相等，则判断当前结点和当前结点的失败指针指向的结点，是否是字符串的结束字符
+&lt;ul&gt;
+&lt;li&gt;如果是，将匹配到的字符保存在结果集中&lt;/li&gt;
+&lt;li&gt;如果不是，当前结点指向孩子结点，继续匹配主串字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如果不相等，则判断当前结点的失败指针是否指向 NULL
+&lt;ul&gt;
+&lt;li&gt;如果是，则令当前结点的指针指向根结点，继续匹配主串字符&lt;/li&gt;
+&lt;li&gt;如果不是，则令当前结点的指针指向当前结点失败指针的结点，继续匹配失败指针的孩子结点和当前主串字符&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

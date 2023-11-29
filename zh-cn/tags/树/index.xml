@@ -1,0 +1,838 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>树 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E6%A0%91/</link>
+        <description>Recent content in 树 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Wed, 23 Aug 2023 22:25:43 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E6%A0%91/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>数据结构（五）树 — B&#43;树</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/</link>
+        <pubDate>Wed, 23 Aug 2023 22:25:43 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/</guid>
+        <description>&lt;h2 id=&#34;树-tree-相关概念&#34;&gt;树 Tree 相关概念&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;父节点、子节点、兄弟节点、根节点、叶子节点（叶节点）&lt;/li&gt;
+&lt;li&gt;节点的高度（Height）
+&lt;ul&gt;
+&lt;li&gt;节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0&lt;/li&gt;
+&lt;li&gt;树的高度 = 根节点的高度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;节点的深度（Depth）
+&lt;ul&gt;
+&lt;li&gt;根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;节点的层数（Level）
+&lt;ul&gt;
+&lt;li&gt;节点的深度 + 1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;b-树-b-tree&#34;&gt;B+ 树 B+ Tree&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;B+ 树 是通过 B 树（二叉查找树）演化而来，目的是在二叉查找树中能够按照区间来查找数据&lt;/li&gt;
+&lt;li&gt;B+ 树中的非叶子节点不存储数据，&lt;strong&gt;只存储索引&lt;/strong&gt;，而 B 树中的节点存储数据&lt;/li&gt;
+&lt;li&gt;B+ 树中的叶子节点使用链表串联起来，链表中的数据是有序的，可以按区间查找，而 B 树中的叶子节点不需要链表串联&lt;/li&gt;
+&lt;li&gt;B+ 树的根节点一般放在内存中，其他节点存储在磁盘中&lt;/li&gt;
+&lt;li&gt;B+ 树中的每个节点中子节点的个数不能超过 m 个，即 m叉树，也不能小于 m/2（除根节点外）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;b-树的实现&#34;&gt;B+ 树的实现&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;B+ 树的非叶子节点存储索引，存储在磁盘中
+&lt;ul&gt;
+&lt;li&gt;内存的访问速度是纳米级别的，磁盘的访问速度是毫秒级别的，读取同样大小的数据，从磁盘中读取花费的时间是从内存中读取的上万倍，甚至几十万倍&lt;/li&gt;
+&lt;li&gt;每个节点的读取操作，都对应一次磁盘 IO 操作&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;树的高度 = 每次查询数据时磁盘 IO 操作的最大次数&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;尽量减少磁盘 IO 操作，也就是尽量降低树的高度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;B+ 树的叶子节点存储的是 k 个数据行的键值、地址信息、当前节点在链表中的前驱节点的地址、当前节点在链表中的后继节点的地址，k 的取值由事先计算得到&lt;/li&gt;
+&lt;li&gt;B+ 树是一个 m 叉树，m 的取值由事先计算得到&lt;/li&gt;
+&lt;li&gt;k、m 的计算方式
+&lt;ul&gt;
+&lt;li&gt;操作系统按照页（PAGE_SIZE）的方式读取内存、磁盘中的数据，一页的大小通常为 4KB，可以通过 getconf PAGE_SIZE 命令查看&lt;/li&gt;
+&lt;li&gt;当读取的数据量超过一页时，会触发多次 IO 操作&lt;/li&gt;
+&lt;li&gt;k、m 的取值则根据每个节点的大小 &amp;lt;= 页的大小，且尽可能的大&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;b-树的操作&#34;&gt;B+ 树的操作&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;查询&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;按照主键的值在树中进行查找，当查找到叶子节点后
+&lt;ul&gt;
+&lt;li&gt;若查找主键 ，则根据叶子节点中的地址信息，获取到具体数据&lt;/li&gt;
+&lt;li&gt;若查找范围区间，则在链表中继续查找，直到不满足条件（达到 limit 限制、超过范围区间），获取到符合区间值的所有数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;插入&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;B+ 树中，m 值是由事先计算得出，即每个节点最多只能有 m 个子节点&lt;/li&gt;
+&lt;li&gt;当插入数据时同时更新索引，插入后的节点个数超过 m 个，则需要对索引进行更新分裂操作&lt;/li&gt;
+&lt;li&gt;将当前节点分裂成两个节点，若当前节点分裂之后，父节点的子节点个数超过 m 个，则继续向上分裂，直至父节点的子节点个数 &amp;lt; m&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/b&amp;#43;_tree.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/b&amp;#43;_tree.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;b&amp;#43;树&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;b+树&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;删除&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;删除某个数据同时删除索引，当删除后的节点个数小于 m/2 时，则需要对索引进行更新合并操作&lt;/li&gt;
+&lt;li&gt;当前节点的个数小于 m/2，将当前节点和它相邻的兄弟节点合并&lt;/li&gt;
+&lt;li&gt;若合并之后的节点个数超过 m，则执行插入的“分裂”操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/b&amp;#43;_tree_2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/b&amp;#43;_tree_2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;b&amp;#43;树&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;b+树&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>数据结构（四）树 — 红黑树、堆</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/</link>
+        <pubDate>Wed, 23 Aug 2023 22:22:42 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/</guid>
+        <description>&lt;h2 id=&#34;树-tree-相关概念&#34;&gt;树 Tree 相关概念&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;父节点、子节点、兄弟节点、根节点、叶子节点（叶节点）&lt;/li&gt;
+&lt;li&gt;节点的高度（Height）
+&lt;ul&gt;
+&lt;li&gt;节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0&lt;/li&gt;
+&lt;li&gt;树的高度 = 根节点的高度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;节点的深度（Depth）
+&lt;ul&gt;
+&lt;li&gt;根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;节点的层数（Level）
+&lt;ul&gt;
+&lt;li&gt;节点的深度 + 1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;平衡二叉查找树&#34;&gt;平衡二叉查找树&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;定义：二叉树中任意一个节点的左右子树的高度相差不能大于 1。&lt;/li&gt;
+&lt;li&gt;目的：解决普通二叉查找树在频繁的插入、删除等动态更新的情况下，出现时间复杂度退化的问题。&lt;/li&gt;
+&lt;li&gt;常见的平衡二叉查找树，AVL 树、Splay Tree（伸展树）、Treap（树堆）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;红黑树-red-black-tree&#34;&gt;红黑树 Red-Black Tree&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;简称 R-B Tree，是一种不严格的平衡二叉查找树。&lt;strong&gt;是为了解决普通二叉查找树在数据更新的过程中，复杂度退化的问题而产生的。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;红黑树的高度近似 log2n，是近似平衡，插入、删除、查找操作的时间复杂度都是 O（logn）。&lt;/li&gt;
+&lt;li&gt;在红黑树中的节点，一类被标记为黑色，一类被标记为红色。&lt;/li&gt;
+&lt;li&gt;红黑树的要求
+&lt;ul&gt;
+&lt;li&gt;根节点是黑色的&lt;/li&gt;
+&lt;li&gt;每个叶子节点都是黑色的空节点，也就是说，叶子节点不存储数据（为了简化红黑树的代码实现）&lt;/li&gt;
+&lt;li&gt;任何相邻的节点都不能同时为红色，也就是说，红色节点是被黑色节点隔开的&lt;/li&gt;
+&lt;li&gt;每个节点，从该节点到达其可达叶子节点的所有路径，都包含相同数目的黑色节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;用红黑树的高度是否比较稳定地趋近 log2n 来证明红黑树是否是近似平衡的。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;左旋rotate-left右旋rotate-right&#34;&gt;左旋（rotate left）、右旋（rotate right）&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;左旋 rotate left，围绕某个节点的左旋&lt;/li&gt;
+&lt;li&gt;右旋 rotate right，围绕某个节点的右旋&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;红黑树的实现&#34;&gt;红黑树的实现&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;插入操作
+&lt;ul&gt;
+&lt;li&gt;插入的节点必须是红色的，新插入的节点都是放在叶子节点上&lt;/li&gt;
+&lt;li&gt;如果插入节点的父节点是黑色的，不需要做其他操作&lt;/li&gt;
+&lt;li&gt;如果插入节点是根节点，直接将节点的颜色置为黑色&lt;/li&gt;
+&lt;li&gt;其他情况则需要进入红黑树的平衡调整过程
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 1：如果关注节点是 a，它的叔叔节点 d 是红色&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_1.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_1.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将关注节点 a 的父节点 b、叔叔节点 d 的颜色都设置成黑色&lt;/li&gt;
+&lt;li&gt;将关注节点 a 的祖父节点 c 的颜色设置成红色&lt;/li&gt;
+&lt;li&gt;关注节点变成 a 的祖父节点 c&lt;/li&gt;
+&lt;li&gt;跳到 CASE 2 或 CASE 3&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 2：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点是其父节点 b 的右子节点&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_2.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_2.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 2&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 2&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;关注节点变成节点 a 的父节点 b&lt;/li&gt;
+&lt;li&gt;围绕新的关注节点 b 左旋&lt;/li&gt;
+&lt;li&gt;跳到 CASE 3&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 3：如果关注节点是 a，它的叔叔节点 d 是黑色，关注节点 a 是其父节点 b 的左子节点&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_3.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_3.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;围绕关注节点 a 的祖父节点 c 右旋&lt;/li&gt;
+&lt;li&gt;将关注节点 a 的父节点 b、兄弟节点 c 的颜色互换&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;删除操作
+&lt;ul&gt;
+&lt;li&gt;针对删除节点的初步调整
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 1：如果要删除的节点是 a，它只有一个子节点 b&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_4.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_4.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;删除节点 a，并且把节点 b 替换道节点 a 的位置&lt;/li&gt;
+&lt;li&gt;节点 a 只能是黑色，节点 b 也只能是红色&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 2：如果要删除的节点 a 有两个非空子节点，并且它的后继节点就是节点 a 的右子节点 c&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_5.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_5.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 2&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 2&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果节点 a 的后继节点就是右子节点 c，那么右子节点 c 肯定没有左子树。将节点 a 删除，并且将节点 c 替换到节点 a 的位置&lt;/li&gt;
+&lt;li&gt;把节点 c 的颜色设置为跟节点 a 相同的颜色&lt;/li&gt;
+&lt;li&gt;如果节点 c 是黑色，将节点 c 的右子节点 d 多加一个黑色&lt;/li&gt;
+&lt;li&gt;将关注节点变成节点 d&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 3：如果要删除的是节点 a，它有两个非空子节点，并且节点 a 的后继节点不是右节点&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_6.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_6.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;找到后继节点 d，并将它删除，删除后继节点 d 的过程参照 CASE 1&lt;/li&gt;
+&lt;li&gt;将节点 a 替换成后继节点 d&lt;/li&gt;
+&lt;li&gt;把节点 d 的颜色设置为跟节点 a 相同的颜色&lt;/li&gt;
+&lt;li&gt;如果节点 d 是黑色，将节点 d 的右子节点 c 多加一个黑色&lt;/li&gt;
+&lt;li&gt;关注节点变成节点 c&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;针对关注节点进行二次调整，为了让红黑树中不存在相邻的红色节点
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 1：如果关注节点是 a，它的兄弟节点 c 是红色的&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_7.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_7.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 1&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 1&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;围绕关注节点 a 的父节点 b 左旋&lt;/li&gt;
+&lt;li&gt;关注节点 a 的父节点 b 和祖父节点 c 交换颜色&lt;/li&gt;
+&lt;li&gt;关注节点不变&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 2：如果关注节点是 a，它的兄弟节点 c 是黑色的，并且节点 c 的左右子节点 d、e 都是黑色的&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_8.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_8.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 2&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 2&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;将关注节点 a 的兄弟节点 c 的颜色变成红色&lt;/li&gt;
+&lt;li&gt;从关注节点 a 中去掉一个黑色，这个时候节点 a 就是单纯的红色或黑色&lt;/li&gt;
+&lt;li&gt;给关注节点 a 的父节点 b 添加一个黑色节点&lt;/li&gt;
+&lt;li&gt;关注节点从 a 变成其父节点 b&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 3：如果关注节点是 a，它的兄弟节点 c 是黑色，c 的左子节点 d 是红色，c 的右子节点 e 是黑色&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_9.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_9.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 3&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 3&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;围绕关注节点 a 的兄弟节点 c 右旋&lt;/li&gt;
+&lt;li&gt;节点 c 和节点 d 交换颜色&lt;/li&gt;
+&lt;li&gt;关注节点不变&lt;/li&gt;
+&lt;li&gt;跳转到 CASE 4&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;CASE 4：如果关注节点 a 的兄弟节点 c 是黑色的，并且 c 的右子节点是红色的&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_10.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/rb_tree_case_10.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;case 4&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;case 4&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;围绕关注节点 a 的父节点 b 左旋&lt;/li&gt;
+&lt;li&gt;将关注节点 a 的兄弟节点 c 的颜色，跟关注节点 a 的父节点 b 设置成相同的颜色&lt;/li&gt;
+&lt;li&gt;将关注节点 a 的父节点 b 的颜色设置为黑色&lt;/li&gt;
+&lt;li&gt;从关注节点 a 中去掉一个黑色，节点 a 就变成了单纯的红色或者黑色&lt;/li&gt;
+&lt;li&gt;将关注节点 a 的叔叔节点 e 设置为黑色&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;参考资料&#34;&gt;参考资料&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/fei33423/article/details/79132930&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/fei33423/article/details/79132930&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/abcdef314159/article/details/77193888&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://blog.csdn.net/abcdef314159/article/details/77193888&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;堆-heap&#34;&gt;堆 Heap&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;堆是一种特殊的树，是一个完全二叉树&lt;/li&gt;
+&lt;li&gt;堆中每一个节点的值都必须大于等于（或小于等于）其子树中每个节点的值，大顶堆、小顶堆&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;堆的实现&#34;&gt;堆的实现&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;堆是一个完全二叉树，使用数组来存储，节省存储空间。直接通过数组的下标，找到对应节点的左右子节点和父节点&lt;/li&gt;
+&lt;li&gt;堆的操作
+&lt;ul&gt;
+&lt;li&gt;插入元素（堆化），时间复杂度 O（logn）
+&lt;ul&gt;
+&lt;li&gt;从下往上的堆化，遇到不满足大小条件的就交换父子节点&lt;/li&gt;
+&lt;li&gt;从上往下的堆化，遇到不满足大小条件的就交换父子节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;删除堆顶元素
+&lt;ul&gt;
+&lt;li&gt;从上往下的堆化，时间复杂度 O（logn）
+&lt;ul&gt;
+&lt;li&gt;将最后一个数字放在堆顶，遇到不满足大小条件的就交换父子节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;基于堆实现排序&#34;&gt;基于堆实现排序&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;建堆，时间复杂度，O（n）
+&lt;ul&gt;
+&lt;li&gt;将数组原地建成一个堆，直接在原数组上操作&lt;/li&gt;
+&lt;li&gt;方式
+&lt;ul&gt;
+&lt;li&gt;从前往后处理数组数据，从下往上的堆化。不断地在堆中插入元素，对堆进行插入操作&lt;/li&gt;
+&lt;li&gt;从后往前处理数组数据，从上往下的堆化。从非叶子节点开始，依次堆化。
+&lt;ol&gt;
+&lt;li&gt;对于完全二叉树来说，下标从 n/2 + 1 到 n 的都是叶子节点&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;排序，时间复杂度，O（nlogn）
+&lt;ul&gt;
+&lt;li&gt;堆顶（数组中的第一个元素）就是最大的元素&lt;/li&gt;
+&lt;li&gt;删除堆顶元素，将堆顶和最后一个元素交换，最大元素放在下标为 n 的位置&lt;/li&gt;
+&lt;li&gt;将剩下的 n - 1 个元素重新构建成堆&lt;/li&gt;
+&lt;li&gt;重复上述操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;堆排序整体的时间复杂度是O（nlogn），不是稳定的排序算法&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;为什么快速排序比堆排序性能好时间复杂度同样为onlogn&#34;&gt;为什么快速排序比堆排序性能好（时间复杂度同样为O(nlogn)）&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;堆排序数据访问的方式没有快速排序友好
+&lt;ul&gt;
+&lt;li&gt;快速排序的数据是顺序访问的，而堆排序是跳着访问的，对 CPU 缓存不友好&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;对于同样的数据，在排序过程中，堆排序算法的数据交换次数要多于快速排序&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;堆的应用&#34;&gt;堆的应用&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;堆排序&lt;/li&gt;
+&lt;li&gt;求 topK&lt;/li&gt;
+&lt;li&gt;流里面的中值&lt;/li&gt;
+&lt;li&gt;流里面的中位数&lt;/li&gt;
+&lt;li&gt;优先级队列&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;优先级队列&#34;&gt;优先级队列&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;思路：数据的出队顺序按照优先级高的先出队&lt;/li&gt;
+&lt;li&gt;实现
+&lt;ul&gt;
+&lt;li&gt;一个堆就可以看作是一个优先级队列&lt;/li&gt;
+&lt;li&gt;在优先级队列中，执行入队操作，就相当于往堆中插入一个元素。执行出队操作，相当于取出堆顶元素。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;应用场景&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;合并有序小文件&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;假设有 100 个小文件，每个文件的大小是 100 MB，每个文件中存储的都是有序的字符串。将这 100 个小文件合并成一个大文件&lt;/li&gt;
+&lt;li&gt;使用数组的实现
+&lt;ul&gt;
+&lt;li&gt;从这 100 个文件中，各取第一个字符串，放入数组中，比较大小，把最小的字符串放入合并后的大文件中，并将它从数组中删除。&lt;/li&gt;
+&lt;li&gt;假设这个最小的字符串来自 13.txt，就从这个文件中取下一个字符串，放入数组中。重新比较大小，选择最小的放入合并后的大文件，将它从数组中删除。&lt;/li&gt;
+&lt;li&gt;重复上述步骤，直至所有文件中的数据都放入到大文件为止。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用优先队列的实现
+&lt;ul&gt;
+&lt;li&gt;和使用数组的方法类似，只不过将从文件中取出的字符串放在小顶堆中。&lt;/li&gt;
+&lt;li&gt;删除堆顶元素，即最小的元素。然后再从堆顶元素所在的文件当中取出下一个字符串，放入堆中。&lt;/li&gt;
+&lt;li&gt;重复上述步骤，直至所有文件中的数据都放入到大文件为止。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;高性能定时器&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;假设定时器中维护了很多定时任务，每个任务都设定了一个要出发执行的时间点。&lt;/li&gt;
+&lt;li&gt;简单粗暴的实现
+&lt;ul&gt;
+&lt;li&gt;每隔一个很小的单位时间（如 1 秒）扫描一遍任务列表，检查是否有任务达到设定的执行时间。如果达到了，就执行任务。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用堆的实现
+&lt;ul&gt;
+&lt;li&gt;按照任务设定的执行时间，将这些任务存储在优先队列中，队列首部（小顶堆的堆顶）存储的是最先执行的任务。&lt;/li&gt;
+&lt;li&gt;将队列首部任务的执行时间与当前时间相减，得到时间间隔 T。即从当前开始，第一个任务执行需要等待的时间。&lt;/li&gt;
+&lt;li&gt;时间 T 过去后，定时器取优先级队列中队列首部的执行任务。&lt;/li&gt;
+&lt;li&gt;移除队列首部任务，然后再计算新的队列首部任务的执行时间点与当前时间点的差值。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;求-top-k&#34;&gt;求 Top K&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;静态数据集合
+&lt;ul&gt;
+&lt;li&gt;例：如何在包含 n 个数据的数组中，查找前 K 大的数据&lt;/li&gt;
+&lt;li&gt;使用小顶堆，维护一个大小为 K 的小顶堆&lt;/li&gt;
+&lt;li&gt;实现：顺序遍历数组，从数组中取出数据与堆顶元素比较，如果比堆顶元素大，则把堆顶元素删除，并将这个数据插入到堆中。如果比堆顶元素小，则不做任何处理，继续遍历数组。&lt;/li&gt;
+&lt;li&gt;时间复杂度
+&lt;ul&gt;
+&lt;li&gt;遍历数组：O（n）&lt;/li&gt;
+&lt;li&gt;堆化：O（logK）&lt;/li&gt;
+&lt;li&gt;所以总共是 O（nlogK）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;动态数据集合
+&lt;ul&gt;
+&lt;li&gt;例：数据集合有两个操作，一个是添加数据，一个是查询当前 K 大数据&lt;/li&gt;
+&lt;li&gt;一直维护一个 K 大小的小顶堆&lt;/li&gt;
+&lt;li&gt;实现：当有数据被添加到集合中时，与堆顶元素比较大小。如果比堆顶元素大，则把堆顶元素删除，并将这个元素插入堆中。如果比堆顶元素小，则不做处理。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;利用堆求中位数&#34;&gt;利用堆求中位数&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;静态数据集合
+&lt;ul&gt;
+&lt;li&gt;先排序，取下标 n / 2 的数据&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;动态数据集合
+&lt;ul&gt;
+&lt;li&gt;维护两个堆，一个大顶堆，一个小顶堆&lt;/li&gt;
+&lt;li&gt;大顶堆中存储前半部分数据，小顶堆中存储后半部分数据，且小顶堆中的数据都大于大顶堆中的数据&lt;/li&gt;
+&lt;li&gt;中位数就是大顶堆的堆顶元素&lt;/li&gt;
+&lt;li&gt;实现：
+&lt;ul&gt;
+&lt;li&gt;n 个数据，如果 n 是偶数，按照从小到大排序，前 n / 2 个数据存储在大顶堆中，后 n / 2 个数据存储在小顶堆中。如果 n 是奇数，大顶堆存储 n / 2 + 1 个数据，小顶堆中存储 n / 2 个数据&lt;/li&gt;
+&lt;li&gt;如果新加入的数据小于等于大顶堆的堆顶元素，将这个数据插入到大顶堆，否则，将这个数据插入到小顶堆&lt;/li&gt;
+&lt;li&gt;当不满足大顶堆和小顶堆的数据个数时，通过将一个堆中不停地将堆顶元素移动到另一个堆，来满足数据个数的要求&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;延伸：如何快速求 n% 的数据，例：如何快速求接口的 99% 响应时间&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;使用两个堆，一个大顶堆，一个小顶堆。大顶堆中保存前 n% 的数据，小顶堆中保存 1 - n% 的数据。大顶堆堆顶的数据就是要求的数据。&lt;/li&gt;
+&lt;li&gt;每次插入一个数据的时候，判断这个数据跟大顶堆堆顶数据和小顶堆堆顶数据的大小关系。如果新插入的数据比大顶堆的堆顶数据小，则插入大顶堆。如果新插入的数据比小顶堆的堆顶数据大，则插入小顶堆。&lt;/li&gt;
+&lt;li&gt;每次插入数据后，需要重新计算大顶堆和小顶堆的数据格式，看看是否还满足要求。如果不满足，就将一个堆中的数据移动到另一个堆中，直到满足要求。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>数据结构（三）树 — 二叉树、递归树</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/</link>
+        <pubDate>Wed, 23 Aug 2023 22:19:41 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/</guid>
+        <description>&lt;h2 id=&#34;树-tree-相关概念&#34;&gt;树 Tree 相关概念&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;父节点、子节点、兄弟节点、根节点、叶子节点（叶节点）&lt;/li&gt;
+&lt;li&gt;节点的高度（Height）
+&lt;ul&gt;
+&lt;li&gt;节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0&lt;/li&gt;
+&lt;li&gt;树的高度 = 根节点的高度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;节点的深度（Depth）
+&lt;ul&gt;
+&lt;li&gt;根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;节点的层数（Level）
+&lt;ul&gt;
+&lt;li&gt;节点的深度 + 1&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;二叉树-binary-tree&#34;&gt;二叉树 Binary Tree&lt;/h2&gt;
+&lt;h3 id=&#34;二叉树&#34;&gt;二叉树&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;每个节点最多有两个子节点，分别是左子节点和右子节点&lt;/li&gt;
+&lt;li&gt;满二叉树
+&lt;ul&gt;
+&lt;li&gt;叶子节点全都在最底层，除了叶子节点之外，每个节点都有左右两个子节点&lt;/li&gt;
+&lt;li&gt;满二叉树的高度大约是 log2(n)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;完全二叉树
+&lt;ul&gt;
+&lt;li&gt;叶子节点都在最底下两层，最后一层的叶子节点都靠左排列，并且除了最后一层，其他层的节点个数都要达到最大&lt;/li&gt;
+&lt;li&gt;完全二叉树的高度是 log2(n) 向下取整&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;存储二叉树
+&lt;ul&gt;
+&lt;li&gt;基于指针或引用的二叉链式存储法
+&lt;ul&gt;
+&lt;li&gt;每个节点有三个字段，分别存储数据、左右子节点的指针&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;基于数组的顺序存储法
+&lt;ul&gt;
+&lt;li&gt;根节点存储在下标为 1 的位置&lt;/li&gt;
+&lt;li&gt;若节点存储在数组中下标为 i 的位置，左子节点存储在下标 2 * i 的位置，右子节点存储在下标 2 * i + 1 的位置&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;遍历二叉树
+&lt;ul&gt;
+&lt;li&gt;前序遍历
+&lt;ul&gt;
+&lt;li&gt;对于树中的任意节点，先打印这个节点，再打印它的左子树，最后打印它的右子树&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;中序遍历
+&lt;ul&gt;
+&lt;li&gt;对于树中的任意节点，先打印它的左子树，再打印它本身，最后打印它的右子树&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;后序遍历
+&lt;ul&gt;
+&lt;li&gt;对于树中的任意节点，先打印它的左子树，再打印它的右子树，最后打印它本身&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;递归公式
+&lt;ul&gt;
+&lt;li&gt;前序遍历的递推公式：preOrder(r) = print r-&amp;gt;preOrder(r-&amp;gt;left)-&amp;gt;preOrder(r-&amp;gt;right)&lt;/li&gt;
+&lt;li&gt;中序遍历的递推公式：inOrder(r) = inOrder(r-&amp;gt;left)-&amp;gt;print r-&amp;gt;inOrder(r-&amp;gt;right)&lt;/li&gt;
+&lt;li&gt;后序遍历的递推公式：postOrder(r) = postOrder(r-&amp;gt;left)-&amp;gt;postOrder(r-&amp;gt;right)-&amp;gt;print r&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;二叉查找树--二叉搜索树binary-search-tree&#34;&gt;二叉查找树 / 二叉搜索树（Binary Search Tree）&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;前提是一颗&lt;strong&gt;完全二叉树&lt;/strong&gt; ，在树中的任意一个节点，其左子树中的每个节点的值，都小于这个节点的值，而右子树节点的值都大于这个节点的值&lt;/li&gt;
+&lt;li&gt;查找操作
+&lt;ul&gt;
+&lt;li&gt;先取根节点，如果等于要查找的数据，则返回，若查找的数据比根节点的值小，则在左子树中递归查找，若查找的数据比根节点的值大，则在右子树中递归查找&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;插入操作
+&lt;ul&gt;
+&lt;li&gt;如果要插入的数据比节点的数据大
+&lt;ul&gt;
+&lt;li&gt;节点的右子树为空，直接将新数据插入到右子节点的位置&lt;/li&gt;
+&lt;li&gt;节点的右子树不为空，继续递归遍历右子树&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如果要插入的数据比节点的数据小
+&lt;ul&gt;
+&lt;li&gt;节点的左子树为空，直接将新数据插入到左子节点的位置&lt;/li&gt;
+&lt;li&gt;节点的左子树不为空，继续递归遍历左子树&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;删除操作
+&lt;ul&gt;
+&lt;li&gt;如果要删除的节点没有子节点
+&lt;ul&gt;
+&lt;li&gt;直接将父节点中指向要删除节点的指针置为 null&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如果要删除的节点只有一个子节点（左子节点或右子节点）
+&lt;ul&gt;
+&lt;li&gt;更新父节点中指向要删除节点的指针，让它指向要删除节点的子节点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;如果要删除的节点有两个子节点
+&lt;ul&gt;
+&lt;li&gt;找到这个节点的右子树中的最小节点，替换到要删除的节点上，删除这个最小节点&lt;/li&gt;
+&lt;li&gt;或者找到这个节点的左子树中的最大节点，替换到要删除的节点上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;取巧的删除操作
+&lt;ul&gt;
+&lt;li&gt;单纯地将要删除的节点标记为“已删除”，没有真正地从树中将这个节点去掉，比较浪费内存空间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;快速地查找最大节点和最小节点、前驱节点和后继节点&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;中序遍历二叉查找树，可以输出有序的数据序列，时间复杂度是 O(n)&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;时间复杂度跟树的高度成正比，也就是 O(height)&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;支持重复数据的二叉查找树&#34;&gt;支持重复数据的二叉查找树&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;二叉查找树中的每个节点不仅仅存储一个数据，通过链表和支持动态扩容的数据等数据结构，把值相同的数据都存储在同一个节点上&lt;/li&gt;
+&lt;li&gt;二叉查找树中的每个节点只存储一个数据，插入相同值时，将要插入的数据放到这个节点的右子树，把这个新插入的数据当作是大于这个节点的值来处理&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;二叉查找树的优势与散列表相比&#34;&gt;二叉查找树的优势（与散列表相比）&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;散列表中的数据是无序存储的，而二叉查找树的中序遍历可以在 O（n）的时间复杂度内，输入有序的数据&lt;/li&gt;
+&lt;li&gt;散列表扩容耗时多，而且遇到散列冲突时性能不稳定，平衡二叉查找树的性能稳定，时间复杂度为 O（logn）&lt;/li&gt;
+&lt;li&gt;由于哈希冲突，散列表的查找速度不一定比平衡二叉查找树的效率高&lt;/li&gt;
+&lt;li&gt;散列表的构造复杂，需要考虑到散列函数的设计、冲突解决办法、扩容、缩容等，而平衡二叉查找树只需要考虑平衡性的问题&lt;/li&gt;
+&lt;li&gt;为了避免过多的散列冲突，散列表装载因子不能过大，会浪费一定的存储空间&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;递归树&#34;&gt;递归树&lt;/h2&gt;
+&lt;p&gt;递归的思想是，&lt;strong&gt;将大问题分解为小问题来求解&lt;/strong&gt;，然后再将小问题分解为小小问题。这样一层一层地分解，直到问题的数据规模被分解得足够小，不用继续递归分解为止。如果把这个一层一层的分解过程画成图，它其实就是一棵树，这棵树就是递归树。&lt;/p&gt;
+&lt;h3 id=&#34;借助递归树分析递归算法的时间复杂度&#34;&gt;借助递归树分析递归算法的时间复杂度&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;分析快速排序的时间复杂度&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/quick_sort_tree.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/quick_sort_tree.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;快排递归树&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;快排递归树&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;假设每次分区后，两个分区的大小比例为 1 ： k，递推公式可以写成 T（n）= T（n / 10）+ T（9n / 10）&lt;/li&gt;
+&lt;li&gt;每层分区操作所遍历的个数之和是 n（固定）&lt;/li&gt;
+&lt;li&gt;当分区不能均匀的一分为二时，递归树不是满二叉树，那么递归树的高度介于最短路径（每次都是 1 / 10）和最长路径（每次都是 9 / 10）之间，所以时间复杂度介于
+nlog10（n）和 nlog9/10（n）之间，时间复杂度仍然是 O（nlog（n））&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;分析斐波那契数列的时间复杂度&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/tree_fn.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/tree_fn.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;斐波那契数列&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;斐波那契数列&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;f（n） = f（n - 1） + f（n - 2），每次数据规模都是 -1 或者 -2，叶子结点的数据规模是 1 或者 2。&lt;/li&gt;
+&lt;li&gt;最长路径是 n（每次走 1 的数据），最短路径是 n / 2（每次走 2 的数据）&lt;/li&gt;
+&lt;li&gt;合并操作需要一次加法运算，第一层的时间消耗是 1，第二层是 2，第三层是 4。如果是最长路径，则总时间消耗是 1 + 2 + 4 + &amp;hellip; + 2n + 1。如果是最短路径，则总消耗时间是 1 + 2 + &amp;hellip; + 2n/2 + 1。&lt;/li&gt;
+&lt;li&gt;时间复杂度介于 O（2n）和 O（2n/2）之间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;分析全排列的时间复杂度&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;把 n 个数据的所有排列都找出来，如果确定了最后一位数据，就变成了求解剩下 n - 1 个数据的排列问题。所以 n 个数据的排列问题，可以分解成 n 个 n - 1 个数据的排列的子问题。&lt;/li&gt;
+&lt;li&gt;f(1,2,&amp;hellip;n) = {最后一位是1, f(n-1)} + {最后一位是2, f(n-1)} +&amp;hellip;+{最后一位是n, f(n-1)}。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

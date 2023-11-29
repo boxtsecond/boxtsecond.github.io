@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='线性表 每个线性表上的数据最多只有前和后两个方向，如 数组、链表、队列、栈 等 非线性表，数据之间不是简单的前后关系，如 二叉树、堆、图 等 栈 Stack “栈”数'><title>数据结构（二）线性表 — 栈、队列</title>
+
+<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/'>
+
+<link rel="stylesheet" href="/scss/style.min.4da60824240567b039cf33c6b4aefd247d22a34bb8a58653cb3948fb57f5cdc6.css"><meta property='og:title' content='数据结构（二）线性表 — 栈、队列'>
+<meta property='og:description' content='线性表 每个线性表上的数据最多只有前和后两个方向，如 数组、链表、队列、栈 等 非线性表，数据之间不是简单的前后关系，如 二叉树、堆、图 等 栈 Stack “栈”数'>
+<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='数据结构' /><meta property='article:tag' content='线性表' /><meta property='article:published_time' content='2023-08-23T22:12:18&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T22:12:18&#43;08:00'/>
+<meta name="twitter:title" content="数据结构（二）线性表 — 栈、队列">
+<meta name="twitter:description" content="线性表 每个线性表上的数据最多只有前和后两个方向，如 数组、链表、队列、栈 等 非线性表，数据之间不是简单的前后关系，如 二叉树、堆、图 等 栈 Stack “栈”数">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+<script>
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.dataLayer = window.dataLayer || [];
+	function gtag(){dataLayer.push(arguments);}
+	gtag('js', new Date());
+	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
+}
+</script>
+<style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="https://boxtsecond.github.io/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/zh-cn">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+            
+            
+            
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/dev/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="2" y="6" width="20" height="12" rx="2" />
+  <line x1="6" y1="10" x2="6" y2="10" />
+  <line x1="10" y1="10" x2="10" y2="10" />
+  <line x1="14" y1="10" x2="14" y2="10" />
+  <line x1="18" y1="10" x2="18" y2="10" />
+  <line x1="6" y1="14" x2="6" y2="14.01" />
+  <line x1="18" y1="14" x2="18" y2="14.01" />
+  <line x1="10" y1="14" x2="14" y2="14" />
+</svg>
+                
+                <span>技术文章</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/workout/' >
+                
+                
+                
+                    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
+<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="SVGRepo_bgCarrier" stroke-width="0"/>
+<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
+<g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M6 7.5H7.5V11.25V12.75V16.5H6V7.5ZM9 12.75V18H4.5V16.5H1.5V7.5H4.5V6H9V11.25L15 11.25V6H19.5V7.5L22.5 7.5V16.5H19.5V18H15V12.75L9 12.75ZM16.5 12.75L16.5 16.5H18L18 7.5L16.5 7.5L16.5 11.25V12.75ZM4.5 9H3V15H4.5V9ZM19.5 15H21V9H19.5V15Z" fill="#C2C2C3"/> </g>
+</svg>
+                
+                <span>健身</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/invest/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="2" y="6" width="20" height="12" rx="2" />
+  <line x1="6" y1="10" x2="6" y2="10" />
+  <line x1="10" y1="10" x2="10" y2="10" />
+  <line x1="14" y1="10" x2="14" y2="10" />
+  <line x1="18" y1="10" x2="18" y2="10" />
+  <line x1="6" y1="14" x2="6" y2="14.01" />
+  <line x1="18" y1="14" x2="18" y2="14.01" />
+  <line x1="10" y1="14" x2="14" y2="14" />
+</svg>
+                
+                <span>投资</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/thoughts/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-writing-sign" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 19c3.333 -2 5 -4 5 -6c0 -3 -1 -3 -2 -3s-2.032 1.085 -2 3c.034 2.048 1.658 2.877 2.5 4c1.5 2 2.5 2.5 3.5 1c.667 -1 1.167 -1.833 1.5 -2.5c1 2.333 2.333 3.5 4 3.5h2.5" />
+  <path d="M20 17v-12c0 -1.121 -.879 -2 -2 -2s-2 .879 -2 2v12l2 2l2 -2z" />
+  <path d="M16 7h4" />
+</svg>
+                
+                <span>生活有感</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+        
+            
+            
+            
+                
+                
+                    
+                
+                    
+                        
+                        
+                        
+                    
+                
+            
+        
+
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" >
+                数据结构与算法
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/">数据结构（二）线性表 — 栈、队列</a>
+    </h2>
+
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Aug 23, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    2148字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="线性表">线性表</h2>
+<ul>
+<li>每个线性表上的数据最多只有前和后两个方向，如 数组、链表、队列、栈 等</li>
+<li>非线性表，数据之间不是简单的前后关系，如 二叉树、堆、图 等</li>
+</ul>
+<h2 id="栈-stack">栈 Stack</h2>
+<h3 id="栈数据结构的特点">“栈”数据结构的特点</h3>
+<ol>
+<li>后进者先出，先进者后出（类似一堆盘子）</li>
+<li>是一种“操作受限”的线性表（只有 入栈 push、出栈 pop 的操作）</li>
+</ol>
+<h3 id="栈的实现空间复杂度-o1">栈的实现，空间复杂度 O（1）</h3>
+<ol>
+<li>顺序栈，用数组实现的栈
+<ul>
+<li>出栈操作，时间复杂度 O（1）</li>
+<li>入栈操作，最好情况时间复杂度O（1），最差情况时间复杂度 O（n），均摊时间复杂度 O（1）</li>
+</ul>
+</li>
+<li>链式栈，用链表实现的栈
+<ul>
+<li>出栈、入栈操作，时间复杂度 O（1）</li>
+</ul>
+</li>
+</ol>
+<h3 id="栈的实际应用">栈的实际应用</h3>
+<ul>
+<li>函数调用栈
+<ol>
+<li>操作系统给每个线程分配一块独立的内存空间，以栈的结构来存储函数调用时的临时变量</li>
+<li>每进入一个函数，将临时变量作为一个栈帧入栈，当被调用函数执行完成后，将这个函数对应的栈帧出栈</li>
+</ol>
+</li>
+<li>表达式求值
+<ol>
+<li>使用两个栈来分别保存，操作数和运算符</li>
+<li>从左向右遍历表达式，当遇到数字时，直接压入操作数栈，遇到运算符时，与运算符的栈顶元素进行比较</li>
+<li>当运算符栈顶的运算符优先级高时，将当前运算符压入栈，当运算符栈顶的运算符优先级低或相同时，从运算符栈中取栈顶运算符，从操作数栈的栈顶取两个操作数，进行计算，并将计算后的结果压入操作数栈</li>
+<li>持续比较，直到结束</li>
+</ol>
+</li>
+<li>检验括号匹配
+<ol>
+<li>从左到右依次扫描字符串，用栈保存未匹配的括号（如，( [ { 等）</li>
+<li>当扫描到需要匹配的括号（如，) ] } 等），则从栈顶取出一个括号，若匹配，则继续，若不匹配，则说明为非法格式</li>
+<li>当所有的括号都扫描完成之后，如果栈为空，则说明字符串为合法格式，否则，说明有未匹配的括号，则为非法格式</li>
+</ol>
+</li>
+<li>浏览器的前进后退功能
+<ol>
+<li>使用两个栈 X Y
+<ul>
+<li>把首次浏览的页面一次压入栈 X</li>
+<li>点击后退时，依次从栈 X 中出栈，并将出栈的数据放入栈 Y，若栈 X 为空，则说明无法后退</li>
+<li>点击前进时，依次从栈 Y 中出栈，并将出栈的数据放入栈 X，若栈 Y 为空，则说明无法前进</li>
+<li>当跳转到新的页面时，则需要清空栈 Y</li>
+</ul>
+</li>
+<li>使用双向链表，使用 prev 和 next 来跳转</li>
+</ol>
+</li>
+</ul>
+<h3 id="内存中的堆栈">内存中的堆栈</h3>
+<ol>
+<li>内存中的堆栈和数据结构中的堆栈不是一个概念，内存中的堆栈是真实存在的物理区，数据结构中的堆栈是抽象的数据存储结构</li>
+<li>内存空间在逻辑上分为三部分：代码区，数据静态区和动态数据区，动态数据区分为 栈区 和 堆区</li>
+<li>代码区：存储方法体的二进制代码，高级调度（作业调度），中级调度（内存调度），低级调度（进程调度）控制代码区执行代码的切换</li>
+<li>静态数据区：存储全局变量、静态变量、常量，常量包括 final 修饰的常量和 String 常量，系统自动分配和回收</li>
+<li>栈区：存储运行方法的形参、局部变量、返回值，由系统自动分配和回收</li>
+<li>堆区：new 一个对象的引用或地址存储在栈区，指向该对象存储在堆区中的真实数据</li>
+</ol>
+<h3 id="堆和栈的区别和联系">堆和栈的区别和联系</h3>
+<ol>
+<li>堆和栈都是指内存空间，不同的是，堆是按需申请、动态分配，并且需要手动释放。栈是由系统自动分配，自动释放，当申请内存超过可用内存时，将报异常提示栈溢出</li>
+<li>栈的内存空间是连续的，堆的内存空间则不是。当收到申请空间的请求时，遍历操作系统中记录空闲内存地址的链表，寻找第一个空间大于所申请空间的堆结点，并将此结点从空闲结点链表中删除</li>
+</ol>
+<h2 id="队列-queue">队列 Queue</h2>
+<h3 id="队列数据结构的特点">“队列”数据结构的特点</h3>
+<ol>
+<li>先进者先出（类似于排队）</li>
+<li>是一种“操作受限”的线性表（只有 入队 enqueue、出队 dequeue 操作）</li>
+</ol>
+<h3 id="队列的实现">队列的实现</h3>
+<ul>
+<li>顺序队列，用数组实现的队列
+<ol>
+<li>有两个指针，分别指向 队列头、队列尾</li>
+<li>入队操作，时间复杂度 O（1）
+<ul>
+<li>由于数组的特性，当队列需要调整长度时，需要数据搬移操作</li>
+</ul>
+</li>
+<li>出队操作，均摊复杂度 O（1）
+<ul>
+<li>每次出队，需要删除数组的第一个元素，若仍旧需要使队列头指向数组的第一个元素，则需要数据搬移，时间复杂度为 O（n）</li>
+<li>优化：在队列无空闲空间时，触发一次数据的搬移操作</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>链式队列，用链表实现的队列
+<ol>
+<li>有两个指针，分别指向队列头、队列尾</li>
+<li>入队操作，时间复杂度 O（1）
+<ul>
+<li>由于链表的特性，可以实现长度无限的队列</li>
+</ul>
+</li>
+<li>出队操作，时间复杂度 O（1）</li>
+</ol>
+</li>
+<li>循环队列，队列头、队列尾相连结的队列，一般用数组实现
+<ul>
+<li>双指针
+<ol>
+<li>有两个指针，分别指向队列头、队列尾</li>
+<li>入队操作，时间复杂度 O（1）
+<ul>
+<li>避免了顺序队列的数据搬移工作，循环入队</li>
+</ul>
+</li>
+<li>出队操作，时间复杂度 O（1）</li>
+<li>注意事项
+<ul>
+<li>确定好队空和队满的判定条件，队空 head == tail、队满 （tail + 1）% n = head （head + tail + 1 = n）</li>
+<li>循坏时，头尾指针的位置要取模</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>头指针 + 队列长度
+<ol>
+<li>入队操作，时间复杂度O（1）</li>
+<li>出队操纵，时间复杂度O（1）</li>
+<li>注意事项
+<ul>
+<li>确定好队空和队满的判定条件，队空 count == head、队满 count == limit</li>
+<li>循环时，头指针的位置要取模，head = ( head + 1 ) % limit，尾指针，tail = ( head + count ) % limit</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+</li>
+<li>双端循环队列，可以分别从队列头、队列尾执行出队、入队操作
+<ol>
+<li>在队列中预留一个位置，使用两个指针，分别指向队列头、队列尾的下一个位置</li>
+<li>注意事项：
+<ul>
+<li>确定好队空和队满的判定条件，队空 head == tail、队满 ( tail + 1 ) % limit == head</li>
+<li>循环时，头尾指针的位置要取模，head = ( head + limit - 1 ) % limit，tail = ( tail + 1 ) % limit</li>
+<li>头指针先取模，再赋值，尾指针先赋值，再取模</li>
+</ul>
+</li>
+</ol>
+</li>
+<li>阻塞队列
+<ol>
+<li>在队列的基础上增加阻塞操作</li>
+<li>在队列为空时，从队列头取数据会被阻塞，在队列满时，入队操作被阻塞</li>
+<li>生产者 - 消费者模型</li>
+</ol>
+</li>
+<li>并发队列
+<ol>
+<li>线程安全的队列，同一时刻仅允许一个入队或出队操作</li>
+<li>可以使用基于数组的循环队列，利用 CAS 原子操作
+<ul>
+<li>入队操作，比较入队前和入队时的 tail，若无变化，则允许入队</li>
+<li>出队操作，比较出队前和出队时的 head，若无变化，则允许出队</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/">数据结构</a>
+        
+            <a href="/zh-cn/tags/%E7%BA%BF%E6%80%A7%E8%A1%A8/">线性表</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css"integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js"integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js"integrity="sha384-vZTG03m&#43;2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.querySelector(`.article-content`), {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ]
+        });})
+</script>
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title"></h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%80%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%95%B0%E7%BB%84%E9%93%BE%E8%A1%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据结构（一）线性表 — 数组、链表</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据结构与算法总览</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据结构（十）字符串相似度</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了70.5k字·共 45篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+        
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+
+var s1 = '2023-04-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+        
+        
+        
+            
+            
+                
+            
+                
+                    
+                    
+                    
+                
+            
+        
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/zh-cn/p/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#线性表">线性表</a></li>
+    <li><a href="#栈-stack">栈 Stack</a>
+      <ol>
+        <li><a href="#栈数据结构的特点">“栈”数据结构的特点</a></li>
+        <li><a href="#栈的实现空间复杂度-o1">栈的实现，空间复杂度 O（1）</a></li>
+        <li><a href="#栈的实际应用">栈的实际应用</a></li>
+        <li><a href="#内存中的堆栈">内存中的堆栈</a></li>
+        <li><a href="#堆和栈的区别和联系">堆和栈的区别和联系</a></li>
+      </ol>
+    </li>
+    <li><a href="#队列-queue">队列 Queue</a>
+      <ol>
+        <li><a href="#队列数据结构的特点">“队列”数据结构的特点</a></li>
+        <li><a href="#队列的实现">队列的实现</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">37</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
+                网络协议
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/zh-cn/tags/lvs/" class="font_size_4">
+                LVS
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script type="text/javascript" src="/ts/custom.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

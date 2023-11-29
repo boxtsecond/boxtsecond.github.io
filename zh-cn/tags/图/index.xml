@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>图 on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/tags/%E5%9B%BE/</link>
+        <description>Recent content in 图 on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Wed, 23 Aug 2023 22:45:41 +0800</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/tags/%E5%9B%BE/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>数据结构（八）基于图的其它算法</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/</link>
+        <pubDate>Wed, 23 Aug 2023 22:45:41 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/</guid>
+        <description>&lt;h2 id=&#34;拓扑排序-topological-sorting&#34;&gt;拓扑排序 Topological Sorting&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;当一组数据间存在两两依赖关系，并且数据间不存在循环依赖的关系。如果要对这组数据进行排序，则可以使用拓扑排序&lt;/li&gt;
+&lt;li&gt;拓扑排序是基于有向无环图的算法&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;需要通过局部顺序来推导出全局顺序的&lt;/strong&gt;，使用拓扑排序来实现&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;拓扑排序的实现方式&#34;&gt;拓扑排序的实现方式&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Kahn 算法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果 s 先于 t 执行，则添加一条 从 s 指向 t 的边&lt;/li&gt;
+&lt;li&gt;若某个顶点的入度为 0，说明没有任何一个顶点需要先于此顶点执行，则此顶点可以先执行&lt;/li&gt;
+&lt;li&gt;在图中找出入度为 0 的顶点，输出并在图中删除此顶点，也就是把这个顶点可达的顶点的入度都 - 1&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;若输出的顶点个数少于图中的顶点个数，并且图中还存在入度不为 0 的顶点，则说明此图中存在环&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;DFS 深度优先遍历算法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;构造逆邻接表，如果 s 先于 t 执行，则添加一条 从 t 指向 s 的边&lt;/li&gt;
+&lt;li&gt;递归的处理每个顶点，先输出这个顶点可到达的顶点后，再输入此顶点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;dijkstra-最短路径算法&#34;&gt;Dijkstra 最短路径算法&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;单源最短路径算法&lt;/strong&gt;，即 求一个顶点到另一个顶点的最短路径&lt;/li&gt;
+&lt;li&gt;Dijkstra 是基于有向有权图&lt;/li&gt;
+&lt;li&gt;Dijkstra 的时间复杂度为 O（E * logV），E 表示边的个数，V 表示顶点个数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;dijkstra-算法的实现&#34;&gt;Dijkstra 算法的实现&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;使用邻接表（邻接矩阵）来表示有向有权图
+&lt;ul&gt;
+&lt;li&gt;每个结点包括起始顶点 s 、结束顶点 t 、权重 w，即 s -&amp;gt; t&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用一个数组来表示从顶点 s 到此顶点 n 的最小距离
+&lt;ul&gt;
+&lt;li&gt;每个结点包括起始顶点 s 、当前顶点 n 、s 到 n 的最小距离 dist&lt;/li&gt;
+&lt;li&gt;初始起点顶点的 dist 为 0，其余顶点的初始 dist 的值为无限大&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;根据 dist 构造一个小顶堆，每次优先获取 dist 最小的顶点
+&lt;ul&gt;
+&lt;li&gt;初始 dist 小顶堆只有起始顶点，遍历其余顶点时不断更新 dist 小顶堆&lt;/li&gt;
+&lt;li&gt;dist 小顶堆中存放的是已经遍历过且计算出 dist 的顶点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用一个数组来表示此顶点是否已经被遍历过
+&lt;ul&gt;
+&lt;li&gt;如果已经遍历过，且发现到达此顶点的更短路径，则更新 dist 的小顶堆&lt;/li&gt;
+&lt;li&gt;如果没遍历过，将此顶点加入到 dist 的小顶堆中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;使用一个数组来表示最短路径，记录每个顶点的前驱顶点&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;dijkstra-的优化&#34;&gt;Dijkstra 的优化&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;当在较大的地图上，计算两点之间的最短路径时
+&lt;ul&gt;
+&lt;li&gt;如果两点间的距离较近，可以在整个大地图中划分出一个小的区块，这个小区块可以覆盖这两个点，但是区域不会太大&lt;/li&gt;
+&lt;li&gt;如果两点间的距离较远，可以把两点所在的大区域当作一个点，先计算两个大区域的路线，然后再细化每个阶段的小路线&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;计算两点间所用最少时间
+&lt;ul&gt;
+&lt;li&gt;将边的权重改为经过这段路所需要的时间&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;计算两点之间所经过最少红绿灯
+&lt;ul&gt;
+&lt;li&gt;将每条边的权重值改为 1，或者直接使用广度优先搜索算法&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;dijkstra-算法的变形和应用&#34;&gt;Dijkstra 算法的变形和应用&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;背景&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;单词经过翻译系统后，得到单词对应的释义及分数，分数代表翻译的可信程度。将句子中的单词翻译后相加，可以得到整句的翻译分数。希望求得翻译得分的 TOP k
+&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/dijk.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/dijk.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;Dijkstra&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;Dijkstra&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;实现&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;回溯算法
+&lt;ul&gt;
+&lt;li&gt;穷举所有的排列组合情况，选取得分最高的前 k 个翻译结果&lt;/li&gt;
+&lt;li&gt;时间复杂度为 O（mn），m 表示每个单词的平均可选翻译个数，n 表示单词数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Dijkstra 算法
+&lt;ul&gt;
+&lt;li&gt;首先可以得到得分最高的一个组合，基于此组合来进行扩展，将每个单词的翻译分别替换成下一个得分最高的翻译。假设为 a0b0c0，扩展后为：a1b0c0、a0b1c0、a0b0c1&lt;/li&gt;
+&lt;li&gt;每次从优先级队列（大顶堆）中取出&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>数据结构（七）图的搜索</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/</link>
+        <pubDate>Wed, 23 Aug 2023 22:39:41 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/</guid>
+        <description>&lt;h2 id=&#34;应用背景&#34;&gt;应用背景&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;广度、深度优先搜索，都是应用于图的搜索算法，是一种暴力搜索的算法。&lt;/li&gt;
+&lt;li&gt;其他应用于图的搜索算法
+&lt;ul&gt;
+&lt;li&gt;A*&lt;/li&gt;
+&lt;li&gt;IDA*&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;广度优先搜索-bfsbreadth-first-search&#34;&gt;广度优先搜索 BFS（Breadth First Search）&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;主要目的：在图中寻找两个顶点间的路径&lt;/li&gt;
+&lt;li&gt;思想：
+&lt;ul&gt;
+&lt;li&gt;类似于“地毯式搜索”，主要包含两个步骤
+&lt;ul&gt;
+&lt;li&gt;不断地访问顶点&lt;/li&gt;
+&lt;li&gt;将“路径”记录下来&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;访问顶点
+&lt;ul&gt;
+&lt;li&gt;将顶点的相邻顶点放入队列中，作为下一个需要访问的顶点。&lt;/li&gt;
+&lt;li&gt;如果此顶点已经被访问过，则继续下一个访问下一个需要访问的顶点。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;记录“路径”
+&lt;ul&gt;
+&lt;li&gt;“路径”，即将每个顶点作为相邻顶点的“上一步”记录下来&lt;/li&gt;
+&lt;li&gt;最终的路径为从终点开始，依次根据“上一步”找到起点&lt;/li&gt;
+&lt;li&gt;当找到终点时停止访问顶点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;代码实现要点
+&lt;ul&gt;
+&lt;li&gt;visited 数组：记录顶点是否被访问&lt;/li&gt;
+&lt;li&gt;queue 数组：记录需要被访问的顶点&lt;/li&gt;
+&lt;li&gt;prev 数组：记录相邻顶点的“上一步”为访问顶点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;复杂度分析
+&lt;ul&gt;
+&lt;li&gt;时间复杂度
+&lt;ul&gt;
+&lt;li&gt;每个顶点最多被访问一次，每个边也最多被访问一次&lt;/li&gt;
+&lt;li&gt;O（V+E），V 为顶点的个数，E 为边的个数&lt;/li&gt;
+&lt;li&gt;在连通图中，E 一定会大于等于 V - 1&lt;/li&gt;
+&lt;li&gt;O（E）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;空间复杂度
+&lt;ul&gt;
+&lt;li&gt;使用邻接表记录顶点的相邻顶点&lt;/li&gt;
+&lt;li&gt;O（V）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;深度优先搜索-dfsdepth-first-search&#34;&gt;深度优先搜索 DFS（Depth First Search）&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;主要目的：在图中寻找两个顶点间的路径&lt;/li&gt;
+&lt;li&gt;思想：
+&lt;ul&gt;
+&lt;li&gt;回漱思想，类似于“走迷宫”，当发现“无路可走”时，返回上一个“岔路口”，主要包含两个步骤
+&lt;ul&gt;
+&lt;li&gt;不断地访问顶点&lt;/li&gt;
+&lt;li&gt;将“路径”记录下来&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;访问顶点
+&lt;ul&gt;
+&lt;li&gt;不断地“深入”访问相邻顶点，直到顶点无相邻顶点或者顶点的相邻顶点已经被访问过&lt;/li&gt;
+&lt;li&gt;当找到终点时停止访问顶点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;记录“路径”
+&lt;ul&gt;
+&lt;li&gt;“路径”，即将每个顶点作为相邻顶点的“上一步”记录下来&lt;/li&gt;
+&lt;li&gt;最终的路径为从终点开始，依次根据“上一步”找到起点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;代码实现要点
+&lt;ul&gt;
+&lt;li&gt;使用递归来实现&lt;/li&gt;
+&lt;li&gt;visited 数组：记录顶点是否被访问&lt;/li&gt;
+&lt;li&gt;prev 数组：记录相邻顶点的“上一步”为访问顶点&lt;/li&gt;
+&lt;li&gt;found 布尔值：记录是否找到终点&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;复杂度分析
+&lt;ul&gt;
+&lt;li&gt;时间复杂度 O（E）
+&lt;ul&gt;
+&lt;li&gt;每个顶点最多被访问两次，每个边最多被访问两次&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;空间复杂度 O（V）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;双向广度优先搜索&#34;&gt;双向广度优先搜索&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/two_way_bfs.jpg&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/two_way_bfs.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;双向广度优先搜索&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;双向广度优先搜索&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;求两个结点 a、b 的最短路径&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从 a 出发，进行广度搜索，记录下 a 的所有一度结点 a1，查看 b 是否出现在集合 a1 中，如果有，则停止&lt;/li&gt;
+&lt;li&gt;从 b 出发，进行广度搜索，记录下 b 的所有一度结点 b1，查看 a、a1 是否出现在 b 和 b1 的并集中&lt;/li&gt;
+&lt;li&gt;重复上述两步，直到找到 a 和 b 的好友的交集 c，则 a、b 的最短通路长为 a 到 c 的通路长度 + b 到 c 的通路长度&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;启发式搜索算法-heuristically-search-algorithm&#34;&gt;启发式搜索算法 Heuristically Search Algorithm&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;A* 搜索算法属于&lt;strong&gt;启发式搜索算法（Heuristically Search Algorithm）&lt;/strong&gt;，是对 Dijkstra 算法的优化和改造&lt;/li&gt;
+&lt;li&gt;启发式搜索算法利用估价函数，避免“跑偏”，贪心地朝着最有可能到达终点的方向前进。&lt;strong&gt;启发式搜索算法找出的路径不一定是最短路径，但可以更加快速地找到最短路线&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;a-搜索算法-a-star-search-algorithm&#34;&gt;A* 搜索算法 A Star Search Algorithm&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;遍历顶点时，从起点到这个顶点的路径及路径的长度是确定的，记作 g（i），i 表示顶点编号&lt;/li&gt;
+&lt;li&gt;通过&lt;strong&gt;启发函数（Heuristic Function）&lt;/strong&gt;，即使用一个估算值来判断从这个顶点到终点的路径长度，避免“跑偏”，记作 h（i）
+&lt;ul&gt;
+&lt;li&gt;可以使用这个顶点到终点之间的直线距离，即欧几里得距离，近似地估计路径长度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;欧几里得距离涉及到比较耗时的开根号计算，可以使用更加简洁的曼哈顿距离（Manhattan Distance），只有简单的加减计算&lt;/li&gt;
+&lt;li&gt;使用估价函数（Evaluation Function），来综合判断该优先遍历哪个顶点，记作 f（i）。譬如 f（i）= g（i）+ h（i）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;a-搜索算法和-dijkstra-算法的区别&#34;&gt;A* 搜索算法和 Dijkstra 算法的区别&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;优先级队列构建的方式不同
+&lt;ul&gt;
+&lt;li&gt;A* 搜索算法是根据估价函数（f（i））来构建优先级队列&lt;/li&gt;
+&lt;li&gt;Dijkstra 算法是根据从起点到当前顶点的路径长度（g（i））来构建优先级队列&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;A* 搜索算法在更新顶点的路径长度（g（i））时，也会同步更新估价函数的值（f（i））&lt;/li&gt;
+&lt;li&gt;循环结束的条件不同
+&lt;ul&gt;
+&lt;li&gt;A* 搜索算法遍历到终点时就结束&lt;/li&gt;
+&lt;li&gt;Dijkstra 算法在终点出优先级队列时结束&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;A* 搜索算法找到的路径不是最短路径，Dijkstra 算法找到的路径是最短路径&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>数据结构（六）图</title>
+        <link>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/</link>
+        <pubDate>Wed, 23 Aug 2023 22:33:41 +0800</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/</guid>
+        <description>&lt;h2 id=&#34;图-graph-相关概念&#34;&gt;图 Graph 相关概念&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;顶点 Vertex：图中的元素&lt;/li&gt;
+&lt;li&gt;边 Edge：图中的一个顶点与任意其他顶点建立的连接关系&lt;/li&gt;
+&lt;li&gt;度 Degree：与顶点相连接的边的条数&lt;/li&gt;
+&lt;li&gt;入度 In-degree：顶点的入度，表示有多少条边指向这个顶点&lt;/li&gt;
+&lt;li&gt;出度 Out-degree：顶点的出度，表示有多少条边是以这个顶点为起点指向其他顶点&lt;/li&gt;
+&lt;li&gt;有向图：图中的边带有方向&lt;/li&gt;
+&lt;li&gt;无向图：图中的边不带有方向&lt;/li&gt;
+&lt;li&gt;带权图：图中的每条边都有一个权重 weight&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;图的存储方式&#34;&gt;图的存储方式&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;邻接矩阵 Adjacency Matrix&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/adj_matrix.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/adj_matrix.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;邻接矩阵&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;邻接矩阵&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用二维数组来存储&lt;/li&gt;
+&lt;li&gt;无向图 A
+&lt;ul&gt;
+&lt;li&gt;如果顶点 i 与顶点 j 之间有边，就将 A[i][j] 和 A[j][i] 标记为1&lt;/li&gt;
+&lt;li&gt;其余标记为 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;有向图 A
+&lt;ul&gt;
+&lt;li&gt;如果顶点 i 与顶点 j 之间，有一条箭头从顶点 i 指向顶点 j 的边，就将 A[i][j] 标记为 1&lt;/li&gt;
+&lt;li&gt;其余标记为 0&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;带权图
+&lt;ul&gt;
+&lt;li&gt;在数组中存储相应的权重&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;优点：
+&lt;ul&gt;
+&lt;li&gt;简单直观&lt;/li&gt;
+&lt;li&gt;获取顶点的关系时，非常的高效&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;方便计算，可以将很多图的运算转换成矩阵之间的运算&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;缺点：比较浪费存储空间&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;邻接表 Adjacency List&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/adj_list.png&#34; &gt;
+		&lt;img src=&#34;https://boxtsecond.github.io/zh-cn/dev/algorithm/img/adj_list.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;邻接表&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;邻接表&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;每个顶点对应一条链表，链表中存储的是与这个顶点相连接的其他顶点&lt;/li&gt;
+&lt;li&gt;链表的存储方式对缓存不太友好，可以将链表替换成其他更加高效的数据结构，如平衡二叉查找树、跳表、有序动态数组等&lt;/li&gt;
+&lt;li&gt;优点：比较节省存储空间&lt;/li&gt;
+&lt;li&gt;缺点：链表无法支持快速查找，可以使用跳表、红黑树、有序动态数组、散列表代替链表&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;图的应用&#34;&gt;图的应用&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;社交网络的好友关系&lt;/strong&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使用一个邻接表来存储好友关系的有向图，可以快速查找到某个用户关注了哪些用户，即此用户的关注列表&lt;/li&gt;
+&lt;li&gt;使用一个逆邻接表来存储好友关系，可以快速查找某个用户被哪些用户关注，即此用户的粉丝列表&lt;/li&gt;
+&lt;li&gt;使用链表的邻接表不能快速地判断两个用户之间的好友关系，可以将链表改为红黑树、跳表、有序动态数组、散列表中的一种&lt;/li&gt;
+&lt;li&gt;若是需要按照用户名称的首字母排序，分也来获取用户的粉丝列表或关注列表，则适合使用跳表。跳表的插入、删除、查找的时间复杂度为 O（logn），空间复杂度为 O（n），跳表本身的数据也是有序的。&lt;/li&gt;
+&lt;li&gt;如果数据太多，可以使用哈希算法等数据分片的方法，将邻接表存储在不同的机器上。或者利用外部存储，即数据库。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

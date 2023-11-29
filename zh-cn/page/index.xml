@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Pages on Bo&#39;s Blog</title>
+        <link>https://boxtsecond.github.io/zh-cn/page/</link>
+        <description>Recent content in Pages on Bo&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>zh-cn</language>
+        <lastBuildDate>Wed, 23 Aug 2023 00:00:00 +0000</lastBuildDate><atom:link href="https://boxtsecond.github.io/zh-cn/page/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>关于</title>
+        <link>https://boxtsecond.github.io/zh-cn/p/%E5%85%B3%E4%BA%8E/</link>
+        <pubDate>Wed, 23 Aug 2023 00:00:00 +0000</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/p/%E5%85%B3%E4%BA%8E/</guid>
+        <description>&lt;ol&gt;
+&lt;li&gt;负责过亿级流量的多个云通信产品，了解短信协议和生态。&lt;/li&gt;
+&lt;li&gt;开发过负载均衡产品 LB 系列&lt;/li&gt;
+&lt;li&gt;云联网产品开发中&amp;hellip;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;永远 18 的程序员，欢迎关注～&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>分类</title>
+        <link>https://boxtsecond.github.io/zh-cn/p/archives/</link>
+        <pubDate>Sun, 28 May 2023 00:00:00 +0000</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/p/archives/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>我的其他地址</title>
+        <link>https://boxtsecond.github.io/zh-cn/p/links/</link>
+        <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/p/links/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>搜索</title>
+        <link>https://boxtsecond.github.io/zh-cn/p/search/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://boxtsecond.github.io/zh-cn/p/search/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>
