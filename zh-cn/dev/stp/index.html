@@ -475,7 +475,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    3541字
+                    3539字
                 </time>
             </div>
         
@@ -504,7 +504,7 @@ if (!doNotTrack) {
 	
 </figure></p>
 <p>为了更好地理解物理链路环路对网络的影响，需要大致了解以太网交换机自学习和转发帧的过程。后文中的“交换机”均表示以太网二层交换机。</p>
-<h2 id="交换机自学习和转发帧的过程">交换机自学习和转发帧的过程</h2>
+<h2 id="交换机自学习和转发帧的过程"><strong>交换机自学习和转发帧的过程</strong></h2>
 <p>交换机 Switch 是一种网络设备，用于在局域网内连接多个网络设备，接收其发送的数据帧。基于目标 MAC 地址决定转发或丢弃数据帧，以及数据帧从哪个端口转发出去。交换机有多个端口，每个端口都被隔离成自己的碰撞域，即连接某个端口的网络设备独占整个带宽。</p>
 <p>交换机在网络中肩负着至关重要的角色，它以一种即插即用的方式，实现了网络设备之间的高效数据传输。在交换机刚启动时，其内部的帧交换表是空的。随着网络中各设备之间的通信，交换机通过自学习算法逐渐建立起帧交换表。</p>
 <ol>
@@ -537,7 +537,7 @@ if (!doNotTrack) {
 <p>交换机 1 的端口 1、2、3 分别连接了网络设备 A、B、C，交换机 2 的端口 4 连接网络设备 E。<br>
 交换机 1 的端口 4 和交换机 2 的端口 2 相连。</p>
 </blockquote>
-<h3 id="自学习过程">自学习过程</h3>
+<h3 id="自学习过程"><strong>自学习过程</strong></h3>
 <p><figure 
 	>
 	<a href="/zh-cn/dev/network_protocol/img/stp_switch_learn.png" >
@@ -557,9 +557,9 @@ if (!doNotTrack) {
 <li>设备 A 发送数据帧至设备 C，交换机 1 的端口 1 接收到此数据帧</li>
 <li>交换机 1 将数据帧的源 MAC 地址和接收端口 1 记录到自己的帧交换表中，这个记录的行为就是交换机的自学习</li>
 </ol>
-<h3 id="转发帧过程">转发帧过程</h3>
+<h3 id="转发帧过程"><strong>转发帧过程</strong></h3>
 <p>交换机 1 自学习之后，根据目标 MAC 地址和交换机的帧交换表，决定转发或丢弃数据帧。其中包括三种情况，泛洪、明确转发和丢弃。</p>
-<h4 id="泛洪">泛洪</h4>
+<h4 id="泛洪"><strong>泛洪</strong></h4>
 <p><figure 
 	>
 	<a href="/zh-cn/dev/network_protocol/img/stp_switch_flood.png" >
@@ -581,7 +581,7 @@ if (!doNotTrack) {
 <li>设备 B、E 收到此数据帧，发现目标 MAC 地址不是自己，丢弃此数据帧</li>
 <li>设备 C 收到此数据帧，发现目标 MAC 地址是自己，接收此数据帧</li>
 </ol>
-<h4 id="转发数据帧">转发数据帧</h4>
+<h4 id="转发数据帧"><strong>转发数据帧</strong></h4>
 <p><figure 
 	>
 	<a href="/zh-cn/dev/network_protocol/img/stp_switch_forward.png" >
@@ -603,7 +603,7 @@ if (!doNotTrack) {
 <li>交换机 1 在帧交换表中查找数据帧的目标 MAC 地址，成功获取到目标 MAC 地址对应的端口 1，将数据帧仅转发至端口 1</li>
 <li>设备 A 收到此数据帧，发现目标 MAC 地址是自己，接收此数据帧</li>
 </ol>
-<h4 id="丢弃数据帧">丢弃数据帧</h4>
+<h4 id="丢弃数据帧"><strong>丢弃数据帧</strong></h4>
 <p><figure 
 	>
 	<a href="/zh-cn/dev/network_protocol/img/stp_switch_drop.png" >
@@ -624,9 +624,9 @@ if (!doNotTrack) {
 <li>交换机 1 将数据帧的源 MAC 地址和接收端口记录到自己的帧交换表中</li>
 <li>交换机 1 在帧交换表中查找数据帧的目标 MAC 地址，成功获取到目标 MAC 地址对应的端口 1，发现端口 1 和源端口一致，丢弃此数据帧</li>
 </ol>
-<h2 id="stp-协议">STP 协议</h2>
+<h2 id="stp-协议"><strong>STP 协议</strong></h2>
 <p><strong>Spanning Tree Protocol，即 STP 协议，用于为以太网构建无环路的逻辑拓扑。</strong></p>
-<h3 id="stp-出现的背景">STP 出现的背景</h3>
+<h3 id="stp-出现的背景"><strong>STP 出现的背景</strong></h3>
 <p><figure 
 	>
 	<a href="/zh-cn/dev/network_protocol/img/stp_bg_single.png" >
@@ -691,15 +691,15 @@ if (!doNotTrack) {
 <p>在环路中的设备收到重复的数据帧，同样也会消耗设备资源</p>
 </li>
 </ol>
-<h3 id="stp-协议的作用">STP 协议的作用</h3>
+<h3 id="stp-协议的作用"><strong>STP 协议的作用</strong></h3>
 <p>STP 协议通过阻塞交换机端口，令其不再转发数据帧，使得环路被裁剪成一颗树，达到**在逻辑上消除环路的目的。**在链路发生故障后，激活备份链路，及时恢复网络连通性。</p>
 <ol>
 <li><strong>消除环路：允许网络物理拓扑中存在备份链路，消除逻辑拓扑上的二层环路</strong></li>
 <li><strong>备份链路：发生故障后使用备份链路，及时恢复网络，提高网络的可靠性</strong></li>
 </ol>
-<h3 id="stp-协议过程解析">STP 协议过程解析</h3>
+<h3 id="stp-协议过程解析"><strong>STP 协议过程解析</strong></h3>
 <p>在解析 STP 协议的具体过程前，先来了解一下 STP 协议中的重要组成部分。</p>
-<h4 id="stp-协议的重要概念">STP 协议的重要概念</h4>
+<h4 id="stp-协议的重要概念"><strong>STP 协议的重要概念</strong></h4>
 <ol>
 <li>根桥 Root Bridge，是整个 STP 网络的逻辑中心，一般会选择性能高的交换设备作为根桥。根桥没有根端口，根桥的全部端口都是指定端口。</li>
 <li>根端口 Root Port，交换机上距离根桥路径最短的端口，每个交换机上最多有一个根端口，负责向根桥方向转发数据。</li>
@@ -707,7 +707,7 @@ if (!doNotTrack) {
 <li>阻塞端口 Blocked Port，如果一个端口既不是根端口又不是指定端口，这个端口将被阻塞。被阻塞的端口仅接受 BPDU 消息，不会接受或发送其他非 BPDU 的数据帧。</li>
 <li>BPDU Bridge Protocol Data Units，STP 生成树过程中所传递的配置消息。</li>
 </ol>
-<h4 id="stp-协议过程解析-1">STP 协议过程解析</h4>
+<h4 id="stp-协议过程解析-1"><strong>STP 协议过程解析</strong></h4>
 <ol>
 <li>选举根桥，根据根桥 ID 选举
 <ul>
@@ -731,7 +731,7 @@ if (!doNotTrack) {
 </li>
 <li>阻塞既不是根端口也不是指定端口的端口</li>
 </ol>
-<h4 id="stp-协议实践">STP 协议实践</h4>
+<h4 id="stp-协议实践"><strong>STP 协议实践</strong></h4>
 <ol>
 <li>
 <p>gns3 网络拓扑及配置</p>
@@ -1019,30 +1019,30 @@ if (!doNotTrack) {
 </ul>
 </li>
 </ol>
-<h3 id="stp-协议的缺点">STP 协议的缺点</h3>
+<h3 id="stp-协议的缺点"><strong>STP 协议的缺点</strong></h3>
 <p>由上可知，当网络中的某个设备发生故障不可用时，需要等待所有的网络设备接收和传播 BPDU，重新选举根桥、根端口、指定端口和阻塞端口，<strong>收敛速度慢</strong>。而且在网络设备端口状态的转换过程中，数据流量会被阻塞，可能会加剧延时。除此之外，<strong>STP 协议对局域网仅生成一棵树，对于所有 VLAN 都使用相同的拓扑</strong>。这意味着在多个 VLAN 环境中，可能存在不必要的阻塞端口。如果需要不同的拓扑或特定的 VLAN 配置，可能需要手动配置。</p>
 <p><strong>总结一下，STP 协议的缺点有以下两条</strong></p>
 <ol>
 <li><strong>收敛速度慢</strong></li>
 <li><strong>不支持 VLAN</strong></li>
 </ol>
-<h2 id="rstpmstp-协议">RSTP、MSTP 协议</h2>
+<h2 id="rstpmstp-协议"><strong>RSTP、MSTP 协议</strong></h2>
 <p>针对 STP 协议缺点的改进，出现了 RSTP 和 MSTP 协议</p>
-<h3 id="rstp-协议">RSTP 协议</h3>
+<h3 id="rstp-协议"><strong>RSTP 协议</strong></h3>
 <p><strong>RSTP 是 STP 的改进版本，它的主要目标是加速 STP 的收敛速度。</strong></p>
 <ol>
 <li>RSTP 引入了两种端口状态：指定端口（Designated Port）和替代端口（Alternate Port）。</li>
 <li>RSTP 使用不同的 BPDU 格式和机制，以快速传播拓扑变化。</li>
 <li>RSTP 的收敛速度较快，通常可以在数秒内响应拓扑变化，而不是 STP 的30秒或更长时间。</li>
 </ol>
-<h3 id="mstp-协议">MSTP 协议</h3>
-<p><strong>MSTP 是STP的另一种改进版本，旨在提供更大的灵活性，特别是在多 VLAN 环境下。</strong></p>
+<h3 id="mstp-协议"><strong>MSTP 协议</strong></h3>
+<p><strong>MSTP 是 STP 的另一种改进版本，旨在提供更大的灵活性，特别是在多 VLAN 环境下。</strong></p>
 <ol>
 <li>MSTP 引入了多个实例（Instance），每个实例可以关联到一个或多个 VLAN。</li>
 <li>MSTP 允许管理员为每个实例配置独立的树状拓扑，支持不同 VLAN，从而提高网络的灵活性。</li>
 <li>MSTP 使用单一 BPDU 格式，但在每个实例中维护独立的树状拓扑，因此可以减少网络开销。</li>
 </ol>
-<h2 id="stp-vs-rstp-vs-mstp">STP vs RSTP vs MSTP</h2>
+<h2 id="stp-vs-rstp-vs-mstp"><strong>STP vs RSTP vs MSTP</strong></h2>
 <div class="table-wrapper"><table>
 <thead>
 <tr>
@@ -1166,6 +1166,18 @@ if (!doNotTrack) {
                 
                     
 <article class="">
+    <a href="/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（七）IP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
     <a href="/zh-cn/dev/vlan/">
         
         
@@ -1188,18 +1200,6 @@ if (!doNotTrack) {
     </a>
 </article>
                 
-                    
-<article class="">
-    <a href="/zh-cn/dev/mac-layer/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">快速理解网络协议（三）MAC 层</h2>
-        </div>
-    </a>
-</article>
-                
             </div>
         </div>
     
@@ -1211,6 +1211,10 @@ if (!doNotTrack) {
     <footer class="site-footer">
   
 
+
+    
+
+    
 
     
 
@@ -1318,8 +1322,10 @@ if (!doNotTrack) {
     <section class="copyright">
         &copy; 
         
-        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-        共书写了70.5k字·共 45篇文章</br><span><p>
+            2023 - 
+        
+        2024 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了74.1k字·共 47篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -1478,39 +1484,39 @@ document.getElementById('days').innerHTML = number_of_days;
             <nav id="TableOfContents">
   <ol>
     <li><a href="#本文概览"><strong>本文概览</strong></a></li>
-    <li><a href="#交换机自学习和转发帧的过程">交换机自学习和转发帧的过程</a>
+    <li><a href="#交换机自学习和转发帧的过程"><strong>交换机自学习和转发帧的过程</strong></a>
       <ol>
-        <li><a href="#自学习过程">自学习过程</a></li>
-        <li><a href="#转发帧过程">转发帧过程</a>
+        <li><a href="#自学习过程"><strong>自学习过程</strong></a></li>
+        <li><a href="#转发帧过程"><strong>转发帧过程</strong></a>
           <ol>
-            <li><a href="#泛洪">泛洪</a></li>
-            <li><a href="#转发数据帧">转发数据帧</a></li>
-            <li><a href="#丢弃数据帧">丢弃数据帧</a></li>
+            <li><a href="#泛洪"><strong>泛洪</strong></a></li>
+            <li><a href="#转发数据帧"><strong>转发数据帧</strong></a></li>
+            <li><a href="#丢弃数据帧"><strong>丢弃数据帧</strong></a></li>
           </ol>
         </li>
       </ol>
     </li>
-    <li><a href="#stp-协议">STP 协议</a>
+    <li><a href="#stp-协议"><strong>STP 协议</strong></a>
       <ol>
-        <li><a href="#stp-出现的背景">STP 出现的背景</a></li>
-        <li><a href="#stp-协议的作用">STP 协议的作用</a></li>
-        <li><a href="#stp-协议过程解析">STP 协议过程解析</a>
+        <li><a href="#stp-出现的背景"><strong>STP 出现的背景</strong></a></li>
+        <li><a href="#stp-协议的作用"><strong>STP 协议的作用</strong></a></li>
+        <li><a href="#stp-协议过程解析"><strong>STP 协议过程解析</strong></a>
           <ol>
-            <li><a href="#stp-协议的重要概念">STP 协议的重要概念</a></li>
-            <li><a href="#stp-协议过程解析-1">STP 协议过程解析</a></li>
-            <li><a href="#stp-协议实践">STP 协议实践</a></li>
+            <li><a href="#stp-协议的重要概念"><strong>STP 协议的重要概念</strong></a></li>
+            <li><a href="#stp-协议过程解析-1"><strong>STP 协议过程解析</strong></a></li>
+            <li><a href="#stp-协议实践"><strong>STP 协议实践</strong></a></li>
           </ol>
         </li>
-        <li><a href="#stp-协议的缺点">STP 协议的缺点</a></li>
+        <li><a href="#stp-协议的缺点"><strong>STP 协议的缺点</strong></a></li>
       </ol>
     </li>
-    <li><a href="#rstpmstp-协议">RSTP、MSTP 协议</a>
+    <li><a href="#rstpmstp-协议"><strong>RSTP、MSTP 协议</strong></a>
       <ol>
-        <li><a href="#rstp-协议">RSTP 协议</a></li>
-        <li><a href="#mstp-协议">MSTP 协议</a></li>
+        <li><a href="#rstp-协议"><strong>RSTP 协议</strong></a></li>
+        <li><a href="#mstp-协议"><strong>MSTP 协议</strong></a></li>
       </ol>
     </li>
-    <li><a href="#stp-vs-rstp-vs-mstp">STP vs RSTP vs MSTP</a></li>
+    <li><a href="#stp-vs-rstp-vs-mstp"><strong>STP vs RSTP vs MSTP</strong></a></li>
   </ol>
 </nav>
         </div>
@@ -1533,9 +1539,13 @@ document.getElementById('days').innerHTML = number_of_days;
     <h3 class="widget-title"> </h3>
     <div class="widget-body">
         <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%88%86%E7%B1%BB1/" class="category-list-link">分类1<span class="category-list-count">1</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%88%86%E7%B1%BB2/" class="category-list-link">分类2<span class="category-list-count">1</a>
+            </span></div>
             <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
             </span></div>
-            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">7</a>
             </span></div>
             <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
             </span></div>
@@ -1567,7 +1577,7 @@ document.getElementById('days').innerHTML = number_of_days;
                     <a href="/zh-cn/p/archives/#2023">
                         
                             <span class="year">2023</span>
-                            <span class="count">37</span>
+                            <span class="count">39</span>
                         
                     </a> 
                 </div>
@@ -1598,12 +1608,12 @@ document.getElementById('days').innerHTML = number_of_days;
                 常见算法类型
             </a>
         
-            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
-                常见应用
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_7">
+                网络协议
             </a>
         
-            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
-                网络协议
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
             </a>
         
             <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">

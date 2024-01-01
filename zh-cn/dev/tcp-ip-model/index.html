@@ -475,7 +475,7 @@ if (!doNotTrack) {
 
 
                 <time class="article-words">
-                    2517字
+                    2548字
                 </time>
             </div>
         
@@ -627,7 +627,7 @@ if (!doNotTrack) {
 <p>IPv4 头</p>
 <ul>
 <li>版本：指定 IP 协议的版本，4 表示 IPv4，占用 4 bits</li>
-<li>首部长度 IHL：表示 IP 头的长度，占用 4 bits</li>
+<li>首部长度 IHL：表示 IP 头的长度，占用 4 bits，其数值表示几个 32 位，如 IHL 为 5，则表示 5 * 32 = 160 bit = 20 Bytes</li>
 <li>区分服务：用于标识网络中不同类型的数据流，只有在使用区分服务时，此字段才有作用，占用 6 bits</li>
 <li>显示拥塞通告：可选功能，在两端都支持且底层网络支持时可被使用，占用 2 bits</li>
 <li>全长：IP 数据报总长度，包括 IP 首部和 IP 数据部分的长度，占用 16 bits</li>
@@ -730,6 +730,18 @@ if (!doNotTrack) {
                 
                     
 <article class="">
+    <a href="/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">快速理解网络协议（七）IP 协议</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
     <a href="/zh-cn/dev/vlan/">
         
         
@@ -752,18 +764,6 @@ if (!doNotTrack) {
     </a>
 </article>
                 
-                    
-<article class="">
-    <a href="/zh-cn/dev/arp-rarp/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">快速理解网络协议（四）ARP、RARP 协议</h2>
-        </div>
-    </a>
-</article>
-                
             </div>
         </div>
     
@@ -775,6 +775,10 @@ if (!doNotTrack) {
     <footer class="site-footer">
   
 
+
+    
+
+    
 
     
 
@@ -882,8 +886,10 @@ if (!doNotTrack) {
     <section class="copyright">
         &copy; 
         
-        2023 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-        共书写了70.5k字·共 45篇文章</br><span><p>
+            2023 - 
+        
+        2024 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了74.1k字·共 47篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -1074,9 +1080,13 @@ document.getElementById('days').innerHTML = number_of_days;
     <h3 class="widget-title"> </h3>
     <div class="widget-body">
         <div class="category-list">
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%88%86%E7%B1%BB1/" class="category-list-link">分类1<span class="category-list-count">1</a>
+            </span></div>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%88%86%E7%B1%BB2/" class="category-list-link">分类2<span class="category-list-count">1</a>
+            </span></div>
             <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
             </span></div>
-            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">6</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">7</a>
             </span></div>
             <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
             </span></div>
@@ -1108,7 +1118,7 @@ document.getElementById('days').innerHTML = number_of_days;
                     <a href="/zh-cn/p/archives/#2023">
                         
                             <span class="year">2023</span>
-                            <span class="count">37</span>
+                            <span class="count">39</span>
                         
                     </a> 
                 </div>
@@ -1139,12 +1149,12 @@ document.getElementById('days').innerHTML = number_of_days;
                 常见算法类型
             </a>
         
-            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
-                常见应用
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_7">
+                网络协议
             </a>
         
-            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_6">
-                网络协议
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
             </a>
         
             <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
