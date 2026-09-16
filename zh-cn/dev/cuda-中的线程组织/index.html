@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='从异构系统与 GPU 硬件结构出发，梳理 Grid / Cluster / Block / Warp / Thread 五层线程组织，以及它们与 GPU、GPC、SM、CUDA Core 的对应关系。'><title>CUDA 中的线程组织</title>
+
+<link rel='canonical' href='http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E7%BB%84%E7%BB%87/'>
+
+<link rel="stylesheet" href="/scss/style.min.88c42b700e80a7b6552d5cf00c9d07979233c285b9340c0684c1b25525e6cd01.css"><meta property='og:title' content='CUDA 中的线程组织'>
+<meta property='og:description' content='从异构系统与 GPU 硬件结构出发，梳理 Grid / Cluster / Block / Warp / Thread 五层线程组织，以及它们与 GPU、GPC、SM、CUDA Core 的对应关系。'>
+<meta property='og:url' content='http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E7%BB%84%E7%BB%87/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='CUDA' /><meta property='article:tag' content='GPU' /><meta property='article:published_time' content='2026-09-16T11:37:07&#43;08:00'/><meta property='article:modified_time' content='2026-09-16T11:37:07&#43;08:00'/>
+<meta name="twitter:title" content="CUDA 中的线程组织">
+<meta name="twitter:description" content="从异构系统与 GPU 硬件结构出发，梳理 Grid / Cluster / Block / Warp / Thread 五层线程组织，以及它们与 GPU、GPC、SM、CUDA Core 的对应关系。">
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-3KS241LCYK');
+        }
+      </script><style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="http://localhost:1313/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_e942ccd7f8095bd0.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/zh-cn">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+            
+            
+            
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>数据结构与算法</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>快速理解网络协议</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="2" y="6" width="20" height="12" rx="2" />
+  <line x1="6" y1="10" x2="6" y2="10" />
+  <line x1="10" y1="10" x2="10" y2="10" />
+  <line x1="14" y1="10" x2="14" y2="10" />
+  <line x1="18" y1="10" x2="18" y2="10" />
+  <line x1="6" y1="14" x2="6" y2="14.01" />
+  <line x1="18" y1="14" x2="18" y2="14.01" />
+  <line x1="10" y1="14" x2="14" y2="14" />
+</svg>
+                
+                <span>CUDA 编程</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+        
+            
+            
+                
+            
+        
+
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" >
+                CUDA 编程
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E7%BB%84%E7%BB%87/">CUDA 中的线程组织</a>
+    </h2>
+
+    
+    <h3 class="article-subtitle">
+        从异构系统与 GPU 硬件结构出发，梳理 Grid / Cluster / Block / Warp / Thread 五层线程组织，以及它们与 GPU、GPC、SM、CUDA Core 的对应关系。
+    </h3>
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Sep 16, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    5791字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="异构系统"><strong>异构系统</strong></h2>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/heterogeneous.png" >
+		<img src="/zh-cn/dev/cuda/img/heterogeneous.png"
+			
+			
+			
+			loading="lazy"
+			alt="异构系统"
+			width="85%">
+	</a>
+	
+	<figcaption>异构系统</figcaption>
+	
+</figure></p>
+<p>CUDA 编程模型是基于 CPU + GPU 的异构计算系统。与 CPU 直连的内存被称为主机内存 host memory，与 GPU 直连的内存称为设备内存 device memory。</p>
+<p>CUDA 程序会在 GPU 上执行部分代码，但整个程序的执行仍然始于 CPU。在 CPU 上运行的代码称为 host 代码，在 GPU 上运行的代码称为 device 代码。host 代码可以使用 CUDA API 在主机内存和设备内存之间传输数据，启动在 GPU 上的代码执行，并等待数据传输或 GPU 代码的完成。</p>
+<p>CPU 和 GPU 可以同时执行代码，以获得最佳性能。</p>
+<h2 id="gpu-硬件结构"><strong>GPU 硬件结构</strong></h2>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/gh100_arch.png" >
+		<img src="/zh-cn/dev/cuda/img/gh100_arch.png"
+			
+			
+			
+			loading="lazy"
+			alt="NVIDIA H100 白皮书 Figure 6"
+			width="85%">
+	</a>
+	
+	<figcaption>NVIDIA H100 白皮书 Figure 6</figcaption>
+	
+</figure></p>
+<p>这是一张 NVIDIA GH100 GPU 的架构图，来源于《NVIDIA H100 白皮书》中的 Figure 6。从上而下的，依次查看 GPU 中的硬件构成。</p>
+<h3 id="gpu-硬件架构总览"><strong>GPU 硬件架构总览</strong></h3>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/gpu_arch_overview.png" >
+		<img src="/zh-cn/dev/cuda/img/gpu_arch_overview.png"
+			
+			
+			
+			loading="lazy"
+			alt="GPU 硬件架构总览"
+			width="85%">
+	</a>
+	
+	<figcaption>GPU 硬件架构总览</figcaption>
+	
+</figure></p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>图中序号</th>
+					<th>硬件</th>
+					<th>作用</th>
+					<th>备注</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>①</td>
+					<td><strong>PCI Express 5.0</strong></td>
+					<td>主机接口。CPU 通过它把<strong>数据和 kernel 启动命令</strong>送进 GPU，也是 cudaMemcpy 的路径。</td>
+					<td>最顶部深灰条</td>
+			</tr>
+			<tr>
+					<td>②</td>
+					<td><strong>GigaThread Engine</strong></td>
+					<td>全局调度器。kernel&laquo;&lt;grid, block&raquo;&gt; 启动后，GigaThread Engine 将 grid 中的 <strong>block 分发至各个空闲 SM。<br>它是两级调度体系的第一级</strong>：芯片级由它把 block 发到 SM，SM 级再由各自的 Warp Scheduler 把 warp 发到执行单元。<strong><br><strong>MIG Control：MIG（Multi-Instance GPU）把整卡</strong>切成多个互相隔离的 GPU 实例</strong>（具体数量因卡而异，有的卡不支持 MIG）<strong>，<strong>供多租户共用一张卡。用 nvidia-smi mig 命令预先划分。<br>二者是</strong>先划分、后调度</strong>的关系：MIG 划定边界，GigaThread 只在边界内派发 block。<br>开启 MIG 后 kernel 只能用到本实例的 SM 与显存带宽，跨不到其它实例。不开 MIG 时整卡即一个实例，GigaThread 面向全部 132 个 SM 调度。</td>
+					<td>顶部橙色长条</td>
+			</tr>
+			<tr>
+					<td>③</td>
+					<td><strong>GPC</strong></td>
+					<td>Thread Block Cluster 对应的硬件层级。Graphics Processing Cluster，一组物理位置相邻的 SM。 <strong>一个 cluster 必须整个装进一个 GPC</strong>，因为簇内跨 SM 通信走的是 GPC 内部的专用互联。</td>
+					<td>中间 8 个大方框</td>
+			</tr>
+			<tr>
+					<td>④</td>
+					<td><strong>TPC</strong></td>
+					<td>Texture Processing Cluster，GPC 与 SM 之间的一层封装。在 CUDA 编程模型中完全不可见。<br>换算整卡 SM 总数：8 GPC × 9 TPC × 2 SM ＝ 144 SM</td>
+					<td>GPC 内的小分组</td>
+			</tr>
+			<tr>
+					<td>⑤</td>
+					<td><strong>SM</strong></td>
+					<td>Thread Block 实际执行的地方。Streaming Multiprocessor，执行线程的单元，数量决定整卡算力规模。</td>
+					<td>GPC 里一格格小竖条</td>
+			</tr>
+			<tr>
+					<td>⑥</td>
+					<td><strong>L2 Cache</strong></td>
+					<td><strong>全卡所有 SM 共享的二级缓存</strong>。图上分为左右两半，中间有互联相通。<br>完整访存层次为 <strong>L1（每 SM 私有）→ L2 缓存（全卡共享）→ HBM3 显存</strong>，越靠外容量越大、延迟越高，命中 L2 缓存即无需访问 HBM3。</td>
+					<td>正中间蓝色大条</td>
+			</tr>
+			<tr>
+					<td>⑦</td>
+					<td><strong>HBM3</strong></td>
+					<td><strong>全局内存（显存）</strong>，即 cudaMalloc 分配的地方。High Bandwidth Memory，堆叠式显存。<br><strong>Memory Controller</strong> 是访存控制器，负责实际收发这些请求。</td>
+					<td>左右两侧竖条</td>
+			</tr>
+			<tr>
+					<td>⑧</td>
+					<td><strong>NVLink</strong></td>
+					<td><strong>卡间</strong>高速互联，用于多卡训练时 GPU 直接交换数据，不必绕经 CPU 和 PCIe。上方 High-Speed Hub 是它的汇聚点。</td>
+					<td>最底部绿色条</td>
+			</tr>
+	</tbody>
+</table></div>
+<h3 id="sm-架构"><strong>SM 架构</strong></h3>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/sm_arch.png" >
+		<img src="/zh-cn/dev/cuda/img/sm_arch.png"
+			
+			
+			
+			loading="lazy"
+			alt="NVIDIA H100 白皮书 Figure 7"
+			width="85%">
+	</a>
+	
+	<figcaption>NVIDIA H100 白皮书 Figure 7</figcaption>
+	
+</figure></p>
+<p>这是一个 SM 内部的硬件架构示意图，来源于《NVIDIA H100 白皮书》中的 Figure 7。从上而下的，依次查看 SM 中的硬件构成。</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/sm_arch_detail.png" >
+		<img src="/zh-cn/dev/cuda/img/sm_arch_detail.png"
+			
+			
+			
+			loading="lazy"
+			alt="SM 内部硬件构成"
+			width="85%">
+	</a>
+	
+	<figcaption>SM 内部硬件构成</figcaption>
+	
+</figure></p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>图中序号</th>
+					<th>硬件</th>
+					<th>作用</th>
+					<th>备注</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>①</td>
+					<td><strong>Processing Block</strong></td>
+					<td>处理块 / 分区。H100 的一个 SM 被切成 4 份（绝大多数是 4，因卡而异）。<br><strong>每份自带独立的调度器、寄存器堆和运算单元</strong>。</td>
+					<td>图中 4 个大方块</td>
+			</tr>
+			<tr>
+					<td>②</td>
+					<td><strong>L1 Instruction Cache</strong></td>
+					<td><strong>指令</strong>缓存，非数据缓存。kernel 编译后的机器指令存放于显存，取指令同样存在延迟，因此在片上缓存。此项<strong>由 4 个 Processing Block 共用</strong>。</td>
+					<td>最顶部蓝条（整 SM 一条）</td>
+			</tr>
+			<tr>
+					<td>③</td>
+					<td><strong>L0 Instruction Cache</strong></td>
+					<td>容量小于 L1、速度更快，<strong>每个 Processing block 私有</strong>。取指令路径为 <strong>显存 → L1 Instruction Cache → L0 → 调度器</strong>，越靠近执行单元延迟越低。</td>
+					<td>每个方块内的顶部蓝条</td>
+			</tr>
+			<tr>
+					<td>④</td>
+					<td><strong>Warp Scheduler</strong></td>
+					<td>warp 的调度者，每个 Processing Block 1 个、<strong>整 SM 共 4 个</strong>（因卡而异）。<br>在数十个驻留 warp 中选择处于<strong>就绪态</strong>的发射指令。warp 因访存阻塞时立即切换至其它 warp，<strong>切换不引入额外开销</strong>，以此掩盖访存延迟。<br><strong>clk：clock cycle（时钟周期）</strong>，硬件最小节拍。<strong>32 thread/clk，一个时钟周期可以发射 32 个线程</strong>，正好是一个完整 warp。</td>
+					<td>橙色条，标 32 thread/clk</td>
+			</tr>
+			<tr>
+					<td>⑤</td>
+					<td><strong>Dispatch Unit</strong></td>
+					<td>分发单元。调度器选定 warp 后，由其将指令<strong>发送至对应的执行单元</strong>：浮点运算送 FP32，访存操作送 LD/ST。<br>调度器决定发射哪个 warp，分发单元决定送往哪类单元。</td>
+					<td>深橙色条，32 thread/clk</td>
+			</tr>
+			<tr>
+					<td>⑥</td>
+					<td><strong>Register File</strong></td>
+					<td><strong>线程私有变量的存储位置</strong>，也是 GPU 上访问<strong>最快</strong>的存储层级。<br>每个 Processing Block 16,384 个 32 位寄存器，<strong>4 × 16,384 ＝ 65,536（64K）个 / SM ＝ 256 KB</strong>。<br>单线程占用越多，SM 可同时驻留的线程数越少，直接决定占有率。</td>
+					<td>深蓝色条，16,384 × 32-bit</td>
+			</tr>
+			<tr>
+					<td>⑦</td>
+					<td><strong>FP32 / INT32 / FP64</strong></td>
+					<td>CUDA core（早期叫 SP），真正做算术的单元。<br>每个 Processing Block 包含：2 列 FP32 × 16 ＝ 32 个 FP32、1 列 INT32 ＝ 16 个、1 列 FP64 ＝ 16 个。<br>CUDA core 总数的计算，只包括 FP32。即 32 个 FP32 × 4 个 Processing Block ＝ 128 个 FP32/SM，再 × 132 个 SM ＝ 16,896 个 CUDA core<br><strong>CUDA 核心数 ≠ 运算单元总数</strong></td>
+					<td>成列的绿色小格</td>
+			</tr>
+			<tr>
+					<td>⑧</td>
+					<td><strong>Tensor Core</strong></td>
+					<td>矩阵乘加专用单元，与 CUDA core 并列但功能不同。CUDA core 单条指令处理<strong>一个标量</strong>，Tensor Core 单条指令完成<strong>一个小矩阵的乘加</strong>，吞吐高出一至两个数量级。<br>卷积与 Attention 的核心计算均为矩阵乘，因此 Tensor Core 的吞吐决定训练和推理性能，支持 FP8/FP16/BF16/TF32 等精度。<br><strong>普通 CUDA 代码不会自动使用</strong>，需经 cuBLAS 等接口调用。</td>
+					<td>大块亮绿部分，每个 Processing Block 1 个</td>
+			</tr>
+			<tr>
+					<td>⑨</td>
+					<td><strong>LD/ST</strong></td>
+					<td><strong>LD：Load（读），ST：Store（写）</strong>，合称<strong>访存单元</strong>。<br>线程读写共享内存或显存的请求都由它执行，并将一个 warp 的 32 个地址合并（coalescing）为尽可能少的内存事务。<br>合并访存优化作用于此环节。</td>
+					<td>底部暗红小格，每个 Processing Block 8 个，因卡而异</td>
+			</tr>
+			<tr>
+					<td>⑩</td>
+					<td><strong>SFU</strong></td>
+					<td>Special Function Unit（特殊函数单元），用硬件直接算 sin / cos / exp / log / 平方根 / 倒数。<br>数量远少于 FP32 单元，此类函数密集时构成瓶颈。</td>
+					<td>底部暗红方块，每个 Processing Block 1 个</td>
+			</tr>
+			<tr>
+					<td>⑪</td>
+					<td><strong>Tensor Memory Accelerator</strong></td>
+					<td>简称 TMA。用于在<strong>显存与共享内存之间异步传输大块数据</strong>，传输期间计算单元继续执行，线程无需等待。通常配合 Tensor Core 使用。</td>
+					<td>底部亮绿长条（整 SM 一条）</td>
+			</tr>
+			<tr>
+					<td>⑫</td>
+					<td><strong>256 KB L1 Data Cache / Shared Memory</strong></td>
+					<td><strong>共享内存与 L1 数据缓存所在地</strong>，<strong>整个 SM 共用一块</strong>，也是<strong>同一 block 内线程共享数据</strong>的物理载体。<strong>L1 数据缓存与共享内存为同一块物理 SRAM</strong>，按比例划分。<br>二者的区别在于由谁管理：<br><strong>共享内存</strong>（<code>__shared__</code>）由程序显式分配、读写与同步<br><strong>L1 数据缓存由硬件自动管理</strong>，访问全局内存时自动缓存，代码中无对应语法，可通过访存局部性提高命中率，或用 cudaFuncSetAttribute 调整两者的划分比例。<br><strong>注意与 L1 / L0 Instruction Cache 区分，那是指令缓存，与此处的数据缓存相互独立</strong>。</td>
+					<td>最底部蓝色长条（整 SM 一条）</td>
+			</tr>
+			<tr>
+					<td>⑬</td>
+					<td><strong>Tex</strong></td>
+					<td>纹理单元，图形渲染中用于贴图采样。通用计算中仅在使用纹理内存（texture memory，提供硬件插值与边界处理）时涉及。<br>常规 CUDA 代码不使用。</td>
+					<td>最底部蓝色小格</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>此外，我们常说的片上、片下，指的是整块 GPU 硅片。「片上」是 on-chip 的中文译法，指在 GPU 芯片内部，与之相对的是 off-chip「片外」，分界线是显存 HBM3。</p>
+<ul>
+<li>片上 on-chip：L1/L0 指令缓存、共享内存、L1 数据缓存、寄存器、L2 缓存，都刻在同一块硅片上</li>
+<li>片外 off-chip：HBM3 显存，是独立的存储芯片，通过封装基板与 GPU 相连</li>
+</ul>
+<h3 id="访存延迟"><strong>访存延迟</strong></h3>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th><strong>访问位置</strong></th>
+					<th><strong>延迟（周期）</strong></th>
+					<th><strong>说明</strong></th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>寄存器</td>
+					<td>~1</td>
+					<td>线程私有，最快</td>
+			</tr>
+			<tr>
+					<td>共享内存 / L1</td>
+					<td>~20–30</td>
+					<td>片上，SM 内</td>
+			</tr>
+			<tr>
+					<td>L2 缓存</td>
+					<td>~200</td>
+					<td>片上，全卡共享</td>
+			</tr>
+			<tr>
+					<td>HBM3 显存</td>
+					<td>~400–600</td>
+					<td>一次访存 ≈ 几百条算术指令的时间</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>一次显存访问的时间，够执行几百条算术指令。如果一个 warp 发出访存请求后就一直等待，那这几百个周期里执行单元完全闲置。</p>
+<p>CPU 通过完善的控制逻辑来应对访存延迟，如大容量缓存、分支预测、乱序执行、预取等，减少访存次数并避免停顿。而 GPU 则通过海量 warp 轮转来掩盖访存延迟，当某个 warp 因访存阻塞时，SM 的 Warp Scheduler 立刻转向下一个就绪的 warp。GPU 掩盖访存延时依赖于 warp 切换的零开销。</p>
+<p>CPU 线程切换要保存或恢复寄存器上下文，代价上千周期。而 GPU 上，每个 warp 的寄存器是一直独占的、不搬走的。这正是每个 SM 中 64 K 寄存器的用途，64 个 warp 的上下文全部常驻在寄存器堆里。切换只是调度器换一个索引，不涉及任何数据搬运，因此不花周期。</p>
+<h3 id="sm-的-warp-约束"><strong>SM 的 warp 约束</strong></h3>
+<h4 id="寄存器容量约束"><strong>寄存器容量约束</strong></h4>
+<p>为了 GPU 线程切换的零开销，每个线程的上下文必须常驻在寄存器中。而数据一旦常驻，寄存器的容量就成为约束。</p>
+<p>每个 SM 上可驻留的线程数 = 每个 SM 的寄存器总个数 / 每线程占用寄存器个数 = 每个 SM 的寄存器总容量 / 每线程占用寄存器容量</p>
+<p>以 H100 举例，每个 SM 的寄存器个数为 16384 * 4 = 65536 个，寄存器总容量为 64KB * 4 = 256 KB。</p>
+<p>如果每线程占用 32 个寄存器，每线程占用寄存器容量 32 * 32 b = 0.125 KB，则每个 SM 上可驻留的线程数 = 64K / 32 = 256 KB / 0.125 KB = 2048 个，换算成 warp 为 2048 / 32 = 64 个。</p>
+<h4 id="共享内存容量约束"><strong>共享内存容量约束</strong></h4>
+<p>SM 细节图中的「256 KB L1 Data Cache / Shared Memory」（序号 ⑫）部分，是共享内存（程序显式分配）与 L1 数据缓存（硬件自动管理）所在地。共享内存是同一 block 内线程共享数据的物理载体。</p>
+<p>共享内存的生命周期等于 block 的生命周期，从 block 被调度到 SM，直到 block 执行结束，这块内存一直分配给该 block，期间不能被换出或让给其他 block。这与寄存器同理，为保证 warp 切换零开销，驻留对象的状态必须常驻片上，因此共享内存的容量也成为驻留数量的约束。</p>
+<p>以 H100 举例，SRAM 总共 256KB，其中共享内存最多可配置到 228KB，划分比例可使用 cudaFuncSetAttribute 调整。</p>
+<p>需注意 CUDA 默认每个 block 最多能占用 48KB 共享内存，超过 48KB 必须使用动态分配（extern <code>__shared__</code> + 启动参数）并通过 cudaFuncSetAttribute 显式 opt-in，否则 kernel 启动失败。</p>
+<p>假设声明每个 block 占用的共享内存大小为 114KB，每个 SM 上最多可驻留 228KB / 114KB = 2 个 block。实际驻留的线程数还取决于 block 大小，假设每个 block 含 256 个线程，即最多可驻留 512 个线程，换算成 warp 为 512 / 32 = 16 个。warp 占有率 = 实际驻留的 warp 数 / 硬件上限 = 16 / 64 = 25%。</p>
+<h4 id="block-槽位约束"><strong>block 槽位约束</strong></h4>
+<p>每个 SM 要同时管理多个驻留 block，需要给每个 block 分配一套管理资源，如 block 索引、同步屏障计数器、共享内存基址寄存器等。这些管理槽位的数量在芯片设计时就已经确定。block 槽位就是一个 SM 能同时「记住」多少个 block 的位置数。与寄存器、共享内存不同，它不是「容量 / 每线程占用量」算出来的，而是硬件的记账位数上限。</p>
+<p>以 H100 为例，每个 SM 最大的 block 槽位是 32 个，即同一时刻最多有 32 个 block 驻留在同一个 SM 上。</p>
+<h4 id="总结"><strong>总结</strong></h4>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>约束</th>
+					<th>本质</th>
+					<th>H100 为例</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>寄存器</td>
+					<td>容量 / 每线程占用量</td>
+					<td>65536 个</td>
+			</tr>
+			<tr>
+					<td>共享内存</td>
+					<td>容量 / 每线程占用量</td>
+					<td>≤ 228 KB</td>
+			</tr>
+			<tr>
+					<td>block 槽位</td>
+					<td>硬件固定的管理位数</td>
+					<td>32 个</td>
+			</tr>
+	</tbody>
+</table></div>
+<h2 id="cuda-编程模型"><strong>CUDA 编程模型</strong></h2>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/cuda_program_model.png" >
+		<img src="/zh-cn/dev/cuda/img/cuda_program_model.png"
+			
+			
+			
+			loading="lazy"
+			alt="CUDA 软件层级（编程模型）"
+			width="85%">
+	</a>
+	
+	<figcaption>CUDA 软件层级（编程模型）</figcaption>
+	
+</figure></p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>概念</th>
+					<th>作用</th>
+					<th>数据交换/同步范围</th>
+					<th>速度</th>
+					<th>备注</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>Thread<br>线程</td>
+					<td>计算逻辑的最小执行单位。kernel 代码就是<strong>一个线程的视角</strong>，靠下标区分各自处理哪份数据（SIMT）。</td>
+					<td>仅自己可见，每个线程的私有变量，存放于寄存器中</td>
+					<td>-</td>
+					<td>-</td>
+			</tr>
+			<tr>
+					<td>Warp<br>线程束</td>
+					<td>硬件调度的最小单位。32 线程锁步执行同一条指令，走不同分支会串行执行各分支（分支发散）。故 block 大小应取 32 的整数倍。</td>
+					<td>同一 warp 内的线程<br>可通过硬件指令寄存器直传（shuffle）从寄存器直接获取其他线程的私有变量。</td>
+					<td>1 周期</td>
+					<td>32 线程</td>
+			</tr>
+			<tr>
+					<td>Thread Block<br>线程块</td>
+					<td>资源分配与同步的基本单位。整块落在一个 SM 上，绝不拆分、不迁移，跑完为止。一个 SM 可同时驻留多个 block。其大小直接决定占有率。</td>
+					<td>同一 block 内的全部线程<br>1. 共享内存（片上，SM 内）<br>2. __syncthreads() 块内屏障（barrier）同步</td>
+					<td>约 20~30 周期</td>
+					<td>≤ 1024 线程</td>
+			</tr>
+			<tr>
+					<td>Thread Block Cluster<br>线程块簇</td>
+					<td>把数据复用的范围从 1 个 SM 扩大到 1 个 GPC。硬件保证同簇 block 并发驻留于同一 GPC，交换数据比绕全局内存快约 7 倍。不使用则退化为传统四层。</td>
+					<td>同一簇内的所有 block<br>1. DSMEM（分布式共享内存），经过 GPC 内的 SM-to-SM 互联网络，可直接对其它 SM 的共享内存做 load/store/atomic<br>2. 簇级屏障同步</td>
+					<td>约 60~100 周期，介于共享内存和全局内存之间</td>
+					<td>≤ 8 block</td>
+			</tr>
+			<tr>
+					<td>Grid<br>网格</td>
+					<td>一次 kernel 启动的作用域。block 间的独立性换来了可扩展性，同一份代码在 SM 少的卡和 SM 多的卡上都能运行，SM 越多吞吐越高。</td>
+					<td>同一 grid 内的所有线程<br>1. 都能访问全局内存（HBM 显存），对全局内存的访问统一经过全卡共享的 L2 缓存<br>2. block 之间不可同步<br>3. 跨 block 只能靠全局内存交换数据，且执行顺序无保证</td>
+					<td>约 400~600 周期</td>
+					<td>一次 kernel 启动的全部线程，≤ 2³¹−1 个 block</td>
+			</tr>
+	</tbody>
+</table></div>
+<h3 id="simt"><strong>SIMT</strong></h3>
+<p>SIMT：Single Instruction, Multiple Threads（单指令多线程），NVIDIA 给 GPU 执行模型起的名字。</p>
+<p>SIMD：Single Instruction, Multiple Data（单指令多数据），CPU 的向量指令，一条指令同时对多个数据做同样的运算。</p>
+<p>SIMT 的核心在于，一条指令同时驱动一个 warp 的 32 个线程执行，每个线程处理不同的数据。</p>
+<p>SIMT 的三个特点</p>
+<ol>
+<li>指令是共享的，数据是各自的</li>
+<li>写代码时是单线程视角</li>
+<li>线程之间靠下标区分</li>
+</ol>
+<h3 id="锁步"><strong>锁步</strong></h3>
+<p>锁步（lock-step），SIMT 的执行方式。而 warp 是 SIMT 的作用单位。</p>
+<p>由于一个 warp 只有一套取指和译码逻辑，因此需要一个 warp 的 32 个线程像被锁在一起一样，同进同退，同一时刻执行同一条指令。</p>
+<h3 id="分支发散"><strong>分支发散</strong></h3>
+<p>分支发散，SIMT 的代价。</p>
+<p>由于一个 warp 的 32 个线程只有一套取指和调度逻辑，同一时刻只能执行一条指令。所以当同一 warp 内的 32 个线程要走不同分支时，硬件没法做到让它们真正同时跑，只能分多趟。</p>
+<pre><code class="language-cpp">if (threadIdx.x % 2 == 0) {
+    A();     // 偶数号线程走这里
+} else {
+    B();     // 奇数号线程走这里
+}
+</code></pre>
+<p>例如上面的 cuda 代码，让一个 warp 里 16 个线程走 A、16 个走 B。</p>
+<p>硬件的做法是，第一趟：执行 A。16 个偶数线程正常计算，16 个奇数线程被屏蔽（lane 空转，什么也不做）。第二趟：执行 B。16 个偶数线程被屏蔽，16 个奇数线程正常计算。总耗时 = A 的时间 + B 的时间，而不是 max(A, B)，即便每一趟都有一半线程在闲着。</p>
+<p>分支发散只发生在 warp 内部，不同 warp 走不同分支完全没有代价，因为它们本来就是独立调度的。这也是优化分支发散的核心思路，让分支条件以 warp 为粒度对齐，而不是以线程为粒度。常见写法是把条件改成 (idx / warpSize) % 2 == 0。</p>
+<h2 id="cuda-软件层级与-gpu-硬件架构的对应关系"><strong>CUDA 软件层级与 GPU 硬件架构的对应关系</strong></h2>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/cuda_arch_mapping.png" >
+		<img src="/zh-cn/dev/cuda/img/cuda_arch_mapping.png"
+			
+			
+			
+			loading="lazy"
+			alt="CUDA 软件层级与 GPU 硬件架构的对应关系"
+			width="85%">
+	</a>
+	
+	<figcaption>CUDA 软件层级与 GPU 硬件架构的对应关系</figcaption>
+	
+</figure></p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>软件概念</th>
+					<th>硬件架构</th>
+					<th>说明</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>Grid</td>
+					<td>GPU</td>
+					<td>一次 kernel 启动对应一个 grid，一个 grid 下的所有 block 会被分发到一张 GPU 上，由 GigaThread 引擎分批派发，SM 一空出位置就补入下一个 block。<br>1. 不同 block 之间，执行顺序无保证、不能相互依赖/同步<br>2. 同一 grid 内的所有线程都能访问全局内存和 L2 缓存</td>
+			</tr>
+			<tr>
+					<td>Thread Block Cluster</td>
+					<td>GPC</td>
+					<td>同一 cluster 的所有 block 保证被并发调度到同一个 GPC，若不指定 cluster，则退化为普通 grid。<br>同一 cluster 内的各 block<br>1. 可读写彼此的共享内存 DSMEM，通过 GPC 内的 SM-to-SM 互联网络<br>2. 可做簇内同步</td>
+			</tr>
+			<tr>
+					<td>Thread Block</td>
+					<td>SM</td>
+					<td>一个 block 完整落在一个 SM 上，不拆分、不迁移，直到执行结束。反之，一个 SM 可同时驻留多个 block。<br>同一 block 内的所有线程<br>1. 共享该 block 独占的那块共享内存<br>2. 可用 __syncthreads() 全块同步<br>3. 一个 block ≤ 1024 线程，大小尽量取 32 的整倍数</td>
+			</tr>
+			<tr>
+					<td>Warp</td>
+					<td>无独立实体<br>由硬件按 32 线程自动切分，在 Warp Scheduler 中调度</td>
+					<td>同一 Warp 的 32 个线程<br>1. SIMT 锁步，同一时刻执行同一条指令<br>2. 分支发散时，各分支串行执行<br>3. Warp 内的线程同步，使用 __syncwarp()</td>
+			</tr>
+			<tr>
+					<td>Thread</td>
+					<td>CUDA Core</td>
+					<td>线程不独占 CUDA Core，是临时占用执行单元的使用关系。线程执行的指令，按 Warp 成批派发到执行单元</td>
+			</tr>
+	</tbody>
+</table></div>
+<h2 id="附件"><strong>附件</strong></h2>
+<ul>
+<li><a class="link" href="https://docs.nvidia.com/cuda/cuda-programming-guide/index.html"  target="_blank" rel="noopener"
+    >CUDA C++ Programming Guide</a></li>
+<li>《NVIDIA H100 Tensor Core GPU Architecture Whitepaper》：本文 GPU 硬件结构与 SM 架构两节的 Figure 6、Figure 7 均出自该白皮书</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/cuda/">CUDA</a>
+        
+            <a href="/zh-cn/tags/gpu/">GPU</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css"integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js"integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js"integrity="sha384-vZTG03m&#43;2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.querySelector(`.article-content`), {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ]
+        });})
+</script>
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2026 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了80.9k字·共 46篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+        
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+
+var s1 = '2023-04-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+        
+        
+            
+        
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/zh-cn/p/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#异构系统"><strong>异构系统</strong></a></li>
+    <li><a href="#gpu-硬件结构"><strong>GPU 硬件结构</strong></a>
+      <ol>
+        <li><a href="#gpu-硬件架构总览"><strong>GPU 硬件架构总览</strong></a></li>
+        <li><a href="#sm-架构"><strong>SM 架构</strong></a></li>
+        <li><a href="#访存延迟"><strong>访存延迟</strong></a></li>
+        <li><a href="#sm-的-warp-约束"><strong>SM 的 warp 约束</strong></a>
+          <ol>
+            <li><a href="#寄存器容量约束"><strong>寄存器容量约束</strong></a></li>
+            <li><a href="#共享内存容量约束"><strong>共享内存容量约束</strong></a></li>
+            <li><a href="#block-槽位约束"><strong>block 槽位约束</strong></a></li>
+            <li><a href="#总结"><strong>总结</strong></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#cuda-编程模型"><strong>CUDA 编程模型</strong></a>
+      <ol>
+        <li><a href="#simt"><strong>SIMT</strong></a></li>
+        <li><a href="#锁步"><strong>锁步</strong></a></li>
+        <li><a href="#分支发散"><strong>分支发散</strong></a></li>
+      </ol>
+    </li>
+    <li><a href="#cuda-软件层级与-gpu-硬件架构的对应关系"><strong>CUDA 软件层级与 GPU 硬件架构的对应关系</strong></a></li>
+    <li><a href="#附件"><strong>附件</strong></a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">cuda 编程<span class="category-list-count">1</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2026">
+                        
+                            <span class="year">2026</span>
+                            <span class="count">1</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2024">
+                        
+                            <span class="year">2024</span>
+                            <span class="count">2</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">38</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_9">
+                网络协议
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/zh-cn/tags/lvs/" class="font_size_4">
+                LVS
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%A0%91/" class="font_size_3">
+                树
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/" class="font_size_2">
+                字符串
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script type="text/javascript" src="/ts/custom.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

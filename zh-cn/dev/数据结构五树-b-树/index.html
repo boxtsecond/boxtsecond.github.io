@@ -1,28 +1,34 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数'><title>数据结构（五）树 — B&#43;树</title>
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0 树的高度 = 根节点的高度 节点的深度（Depth） 根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0 节点的层数（Level） 节点的深度 &#43; 1 B&#43; 树 B&#43; Tree B&#43; 树 是通过 B 树（二叉查找树）演化而来，目的是在二叉查找树中能够按照区间来查找数据 B&#43; 树中的非叶子节点不存储数据，只存储索引，而 B 树中的节点存储数据 B&#43; 树中的叶子节点使用链表串联起来，链表中的数据是有序的，可以按区间查找，而 B 树中的叶子节点不需要链表串联 B&#43; 树的根节点一般放在内存中，其他节点存储在磁盘中 B&#43; 树中的每个节点中子节点的个数不能超过 m 个，即 m叉树，也不能小于 m/2（除根节点外） B&#43; 树的实现 B&#43; 树的非叶子节点存储索引，存储在磁盘中 内存的访问速度是纳米级别的，磁盘的访问速度是毫秒级别的，读取同样大小的数据，从磁盘中读取花费的时间是从内存中读取的上万倍，甚至几十万倍 每个节点的读取操作，都对应一次磁盘 IO 操作 树的高度 = 每次查询数据时磁盘 IO 操作的最大次数 尽量减少磁盘 IO 操作，也就是尽量降低树的高度 B&#43; 树的叶子节点存储的是 k 个数据行的键值、地址信息、当前节点在链表中的前驱节点的地址、当前节点在链表中的后继节点的地址，k 的取值由事先计算得到 B&#43; 树是一个 m 叉树，m 的取值由事先计算得到 k、m 的计算方式 操作系统按照页（PAGE_SIZE）的方式读取内存、磁盘中的数据，一页的大小通常为 4KB，可以通过 getconf PAGE_SIZE 命令查看 当读取的数据量超过一页时，会触发多次 IO 操作 k、m 的取值则根据每个节点的大小 &lt;= 页的大小，且尽可能的大 B&#43; 树的操作 查询
+'><title>数据结构（五）树 — B&#43;树</title>
 
-<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/'>
+<link rel='canonical' href='http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/'>
 
-<link rel="stylesheet" href="/scss/style.min.4da60824240567b039cf33c6b4aefd247d22a34bb8a58653cb3948fb57f5cdc6.css"><meta property='og:title' content='数据结构（五）树 — B&#43;树'>
-<meta property='og:description' content='树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数'>
-<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/'>
+<link rel="stylesheet" href="/scss/style.min.88c42b700e80a7b6552d5cf00c9d07979233c285b9340c0684c1b25525e6cd01.css"><meta property='og:title' content='数据结构（五）树 — B&#43;树'>
+<meta property='og:description' content='树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0 树的高度 = 根节点的高度 节点的深度（Depth） 根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0 节点的层数（Level） 节点的深度 &#43; 1 B&#43; 树 B&#43; Tree B&#43; 树 是通过 B 树（二叉查找树）演化而来，目的是在二叉查找树中能够按照区间来查找数据 B&#43; 树中的非叶子节点不存储数据，只存储索引，而 B 树中的节点存储数据 B&#43; 树中的叶子节点使用链表串联起来，链表中的数据是有序的，可以按区间查找，而 B 树中的叶子节点不需要链表串联 B&#43; 树的根节点一般放在内存中，其他节点存储在磁盘中 B&#43; 树中的每个节点中子节点的个数不能超过 m 个，即 m叉树，也不能小于 m/2（除根节点外） B&#43; 树的实现 B&#43; 树的非叶子节点存储索引，存储在磁盘中 内存的访问速度是纳米级别的，磁盘的访问速度是毫秒级别的，读取同样大小的数据，从磁盘中读取花费的时间是从内存中读取的上万倍，甚至几十万倍 每个节点的读取操作，都对应一次磁盘 IO 操作 树的高度 = 每次查询数据时磁盘 IO 操作的最大次数 尽量减少磁盘 IO 操作，也就是尽量降低树的高度 B&#43; 树的叶子节点存储的是 k 个数据行的键值、地址信息、当前节点在链表中的前驱节点的地址、当前节点在链表中的后继节点的地址，k 的取值由事先计算得到 B&#43; 树是一个 m 叉树，m 的取值由事先计算得到 k、m 的计算方式 操作系统按照页（PAGE_SIZE）的方式读取内存、磁盘中的数据，一页的大小通常为 4KB，可以通过 getconf PAGE_SIZE 命令查看 当读取的数据量超过一页时，会触发多次 IO 操作 k、m 的取值则根据每个节点的大小 &lt;= 页的大小，且尽可能的大 B&#43; 树的操作 查询
+'>
+<meta property='og:url' content='http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='数据结构' /><meta property='article:tag' content='树' /><meta property='article:published_time' content='2023-08-23T22:25:43&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T22:25:43&#43;08:00'/>
 <meta name="twitter:title" content="数据结构（五）树 — B&#43;树">
-<meta name="twitter:description" content="树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数">
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
-<script>
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.dataLayer = window.dataLayer || [];
-	function gtag(){dataLayer.push(arguments);}
-	gtag('js', new Date());
-	gtag('config', 'G-3KS241LCYK', { 'anonymize_ip': false });
-}
-</script>
-<style>
+<meta name="twitter:description" content="树 Tree 相关概念 父节点、子节点、兄弟节点、根节点、叶子节点（叶节点） 节点的高度（Height） 节点到叶子节点的最长路径（边数），从最底层开始计数，计数的起点是 0 树的高度 = 根节点的高度 节点的深度（Depth） 根节点到当前节点所经历的边的个数，从根节点开始度量，计数起点是 0 节点的层数（Level） 节点的深度 &#43; 1 B&#43; 树 B&#43; Tree B&#43; 树 是通过 B 树（二叉查找树）演化而来，目的是在二叉查找树中能够按照区间来查找数据 B&#43; 树中的非叶子节点不存储数据，只存储索引，而 B 树中的节点存储数据 B&#43; 树中的叶子节点使用链表串联起来，链表中的数据是有序的，可以按区间查找，而 B 树中的叶子节点不需要链表串联 B&#43; 树的根节点一般放在内存中，其他节点存储在磁盘中 B&#43; 树中的每个节点中子节点的个数不能超过 m 个，即 m叉树，也不能小于 m/2（除根节点外） B&#43; 树的实现 B&#43; 树的非叶子节点存储索引，存储在磁盘中 内存的访问速度是纳米级别的，磁盘的访问速度是毫秒级别的，读取同样大小的数据，从磁盘中读取花费的时间是从内存中读取的上万倍，甚至几十万倍 每个节点的读取操作，都对应一次磁盘 IO 操作 树的高度 = 每次查询数据时磁盘 IO 操作的最大次数 尽量减少磁盘 IO 操作，也就是尽量降低树的高度 B&#43; 树的叶子节点存储的是 k 个数据行的键值、地址信息、当前节点在链表中的前驱节点的地址、当前节点在链表中的后继节点的地址，k 的取值由事先计算得到 B&#43; 树是一个 m 叉树，m 的取值由事先计算得到 k、m 的计算方式 操作系统按照页（PAGE_SIZE）的方式读取内存、磁盘中的数据，一页的大小通常为 4KB，可以通过 getconf PAGE_SIZE 命令查看 当读取的数据量超过一页时，会触发多次 IO 操作 k、m 的取值则根据每个节点的大小 &lt;= 页的大小，且尽可能的大 B&#43; 树的操作 查询
+">
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-3KS241LCYK');
+        }
+      </script><style>
     :root {
         --article-font-family: var(--base-font-family);
     }
@@ -73,7 +79,7 @@ if (!doNotTrack) {
 ">
     
 <div id="article-toolbar">
-    <a href="https://boxtsecond.github.io/" class="back-home">
+    <a href="http://localhost:1313/" class="back-home">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
   <polyline points="15 6 9 12 15 18" />
@@ -101,7 +107,7 @@ if (!doNotTrack) {
                     
                     
                         
-                        <img src="/img/avatar_huba2d4ab9927040bf281d0658d55e219b_279666_300x0_resize_q75_box.jpg" width="300"
+                        <img src="/img/avatar_hu_e942ccd7f8095bd0.jpg" width="300"
                             height="478" class="site-logo" loading="lazy" alt="Avatar">
                     
                 
@@ -209,7 +215,50 @@ if (!doNotTrack) {
 
 
         <li >
-            <a href='/zh-cn/dev/' >
+            <a href='/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>数据结构与算法</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>快速理解网络协议</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/' >
                 
                 
                 
@@ -225,53 +274,7 @@ if (!doNotTrack) {
   <line x1="10" y1="14" x2="14" y2="14" />
 </svg>
                 
-                <span>技术文章</span>
-            </a>
-        </li>
-        
-            
-              
-
-
-        <li >
-            <a href='/zh-cn/workout/' >
-                
-                
-                
-                    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<!-- Uploaded to: SVG Repo, www.svgrepo.com, Transformed by: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="SVGRepo_bgCarrier" stroke-width="0"/>
-<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
-<g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M6 7.5H7.5V11.25V12.75V16.5H6V7.5ZM9 12.75V18H4.5V16.5H1.5V7.5H4.5V6H9V11.25L15 11.25V6H19.5V7.5L22.5 7.5V16.5H19.5V18H15V12.75L9 12.75ZM16.5 12.75L16.5 16.5H18L18 7.5L16.5 7.5L16.5 11.25V12.75ZM4.5 9H3V15H4.5V9ZM19.5 15H21V9H19.5V15Z" fill="#C2C2C3"/> </g>
-</svg>
-                
-                <span>健身</span>
-            </a>
-        </li>
-        
-            
-              
-
-
-        <li >
-            <a href='/zh-cn/invest/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <rect x="2" y="6" width="20" height="12" rx="2" />
-  <line x1="6" y1="10" x2="6" y2="10" />
-  <line x1="10" y1="10" x2="10" y2="10" />
-  <line x1="14" y1="10" x2="14" y2="10" />
-  <line x1="18" y1="10" x2="18" y2="10" />
-  <line x1="6" y1="14" x2="6" y2="14.01" />
-  <line x1="18" y1="14" x2="18" y2="14.01" />
-  <line x1="10" y1="14" x2="14" y2="14" />
-</svg>
-                
-                <span>投资</span>
+                <span>CUDA 编程</span>
             </a>
         </li>
         
@@ -294,26 +297,6 @@ if (!doNotTrack) {
 
                 
                 <span>搜索</span>
-            </a>
-        </li>
-        
-            
-              
-
-
-        <li >
-            <a href='/zh-cn/thoughts/' >
-                
-                
-                
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-writing-sign" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M3 19c3.333 -2 5 -4 5 -6c0 -3 -1 -3 -2 -3s-2.032 1.085 -2 3c.034 2.048 1.658 2.877 2.5 4c1.5 2 2.5 2.5 3.5 1c.667 -1 1.167 -1.833 1.5 -2.5c1 2.333 2.333 3.5 4 3.5h2.5" />
-  <path d="M20 17v-12c0 -1.121 -.879 -2 -2 -2s-2 .879 -2 2v12l2 2l2 -2z" />
-  <path d="M16 7h4" />
-</svg>
-                
-                <span>生活有感</span>
             </a>
         </li>
         
@@ -409,16 +392,6 @@ if (!doNotTrack) {
         
             
             
-            
-                
-                
-                    
-                
-                    
-                        
-                        
-                        
-                    
                 
             
         
@@ -816,8 +789,8 @@ if (!doNotTrack) {
         
             2023 - 
         
-        2024 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-        共书写了74.1k字·共 46篇文章</br><span><p>
+        2026 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了80.9k字·共 46篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -921,16 +894,6 @@ document.getElementById('days').innerHTML = number_of_days;
     
         
         
-        
-            
-            
-                
-            
-                
-                    
-                    
-                    
-                
             
         
     
@@ -1004,11 +967,13 @@ document.getElementById('days').innerHTML = number_of_days;
     <h3 class="widget-title"> </h3>
     <div class="widget-body">
         <div class="category-list">
-            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">cuda 编程<span class="category-list-count">1</a>
             </span></div>
-            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">7</a>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
             </span></div>
-            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
             </span></div>
         </div>
     </div>
@@ -1034,6 +999,22 @@ document.getElementById('days').innerHTML = number_of_days;
         
         
         <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2026">
+                        
+                            <span class="year">2026</span>
+                            <span class="count">1</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2024">
+                        
+                            <span class="year">2024</span>
+                            <span class="count">2</span>
+                        
+                    </a> 
+                </div>
             <div class="archives-year">
                     <a href="/zh-cn/p/archives/#2023">
                         
@@ -1069,7 +1050,7 @@ document.getElementById('days').innerHTML = number_of_days;
                 常见算法类型
             </a>
         
-            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_7">
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_9">
                 网络协议
             </a>
         
