@@ -449,7 +449,7 @@
 
 
                 <time class="article-words">
-                    5791字
+                    5971字
                 </time>
             </div>
         
@@ -866,6 +866,38 @@
 <p>例如上面的 cuda 代码，让一个 warp 里 16 个线程走 A、16 个走 B。</p>
 <p>硬件的做法是，第一趟：执行 A。16 个偶数线程正常计算，16 个奇数线程被屏蔽（lane 空转，什么也不做）。第二趟：执行 B。16 个偶数线程被屏蔽，16 个奇数线程正常计算。总耗时 = A 的时间 + B 的时间，而不是 max(A, B)，即便每一趟都有一半线程在闲着。</p>
 <p>分支发散只发生在 warp 内部，不同 warp 走不同分支完全没有代价，因为它们本来就是独立调度的。这也是优化分支发散的核心思路，让分支条件以 warp 为粒度对齐，而不是以线程为粒度。常见写法是把条件改成 (idx / warpSize) % 2 == 0。</p>
+<h3 id="threadlanecuda-core-的区别"><strong>Thread、Lane、CUDA Core 的区别</strong></h3>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>名词</th>
+					<th>属于</th>
+					<th>含义</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>Thread</td>
+					<td>编程模型</td>
+					<td>CUDA 程序创建的执行实体，有 threadIdx</td>
+			</tr>
+			<tr>
+					<td>Lane</td>
+					<td>Warp 内部结构</td>
+					<td>0~31 的槽位编号，threadIdx.x % 32</td>
+			</tr>
+			<tr>
+					<td>执行单元</td>
+					<td>物理硬件</td>
+					<td>实际执行运算的电路，按指令类型分工、数量各不相同。SM 中包含的执行单元有 FP32、INT32、FP64、LD/ST、SFU、Tensor Core。</td>
+			</tr>
+			<tr>
+					<td>CUDA Core</td>
+					<td>物理硬件</td>
+					<td>执行单元中的一类。官方口径专指 FP32 单元，早期叫 SP</td>
+			</tr>
+	</tbody>
+</table></div>
 <h2 id="cuda-软件层级与-gpu-硬件架构的对应关系"><strong>CUDA 软件层级与 GPU 硬件架构的对应关系</strong></h2>
 <p><figure 
 	>
@@ -1103,7 +1135,7 @@
             2023 - 
         
         2026 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-        共书写了80.9k字·共 46篇文章</br><span><p>
+        共书写了81.1k字·共 46篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -1272,6 +1304,7 @@ document.getElementById('days').innerHTML = number_of_days;
         <li><a href="#simt"><strong>SIMT</strong></a></li>
         <li><a href="#锁步"><strong>锁步</strong></a></li>
         <li><a href="#分支发散"><strong>分支发散</strong></a></li>
+        <li><a href="#threadlanecuda-core-的区别"><strong>Thread、Lane、CUDA Core 的区别</strong></a></li>
       </ol>
     </li>
     <li><a href="#cuda-软件层级与-gpu-硬件架构的对应关系"><strong>CUDA 软件层级与 GPU 硬件架构的对应关系</strong></a></li>
