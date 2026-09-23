@@ -393,9 +393,6 @@ __global__ void myKernel(float* in, float* out, int n) // ② 形参：寄存器
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;冲突路数 ＝ gcd(元素的下标步长, 每个 wavefront 内的线程数)&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;下标步长就是代码方括号里的那个乘数，&lt;strong&gt;不乘字节数&lt;/strong&gt;。元素宽度的影响已经在第 1 步用过一次，再乘一次就是重复计算&lt;/li&gt;
-&lt;/ul&gt;
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;实际需要的总周期数：wavefront * 冲突路数&lt;/p&gt;

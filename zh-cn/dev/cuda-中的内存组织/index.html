@@ -449,7 +449,7 @@
 
 
                 <time class="article-words">
-                    4071字
+                    4019字
                 </time>
             </div>
         
@@ -754,9 +754,6 @@ __global__ void myKernel(float* in, float* out, int n) // ② 形参：寄存器
 </li>
 <li>
 <p>冲突路数 ＝ gcd(元素的下标步长, 每个 wavefront 内的线程数)</p>
-<ul>
-<li>下标步长就是代码方括号里的那个乘数，<strong>不乘字节数</strong>。元素宽度的影响已经在第 1 步用过一次，再乘一次就是重复计算</li>
-</ul>
 </li>
 <li>
 <p>实际需要的总周期数：wavefront * 冲突路数</p>
