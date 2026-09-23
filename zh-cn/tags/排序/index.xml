@@ -7,6 +7,619 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
         <lastBuildDate>Thu, 24 Aug 2023 12:02:21 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/%E6%8E%92%E5%BA%8F/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>数据结构与算法总览</title>
+        <link>http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
+        <pubDate>Thu, 24 Aug 2023 13:28:17 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</guid>
+        <description>&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/best.jpg&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/best.jpg&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;BE BEST&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;BE BEST&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;思维导图&#34;&gt;思维导图&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/all.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/all.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;数据结构与算法总览&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;数据结构与算法总览&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;文章列表&#34;&gt;文章列表&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;如何学习算法&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;数据结构&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%80%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%95%B0%E7%BB%84%E9%93%BE%E8%A1%A8/&#34; &gt;线性表 - 数组、链表&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/&#34; &gt;线性表 - 栈、队列&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/&#34; &gt;树 — 二叉树、递归树&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/&#34; &gt;树 — 红黑树、堆&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/&#34; &gt;树 — B+树&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/&#34; &gt;图&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/&#34; &gt;图的搜索&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/&#34; &gt;基于图的其它算法&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/&#34; &gt;字符串匹配&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/&#34; &gt;字符串相似度&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;常见类型&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/&#34; &gt;排序&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/&#34; &gt;O(n^2)：冒泡排序、插入排序、选择排序&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/&#34; &gt;O(nlogn)：归并排序、快速排序、堆排序&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/&#34; &gt;O(n)：桶排序、计数排序、基数排序&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/&#34; &gt;排序算法对比&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/&#34; &gt;查找&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/&#34; &gt;过滤&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/&#34; &gt;相似&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/&#34; &gt;基本算法思想&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;常见应用&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%80%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/&#34; &gt;索引底层的数据结构&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%8Credis-%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/&#34; &gt;Redis 常用数据类型对应的数据结构&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/&#34; &gt;搜索引擎&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/&#34; &gt;Disruptor 内存消息队列&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/&#34; &gt;鉴权与限流&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/&#34; &gt;短网址服务&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;打赏&#34;&gt;打赏&lt;/h2&gt;
+&lt;p&gt;请我喝杯奶茶吧～&lt;/p&gt;
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;td &gt;&lt;center&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/dev/payment_img/wechat.jpg&#34; width=&#34;300&#34; height=&#34;240&#34; &gt;&lt;/center&gt;&lt;/td&gt;
+        &lt;td &gt;&lt;center&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/dev/payment_img/alipay.jpg&#34; width=&#34;300&#34; height=&#34;240&#34; &gt;&lt;/center&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</description>
+        </item>
+        <item>
+        <title>CUDA 中的内存组织</title>
+        <link>http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/</link>
+        <pubDate>Wed, 23 Sep 2026 11:12:04 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/</guid>
+        <description>&lt;h2 id=&#34;内存结构&#34;&gt;&lt;strong&gt;内存结构&lt;/strong&gt;&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;内存类型&lt;/th&gt;
+					&lt;th&gt;作用域&lt;/th&gt;
+					&lt;th&gt;生命周期&lt;/th&gt;
+					&lt;th&gt;物理位置&lt;/th&gt;
+					&lt;th&gt;延迟&lt;/th&gt;
+					&lt;th&gt;说明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;寄存器 Register&lt;/td&gt;
+					&lt;td&gt;单个线程&lt;/td&gt;
+					&lt;td&gt;线程&lt;/td&gt;
+					&lt;td&gt;SM 内的 Register File&lt;/td&gt;
+					&lt;td&gt;~1&lt;/td&gt;
+					&lt;td&gt;存放 kernel 里的局部变量，片上。由编译器自动分配，代码中无显式语法。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;本地内存 Local&lt;/td&gt;
+					&lt;td&gt;单个线程&lt;/td&gt;
+					&lt;td&gt;线程&lt;/td&gt;
+					&lt;td&gt;显存&lt;/td&gt;
+					&lt;td&gt;~400-600&lt;/td&gt;
+					&lt;td&gt;在寄存器放不下时，会放在这里&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Warp 内寄存器直传&lt;/td&gt;
+					&lt;td&gt;同一 Warp 内的 32 线程&lt;/td&gt;
+					&lt;td&gt;指令级&lt;/td&gt;
+					&lt;td&gt;-&lt;/td&gt;
+					&lt;td&gt;~1&lt;/td&gt;
+					&lt;td&gt;严格说不是一种内存，而是 &lt;code&gt;__shfl_sync&lt;/code&gt; 等指令在 Register File 上的交叉互连，允许一条 lane 读取另一条 lane 的寄存器。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;共享内存 Shared&lt;/td&gt;
+					&lt;td&gt;同一 block&lt;/td&gt;
+					&lt;td&gt;block&lt;/td&gt;
+					&lt;td&gt;与 L1 数据缓存共用同一块 SRAM&lt;/td&gt;
+					&lt;td&gt;~20–30&lt;/td&gt;
+					&lt;td&gt;用 &lt;code&gt;__shared__&lt;/code&gt; 显式声明，由程序自己管理。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;分布式共享内存 DSMEM&lt;/td&gt;
+					&lt;td&gt;同一 cluster&lt;/td&gt;
+					&lt;td&gt;cluster&lt;/td&gt;
+					&lt;td&gt;不是一种新的物理存储介质，而是共享内存的一种扩展寻址方式&lt;/td&gt;
+					&lt;td&gt;介于共享内存与全局内存之间&lt;/td&gt;
+					&lt;td&gt;簇内各 block 可直接对其它 SM 的共享内存做 load / store / atomic。&lt;br&gt;经 GPC 内的 SM-to-SM 互联网络，比绕全局内存交换数据快约 7 倍。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;全局内存 Global&lt;/td&gt;
+					&lt;td&gt;全体线程 + 主机端&lt;/td&gt;
+					&lt;td&gt;由 API 决定&lt;/td&gt;
+					&lt;td&gt;显存&lt;/td&gt;
+					&lt;td&gt;~400–600&lt;/td&gt;
+					&lt;td&gt;cudaMalloc 分配的地方。&lt;br&gt;访问统一经过全卡共享的 L2 缓存。不随 kernel 结束而释放，主机端也可读写。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;L1 数据缓存&lt;/td&gt;
+					&lt;td&gt;本 SM&lt;/td&gt;
+					&lt;td&gt;硬件自动&lt;/td&gt;
+					&lt;td&gt;与共享内存共用同一块 SRAM&lt;/td&gt;
+					&lt;td&gt;~20–30&lt;/td&gt;
+					&lt;td&gt;访问全局内存时由硬件自动缓存，代码中无对应语法。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;L2 缓存&lt;/td&gt;
+					&lt;td&gt;全卡所有 SM&lt;/td&gt;
+					&lt;td&gt;硬件自动&lt;/td&gt;
+					&lt;td&gt;GPU 内的 L2 Cache&lt;/td&gt;
+					&lt;td&gt;~200&lt;/td&gt;
+					&lt;td&gt;全卡所有 SM 共享。是跨 SM 数据复用的唯一硬件通路&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;常量内存 Constant&lt;/td&gt;
+					&lt;td&gt;全体线程（只读）&lt;/td&gt;
+					&lt;td&gt;由 API 决定&lt;/td&gt;
+					&lt;td&gt;显存&lt;/td&gt;
+					&lt;td&gt;~400–600&lt;/td&gt;
+					&lt;td&gt;&lt;code&gt;__constant__&lt;/code&gt; 声明，数据在显存。&lt;br&gt;经每 SM 8 KB 专用缓存读取，总量上限 64 KB。一个 warp 读同一地址时可广播，此时效率最高。&lt;br&gt;读不同地址时会按地址数拆成多次请求，吞吐成比例下降。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;纹理 / 表面内存&lt;/td&gt;
+					&lt;td&gt;全体线程（通常只读）&lt;/td&gt;
+					&lt;td&gt;由 API 决定&lt;/td&gt;
+					&lt;td&gt;显存&lt;/td&gt;
+					&lt;td&gt;~400–600&lt;/td&gt;
+					&lt;td&gt;经专用的纹理缓存读取。带硬件插值、归一化坐标和边界处理，为二维空间局部性优化。&lt;br&gt;源自图形渲染，通用计算中较少使用。&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;代码中的内存&#34;&gt;&lt;strong&gt;代码中的内存&lt;/strong&gt;&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;// ① 全局作用域：常量内存（显存 + 每 SM 8 KB 常量缓存）
+__constant__ float coef[64];
+
+__global__ void myKernel(float* in, float* out, int n) // ② 形参：寄存器
+{
+    // ③ 普通局部变量：寄存器
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    float sum = 0.0f;
+
+    // ④ 小的、下标可静态确定的数组：寄存器
+    float acc[4] = {0,0,0,0};
+
+    // ⑤ 下标运行时才知道 → 编译器放进本地内存（显存！）
+    float buf[64];
+    buf[idx % 64] = sum;
+
+    // ⑥ 共享内存：片上 SRAM，本 block 独占一份
+    __shared__ float tile[256];
+    tile[threadIdx.x] = in[idx];   // 全局 → 共享
+    __syncthreads();
+
+    // ⑦ 指针指向的数据：全局内存（显存），指针本身在寄存器
+    out[idx] = tile[threadIdx.x] * coef[0];
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;代码序号&lt;/th&gt;
+					&lt;th&gt;代码概念&lt;/th&gt;
+					&lt;th&gt;物理位置&lt;/th&gt;
+					&lt;th&gt;说明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;①&lt;/td&gt;
+					&lt;td&gt;常量内存&lt;/td&gt;
+					&lt;td&gt;显存&lt;/td&gt;
+					&lt;td&gt;经每 SM 8KB 的常量缓存读取，全 grid 只读可见。&lt;br&gt;warp 内读同一地址时广播，最快；读不同地址会拆成多次请求。&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;②&lt;/td&gt;
+					&lt;td&gt;形参&lt;/td&gt;
+					&lt;td&gt;常量内存 → 寄存器&lt;/td&gt;
+					&lt;td&gt;线程私有，经常量内存传递，kernel 执行时由编译器加载进寄存器使用&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;③&lt;/td&gt;
+					&lt;td&gt;局部变量&lt;/td&gt;
+					&lt;td&gt;寄存器&lt;/td&gt;
+					&lt;td&gt;线程私有，由编译器自动分配&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;④&lt;/td&gt;
+					&lt;td&gt;小数组（常量下标）&lt;/td&gt;
+					&lt;td&gt;寄存器/显存&lt;/td&gt;
+					&lt;td&gt;下标能静态确定到具体某个元素时，编译器把每个元素当成独立的标量变量，各自分配寄存器（按数据宽度占 1 个或多个 32-bit 寄存器）&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;⑤&lt;/td&gt;
+					&lt;td&gt;数组（动态下标）&lt;/td&gt;
+					&lt;td&gt;本地内存（显存）&lt;/td&gt;
+					&lt;td&gt;满足以下任一种情景，数据会保存在本地内存&lt;br&gt;  1. 下标非常量，编译器无法静态确定&lt;br&gt;  2. 数组太大，编译器判断放寄存器不划算&lt;br&gt;  3. kernel 整体寄存器压力过高，发生溢出（spilling），每线程最多 255 个 32-bit 寄存器&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;⑥&lt;/td&gt;
+					&lt;td&gt;共享内存&lt;/td&gt;
+					&lt;td&gt;SM 内的 SRAM&lt;/td&gt;
+					&lt;td&gt;与 L1 共用同一块 SRAM，本 block 独占一份，其它 block 看不到&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;⑦&lt;/td&gt;
+					&lt;td&gt;全局内存&lt;/td&gt;
+					&lt;td&gt;显存&lt;/td&gt;
+					&lt;td&gt;经 L1 → L2 → HBM3 访问&lt;br&gt;指针变量本身在寄存器，它指向的数据在显存&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;共享内存&#34;&gt;&lt;strong&gt;共享内存&lt;/strong&gt;&lt;/h2&gt;
+&lt;h3 id=&#34;共享内存的物理结构&#34;&gt;&lt;strong&gt;共享内存的物理结构&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/shared_mem_bank.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/shared_mem_bank.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;共享内存的 bank 结构&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;共享内存的 bank 结构&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;共享内存被分成大小相等、可同时访问的模块，称为 bank。bank 是整块共享内存的物理结构，图中的每一列对应一个 bank。整个共享内存只有 32 个 bank，增大共享内存只会让每个 bank 更深，但 bank 的数量不变。&lt;/p&gt;
+&lt;p&gt;地址按 32-bit 字（4 字节）映射到 bank，bank = 字地址 % 32，即图中的一个个小方格。第 0～31 个 32-bit 字横跨所有的 bank，第 32 个绕回到 bank 0。&lt;/p&gt;
+&lt;p&gt;一个 bank 在一个时钟周期里，只能读出（或写入）一个 32-bit 字，因此在同一时刻一个 bank 只能服务一个地址。把连续的 32 个字分散到 32 个不同 bank，正是为了让一个 warp 的 32 个线程能同时取数，获得 32 倍带宽。&lt;/p&gt;
+&lt;p&gt;array[threadIdx.x] 这种最自然的写法自动满足这一点，注意这里的 array 数据类型需要是 int 或 float 4 字节，每个元素正好占用一个字，32 个线程正好铺满 32 个 bank。反之，如果多个线程的不同地址落在同一 bank，就会发生 bank conflict，硬件将拆成多次串行。&lt;/p&gt;
+&lt;h3 id=&#34;共享内存的-bank-conflict&#34;&gt;&lt;strong&gt;共享内存的 Bank Conflict&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;若一次请求的 n 个地址落在 n 个不同的 bank 上，就能同时完成，带宽是单个模块的 n 倍。若两个地址落在同一个 bank，则发生 bank conflict，硬件必须把请求拆成多次串行完成， 吞吐按拆分次数成比例下降。&lt;/p&gt;
+&lt;p&gt;有一个例外，当多个线程读同一个 32-bit 字时，一次读取后广播给所有线程，不会发生 bank conflict。而当多个线程写同一个 32-bit 字时，只有其中一个线程的写会生效，但具体是哪个线程不确定。因此，如果多个线程要写同一个地址且在意结果，必须用原子操作或者重新设计数据布局。&lt;/p&gt;
+&lt;p&gt;综上，bank conflict 是&lt;strong&gt;同一个 warp 内部&lt;/strong&gt;的问题，与 SM 上驻留了几个 block 无关。&lt;/p&gt;
+&lt;h4 id=&#34;无-bank-conflict&#34;&gt;&lt;strong&gt;无 bank conflict&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_no_conflict.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_no_conflict.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;无 bank conflict&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;无 bank conflict&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;array[threadIdx.x]：32 个线程访问连续的 32 个 32-bit 字。同一时刻，32 个 bank 各被访问一次，一次即可完成，是最理想的访问模式。&lt;/p&gt;
+&lt;h4 id=&#34;2-路冲突&#34;&gt;&lt;strong&gt;2 路冲突&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_conflict_2way.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_conflict_2way.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;2 路 bank conflict&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;2 路 bank conflict&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;array[threadIdx.x * 2]：每隔一个 32-bit 字访问。线程 0 访问字 0，在 bank 0；线程 16 访问字 32，也是 bank 0，发生 2 路冲突。bank 的访问拆成 2 次串行，吞吐减半，一半的 bank 全程闲置。&lt;/p&gt;
+&lt;h4 id=&#34;32-路冲突&#34;&gt;&lt;strong&gt;32 路冲突&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_conflict_32way.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_conflict_32way.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;32 路 bank conflict&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;32 路 bank conflict&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;array[threadIdx.x * 32]：每隔 32 个 32-bit 字访问。所有 32 个线程都撞在 bank 0 上，而地址各不相同，发生 32 路冲突。bank 的访问拆成 32 次串行，吞吐慢 32 倍，这是最糟的情况。&lt;/p&gt;
+&lt;p&gt;面对这种场景，最常见的优化手段为 padding。把 array[32][32] 改成 array[32][33]，每行错开一个 32-bit 字，列访问就自然分散到不同 bank。于是按列访问 array[threadIdx.x][k] 时（k 固定），跨行取同一列，如下图所示。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_conflict_padding.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/bank_conflict_padding.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;padding 消除 bank conflict&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;padding 消除 bank conflict&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h4 id=&#34;冲突路数计算&#34;&gt;&lt;strong&gt;冲突路数计算&lt;/strong&gt;&lt;/h4&gt;
+&lt;h5 id=&#34;每元素占用字节数--4&#34;&gt;&lt;strong&gt;每元素占用字节数 &amp;lt; 4&lt;/strong&gt;&lt;/h5&gt;
+&lt;p&gt;char、short 这种数据类型，多个线程会落在同一个 32-bit 字内，触发的是广播而不是冲突。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;字节步长 = 下标步长 × 每元素占的字节数&lt;/li&gt;
+&lt;li&gt;字节步长 &amp;lt; 4，无冲突；字节步长 ≥ 4，冲突路数 =  gcd(字节步长 / 4, 32)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h5 id=&#34;每元素占用字节数--4-1&#34;&gt;&lt;strong&gt;每元素占用字节数 ≥ 4&lt;/strong&gt;&lt;/h5&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;wavefront = ceil(32 × 每元素占的字节数  / 128)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;wavefront：共享内存单元把一条访存指令拆成的一次内部处理批次&lt;/li&gt;
+&lt;li&gt;一个 warp 有 32 个线程&lt;/li&gt;
+&lt;li&gt;一个 bank 返回 4 字节，32 个 bank，每周期最多能返回 128 字节&lt;/li&gt;
+&lt;li&gt;ceil(这条指令一共要搬多少字节 / 每周期能搬多少字节)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;每个 wavefront 内的线程数 = 32 / wavefront&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一个 warp 的 32 个线程，被平均分到 W 个 wavefront 里，求出每个 wavefront 摊到多少个线程&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;冲突路数 ＝ gcd(元素的下标步长, 每个 wavefront 内的线程数)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;下标步长就是代码方括号里的那个乘数，&lt;strong&gt;不乘字节数&lt;/strong&gt;。元素宽度的影响已经在第 1 步用过一次，再乘一次就是重复计算&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;实际需要的总周期数：wavefront * 冲突路数&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;同一个 wavefront 内部并行，不同 wavefront 之间串行&lt;/li&gt;
+&lt;li&gt;每个 wavefront 拆分成 冲突路数 个周期&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;数据类型&lt;/th&gt;
+					&lt;th&gt;每元素占的字节数&lt;/th&gt;
+					&lt;th&gt;wavefront&lt;/th&gt;
+					&lt;th&gt;每个 wavefront 内的线程数&lt;/th&gt;
+					&lt;th&gt;下标步长&lt;/th&gt;
+					&lt;th&gt;冲突路数&lt;/th&gt;
+					&lt;th&gt;说明&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;char&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x] 为 1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;1. 无冲突：多个线程落在同一个 32-bit 字内&lt;br&gt;  2. 广播：落在同一个 bank 的同一个字，一次读出即可满足&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;char&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x * 3] 为 3&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;字节步长 3 &amp;lt; 4，相邻线程常落在同一个字里，广播，无冲突&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;short&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x] 为 1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;同上&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;short&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x * 3] 为 3&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;同上&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;float&lt;/td&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x] 为 1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;无冲突&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;float&lt;/td&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x * 2] 为 2&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;2 路冲突，吞吐减半&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;double&lt;/td&gt;
+					&lt;td&gt;8&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;16&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x] 为 1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;无冲突。拆 2 个 wavefront 是 128 字节 / 周期返回带宽所致，不是 bank conflict&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;double&lt;/td&gt;
+					&lt;td&gt;8&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;16&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x * 2] 为 2&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;2 路冲突，吞吐减半&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;float4&lt;/td&gt;
+					&lt;td&gt;16&lt;/td&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;8&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x] 为 1&lt;/td&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;无冲突。向量化访问通常是推荐做法&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;float4&lt;/td&gt;
+					&lt;td&gt;16&lt;/td&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;8&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x * 2] 为 2&lt;/td&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;总周期 4 × 2 ＝ 8，其中 4 个是带宽必需，另 4 个是冲突浪费，可用 padding 消除&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;float4&lt;/td&gt;
+					&lt;td&gt;16&lt;/td&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;8&lt;/td&gt;
+					&lt;td&gt;array[threadIdx.x * 4] 为 4&lt;/td&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;4 路冲突，吞吐降至 1/4&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;strong&gt;wavefront 只随数据类型变，冲突路数只随下标步长变&lt;/strong&gt;。数据类型本身不制造 bank conflict，宽类型带来的是 wavefront 增多，这是 128 字节 / 周期返回带宽的物理限制。真正能优化的是步长造成的冲突路数。因此&lt;strong&gt;任何数据类型，连续访问（步长为 1）都不会发生 bank conflict&lt;/strong&gt;。&lt;/p&gt;
+&lt;h2 id=&#34;全局内存&#34;&gt;&lt;strong&gt;全局内存&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/global_mem_access_path.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/global_mem_access_path.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;全局内存的访存路径&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;全局内存的访存路径&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;一个 warp 的 32 个线程同时访问全局内存时，LD/ST 单元会把这 32 个地址 合并成尽量少的内存事务，然后发往 L1 / L2 缓存层级，若命中则返回，未命中则最终到达显存。这个合并成尽量少的内存事务，称之为&lt;strong&gt;合并访存 Coalescing。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;内存事务 Memory Transaction，是硬件访问显存的最小搬运单位，一次只能是 32、64 或 128 字节。即使线程只要 4 字节，硬件也必须搬回一整个事务。&lt;/p&gt;
+&lt;p&gt;事务的起始地址必须是自身大小的整倍数，比如 128 字节的事务，只能从 0、128、256 … 开始，不能从 4 或 100 开始。如果地址稍有错位，就可能多触发一个事务。&lt;/p&gt;
+&lt;p&gt;因此，内存访问优化的关键有两个，内存事务的数量和缓存命中率。&lt;/p&gt;
+&lt;h3 id=&#34;连续访问发起的内存事务&#34;&gt;&lt;strong&gt;连续访问发起的内存事务&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/mem_txn_coalesced.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/mem_txn_coalesced.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;连续访问发起的内存事务&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;连续访问发起的内存事务&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;以 128 字节的内存事务为例（实际硬件会根据访问宽度与分布选用 32 / 64 / 128 字节事务），访问 global_data[i]。32 个线程访问连续的 32 个 float，合计 128 字节，恰好等于一个事务的大小且自然对齐。LD/ST 单元只需发起 1 个事务，搬回的 128 字节全部有用，是最理想的访问模式，带宽利用率 100%。&lt;/p&gt;
+&lt;h3 id=&#34;跨步访问发起的内存事务&#34;&gt;&lt;strong&gt;跨步访问发起的内存事务&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/mem_txn_strided.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/mem_txn_strided.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;跨步访问发起的内存事务&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;跨步访问发起的内存事务&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;以 128 字节的内存事务为例，访问 global_data[i * 2]。线程访问 global_data[0]、global_data[2]、global_data[4]…… 跨度 8 字节，32 个地址横跨 2 个事务段。需要 2 个事务搬回 256 字节，其中只有 128 字节有用，另 128 字节（红色部分）白搬，一半的带宽被浪费。&lt;/p&gt;
+&lt;p&gt;更极端的，访问 global_data[i * 32]，需要 32 个事务搬回 4096 字节，而真正要用的只有 128 字节。带宽利用率仅 3%，等于浪费了 97% 的显存带宽。&lt;/p&gt;
+&lt;h3 id=&#34;起点错位访问发起的内存事务&#34;&gt;&lt;strong&gt;起点错位访问发起的内存事务&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/mem_txn_misaligned.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/mem_txn_misaligned.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;起点错位访问发起的内存事务&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;起点错位访问发起的内存事务&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;以 128 字节的内存事务为例，访问 global_data[i + 1]。访问 global_data[1] 到 global_data[32]，数据依然连续，合计也是 128 字节。但起点在字节 4，不是 128 的整数倍，违反了自然对齐要求，于是这段数据横跨两个事务段。需要 2 个事务，带宽利用率降到 50%。&lt;/p&gt;
+&lt;h3 id=&#34;优化合并访存&#34;&gt;&lt;strong&gt;优化合并访存&lt;/strong&gt;&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;让相邻线程访问相邻数据&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;int i = blockIdx.x * blockDim.x + threadIdx.x;
+float v = data[i];        // ✓ 相邻线程访问相邻地址
+float v = data[i * 32];   // ✗ 地址分散，事务暴增
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;用 SoA 替代 AoS&lt;/li&gt;
+&lt;/ol&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;// AoS 结构体数组
+// AoS：访问 p[i].x 时，相邻线程地址相差 12 字节 ✗
+struct { float x, y, z; } p[N];
+
+// SoA 数组的结构体
+// SoA：访问 x[i] 时，相邻线程地址相差 4 字节 ✓
+struct { float x[N], y[N], z[N]; } p;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;
+&lt;p&gt;保证起始地址对齐&lt;/p&gt;
+&lt;p&gt;cudaMalloc 返回的指针天然按 256 字节对齐，自行偏移后可能破坏对齐。二维数组建议用 cudaMallocPitch，它会自动补齐每行的宽度。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
         <title>CUDA 中的线程组织</title>
         <link>http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E7%BB%84%E7%BB%87/</link>
         <pubDate>Wed, 16 Sep 2026 11:37:07 +0800</pubDate>
@@ -507,94 +1120,6 @@
     &gt;CUDA C++ Programming Guide&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;《NVIDIA H100 Tensor Core GPU Architecture Whitepaper》：本文 GPU 硬件结构与 SM 架构两节的 Figure 6、Figure 7 均出自该白皮书&lt;/li&gt;
 &lt;/ul&gt;
-</description>
-        </item>
-        <item>
-        <title>数据结构与算法总览</title>
-        <link>http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
-        <pubDate>Thu, 24 Aug 2023 13:28:17 +0800</pubDate>
-        
-        <guid>http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</guid>
-        <description>&lt;p&gt;&lt;figure 
-	&gt;
-	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/best.jpg&#34; &gt;
-		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/best.jpg&#34;
-			
-			
-			
-			loading=&#34;lazy&#34;
-			alt=&#34;BE BEST&#34;
-			width=&#34;85%&#34;&gt;
-	&lt;/a&gt;
-	
-	&lt;figcaption&gt;BE BEST&lt;/figcaption&gt;
-	
-&lt;/figure&gt;&lt;/p&gt;
-&lt;h2 id=&#34;思维导图&#34;&gt;思维导图&lt;/h2&gt;
-&lt;p&gt;&lt;figure 
-	&gt;
-	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/all.png&#34; &gt;
-		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/algorithm/img/all.png&#34;
-			
-			
-			
-			loading=&#34;lazy&#34;
-			alt=&#34;数据结构与算法总览&#34;
-			width=&#34;85%&#34;&gt;
-	&lt;/a&gt;
-	
-	&lt;figcaption&gt;数据结构与算法总览&lt;/figcaption&gt;
-	
-&lt;/figure&gt;&lt;/p&gt;
-&lt;h2 id=&#34;文章列表&#34;&gt;文章列表&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;如何学习算法&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;数据结构&lt;/a&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%80%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%95%B0%E7%BB%84%E9%93%BE%E8%A1%A8/&#34; &gt;线性表 - 数组、链表&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%8C%E7%BA%BF%E6%80%A7%E8%A1%A8-%E6%A0%88%E9%98%9F%E5%88%97/&#34; &gt;线性表 - 栈、队列&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%89%E6%A0%91-%E4%BA%8C%E5%8F%89%E6%A0%91%E9%80%92%E5%BD%92%E6%A0%91/&#34; &gt;树 — 二叉树、递归树&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%9B%9B%E6%A0%91-%E7%BA%A2%E9%BB%91%E6%A0%91%E5%A0%86/&#34; &gt;树 — 红黑树、堆&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BA%94%E6%A0%91-b-%E6%A0%91/&#34; &gt;树 — B+树&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AD%E5%9B%BE/&#34; &gt;图&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%83%E5%9B%BE%E7%9A%84%E6%90%9C%E7%B4%A2/&#34; &gt;图的搜索&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%AB%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84%E5%85%B6%E5%AE%83%E7%AE%97%E6%B3%95/&#34; &gt;基于图的其它算法&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B9%9D%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D/&#34; &gt;字符串匹配&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%8D%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9B%B8%E4%BC%BC%E5%BA%A6/&#34; &gt;字符串相似度&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;常见类型&lt;/a&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%80%E6%8E%92%E5%BA%8F/&#34; &gt;排序&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%8C%E6%8E%92%E5%BA%8F-on2%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F/&#34; &gt;O(n^2)：冒泡排序、插入排序、选择排序&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%89%E6%8E%92%E5%BA%8F-onlogn%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E5%A0%86%E6%8E%92%E5%BA%8F/&#34; &gt;O(nlogn)：归并排序、快速排序、堆排序&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%9B%9B%E6%8E%92%E5%BA%8F-on%E6%A1%B6%E6%8E%92%E5%BA%8F%E8%AE%A1%E6%95%B0%E6%8E%92%E5%BA%8F%E5%9F%BA%E6%95%B0%E6%8E%92%E5%BA%8F/&#34; &gt;O(n)：桶排序、计数排序、基数排序&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%BA%94%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E5%AF%B9%E6%AF%94/&#34; &gt;排序算法对比&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AD%E6%9F%A5%E6%89%BE/&#34; &gt;查找&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B8%83%E8%BF%87%E6%BB%A4/&#34; &gt;过滤&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E5%85%AB%E7%9B%B8%E4%BC%BC/&#34; &gt;相似&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B%E4%B9%9D%E5%9F%BA%E6%9C%AC%E7%AE%97%E6%B3%95%E6%80%9D%E6%83%B3/&#34; &gt;基本算法思想&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%A6%82%E4%BD%95%E5%AD%A6%E4%B9%A0%E7%AE%97%E6%B3%95/&#34; &gt;常见应用&lt;/a&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%80%E7%B4%A2%E5%BC%95%E5%BA%95%E5%B1%82%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/&#34; &gt;索引底层的数据结构&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%8Credis-%E5%B8%B8%E7%94%A8%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/&#34; &gt;Redis 常用数据类型对应的数据结构&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%B8%89%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8E/&#34; &gt;搜索引擎&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%9B%9Bdisruptor-%E5%86%85%E5%AD%98%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/&#34; &gt;Disruptor 内存消息队列&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E4%BA%94%E9%89%B4%E6%9D%83%E4%B8%8E%E9%99%90%E6%B5%81/&#34; &gt;鉴权与限流&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8%E5%85%AD%E7%9F%AD%E7%BD%91%E5%9D%80%E6%9C%8D%E5%8A%A1/&#34; &gt;短网址服务&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;打赏&#34;&gt;打赏&lt;/h2&gt;
-&lt;p&gt;请我喝杯奶茶吧～&lt;/p&gt;
-&lt;table&gt;
-    &lt;tr&gt;
-        &lt;td &gt;&lt;center&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/dev/payment_img/wechat.jpg&#34; width=&#34;300&#34; height=&#34;240&#34; &gt;&lt;/center&gt;&lt;/td&gt;
-        &lt;td &gt;&lt;center&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/dev/payment_img/alipay.jpg&#34; width=&#34;300&#34; height=&#34;240&#34; &gt;&lt;/center&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-&lt;/table&gt;
 </description>
         </item>
         <item>
