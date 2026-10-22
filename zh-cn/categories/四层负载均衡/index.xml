@@ -2130,22 +2130,6 @@ struct { float x[N], y[N], z[N]; } p;
 </description>
         </item>
         <item>
-        <title>快速理解网络协议（八）IPv6</title>
-        <link>https://boxtsecond.github.io/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ABipv6/</link>
-        <pubDate>Tue, 02 Jan 2024 22:24:58 +0800</pubDate>
-        
-        <guid>https://boxtsecond.github.io/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E5%85%ABipv6/</guid>
-        <description>&lt;h2 id=&#34;本文概览&#34;&gt;&lt;strong&gt;本文概览&lt;/strong&gt;&lt;/h2&gt;
-&lt;h2 id=&#34;ipv6&#34;&gt;&lt;strong&gt;IPv6&lt;/strong&gt;&lt;/h2&gt;
-&lt;h3 id=&#34;ipv6-&#34;&gt;**IPv6 **&lt;/h3&gt;
-&lt;h3 id=&#34;ipv6-数据包格式&#34;&gt;&lt;strong&gt;IPv6 数据包格式&lt;/strong&gt;&lt;/h3&gt;
-&lt;h3 id=&#34;ipv6-实现分片&#34;&gt;&lt;strong&gt;IPv6 实现分片&lt;/strong&gt;&lt;/h3&gt;
-&lt;h3 id=&#34;ipv6-实现路由&#34;&gt;&lt;strong&gt;IPv6 实现路由&lt;/strong&gt;&lt;/h3&gt;
-&lt;h2 id=&#34;ipv4-抓包实践&#34;&gt;&lt;strong&gt;IPv4 抓包实践&lt;/strong&gt;&lt;/h2&gt;
-&lt;h2 id=&#34;ipv6-抓包实践&#34;&gt;&lt;strong&gt;IPv6 抓包实践&lt;/strong&gt;&lt;/h2&gt;
-</description>
-        </item>
-        <item>
         <title>快速理解网络协议（七）IP 协议</title>
         <link>https://boxtsecond.github.io/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/</link>
         <pubDate>Mon, 18 Dec 2023 15:08:36 +0800</pubDate>
