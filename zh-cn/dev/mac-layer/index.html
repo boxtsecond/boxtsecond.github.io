@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 本文概览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1
 物理层，顾名思义，表示实际的物理链接。物理层利用物理传输介质为通信的两端建立链接，实现比特流的传输，如铜线、光缆或无线通道，保证比特流正确的传输到对端。常见设备包括中继器、集线器等。其中集线器 Hub，完全在物理层工作，会将自己收到的每一个字节，都复制到其他端口上去，即广播模式。
 '><title>快速理解网络协议（三）MAC 层</title>
 
-<link rel='canonical' href='http://localhost:1313/zh-cn/dev/mac-layer/'>
+<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/dev/mac-layer/'>
 
 <link rel="stylesheet" href="/scss/style.min.88c42b700e80a7b6552d5cf00c9d07979233c285b9340c0684c1b25525e6cd01.css"><meta property='og:title' content='快速理解网络协议（三）MAC 层'>
 <meta property='og:description' content='本文概览 本文概览 物理层 Physical Layer 虽然 TCP/IP 模型不涉及硬件设备所在的物理层，但还是在这里简单介绍下物理层。1
 物理层，顾名思义，表示实际的物理链接。物理层利用物理传输介质为通信的两端建立链接，实现比特流的传输，如铜线、光缆或无线通道，保证比特流正确的传输到对端。常见设备包括中继器、集线器等。其中集线器 Hub，完全在物理层工作，会将自己收到的每一个字节，都复制到其他端口上去，即广播模式。
 '>
-<meta property='og:url' content='http://localhost:1313/zh-cn/dev/mac-layer/'>
+<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/dev/mac-layer/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-08-23T17:16:32&#43;08:00'/><meta property='article:modified_time' content='2023-08-23T17:16:32&#43;08:00'/>
 <meta name="twitter:title" content="快速理解网络协议（三）MAC 层">
@@ -82,7 +82,7 @@
 ">
     
 <div id="article-toolbar">
-    <a href="http://localhost:1313/" class="back-home">
+    <a href="https://boxtsecond.github.io/" class="back-home">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
   <polyline points="15 6 9 12 15 18" />
@@ -524,7 +524,7 @@
 <p>在网络通信中，使用 MAC 地址直接进行通信是不可行的，我们借助 IP 地址作为中间桥梁来实现通信。在局域网中，知道了要发送的 IP 地址，该如何获得目标设备的 MAC 地址呢？</p>
 <p>每个设备的网卡的 MAC 地址都是固定的，我们可以手动一个个添加局域网中其他设备的 MAC 地址，随着局域网中的主机越来越多，这种方式难以为继。我们需要自动获取、更新和维护各个设备的 MAC 地址，这就是 Address Resolution Protocol。</p>
 <p><strong>ARP 协议，工作在 MAC 层，用于获得已知 IP 地址的 MAC 地址</strong>。而手动配置 MAC 地址的方式，一般是出于安全考虑，为了防止非法用户访问，由网络管理员手动在 MAC 地址表中添加合法用户的 MAC 地址表项，当手动配置的数量比较大时，难以人工维护，可以使用端口安全功能实现 MAC 地址和接口的动态绑定。</p>
-<p>具体的 ARP 协议内容，查看<a class="link" href="http://localhost:1313/zh-cn/dev/arp-rarp/" ><strong>快速理解网络协议（四）ARP、RARP 协议</strong></a>。</p>
+<p>具体的 ARP 协议内容，查看<a class="link" href="https://boxtsecond.github.io/zh-cn/dev/arp-rarp/" ><strong>快速理解网络协议（四）ARP、RARP 协议</strong></a>。</p>
 <h3 id="mac-层的传输单位-frame"><strong>MAC 层的传输单位 Frame</strong></h3>
 <p><strong>以太网帧 Ethernet frame 是 MAC 层传输数据的基本单位</strong>。其中 MAC 头部包含 目标 MAC 地址、源 MAC 地址 和 类型。类型标识了传输数据的封装协议<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>。常见的类型有，0x0800 表示 IPv4 数据报，0x0806 表示 ARP 数据报，0x86DD 表示 IPv6 数据报<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup>。</p>
 <p><figure 
@@ -794,7 +794,7 @@
             2023 - 
         
         2026 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-        共书写了90.1k字·共 48篇文章</br><span><p>
+        共书写了90.8k字·共 48篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -982,13 +982,13 @@ document.getElementById('days').innerHTML = number_of_days;
     <h3 class="widget-title"> </h3>
     <div class="widget-body">
         <div class="category-list">
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">CUDA 编程<span class="category-list-count">3</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">CUDA 编程<span class="category-list-count">3</a>
             </span></div>
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
             </span></div>
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
             </span></div>
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
             </span></div>
         </div>
     </div>

@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-cn">
-    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+    <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='本文概览 本文概览 IP 协议 Internet Protocol，工作在网络层。网络层将数据从一台计算机传输到另一台计算机，即使该计算机位于远程网络上，而数据链路层仅处理本地的设备。IP 协议的核心目标是实现分组交换（packet-switched）网络中的数据传输。为了实现此目标，IP 协议需要提供寻址、封装和路由的功能。
 '><title>快速理解网络协议（七）IP 协议</title>
 
-<link rel='canonical' href='http://localhost:1313/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/'>
+<link rel='canonical' href='https://boxtsecond.github.io/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/'>
 
 <link rel="stylesheet" href="/scss/style.min.88c42b700e80a7b6552d5cf00c9d07979233c285b9340c0684c1b25525e6cd01.css"><meta property='og:title' content='快速理解网络协议（七）IP 协议'>
 <meta property='og:description' content='本文概览 本文概览 IP 协议 Internet Protocol，工作在网络层。网络层将数据从一台计算机传输到另一台计算机，即使该计算机位于远程网络上，而数据链路层仅处理本地的设备。IP 协议的核心目标是实现分组交换（packet-switched）网络中的数据传输。为了实现此目标，IP 协议需要提供寻址、封装和路由的功能。
 '>
-<meta property='og:url' content='http://localhost:1313/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/'>
+<meta property='og:url' content='https://boxtsecond.github.io/zh-cn/dev/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E4%B8%83ip-%E5%8D%8F%E8%AE%AE/'>
 <meta property='og:site_name' content='Bo&#39;s Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='网络协议' /><meta property='article:published_time' content='2023-12-18T15:08:36&#43;08:00'/><meta property='article:modified_time' content='2023-12-18T15:08:36&#43;08:00'/>
 <meta name="twitter:title" content="快速理解网络协议（七）IP 协议">
@@ -79,7 +79,7 @@
 ">
     
 <div id="article-toolbar">
-    <a href="http://localhost:1313/" class="back-home">
+    <a href="https://boxtsecond.github.io/" class="back-home">
         <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
   <polyline points="15 6 9 12 15 18" />
@@ -495,7 +495,7 @@
 <h3 id="解决寻址"><strong>解决“寻址”</strong></h3>
 <p>网络层需要提供给传输层一个统一的网络地址，即使在局域网和广域网之间也是如此，这个统一的网络地址就是 IP 地址。IP 协议借助 IP 地址完成寻址和路由的功能。需要注意的是，每个网络设备都可能有多个 IP 地址，所以“寻址”寻的是网络接口，即 <strong>Addressing host interfaces</strong>，而不是某一设备 <strong>Addressing host</strong>。</p>
 <h4 id="网络层寻址-vs-数据链路层寻址"><strong>网络层“寻址” VS 数据链路层“寻址”</strong></h4>
-<p>在<a class="link" href="http://localhost:1313/zh-cn/dev/mac-layer/#解决寻址问题" ><strong>快速理解网络协议（三）MAC 层</strong></a>中我们提到<strong>数据链路层通过 MAC 地址来解决寻址的问题</strong>。那么在网络层的“寻址”和数据链路层的“寻址”有什么区别？</p>
+<p>在<a class="link" href="https://boxtsecond.github.io/zh-cn/dev/mac-layer/#解决寻址问题" ><strong>快速理解网络协议（三）MAC 层</strong></a>中我们提到<strong>数据链路层通过 MAC 地址来解决寻址的问题</strong>。那么在网络层的“寻址”和数据链路层的“寻址”有什么区别？</p>
 <ol>
 <li>适用的网络范围不同
 <ul>
@@ -516,7 +516,7 @@
 <ol>
 <li>
 <p><strong>解析目标 IP 地址</strong></p>
-<p>通过 IP 地址的网络号部分，判定源 IP 地址和目标 IP 地址是否同属于一个网络。若属于同一个网络，则直接发送至目标设备。（<em>详情参见<a class="link" href="http://localhost:1313/zh-cn/dev/arp-rarp/" ><strong>快速理解网络协议（四）ARP、RARP 协议</strong></a></em>）</p>
+<p>通过 IP 地址的网络号部分，判定源 IP 地址和目标 IP 地址是否同属于一个网络。若属于同一个网络，则直接发送至目标设备。（<em>详情参见<a class="link" href="https://boxtsecond.github.io/zh-cn/dev/arp-rarp/" ><strong>快速理解网络协议（四）ARP、RARP 协议</strong></a></em>）</p>
 </li>
 <li>
 <p><strong>查找路由表</strong></p>
@@ -624,7 +624,7 @@
 			</tr>
 	</tbody>
 </table></div>
-<p>IP 地址 CIDR 详解查看：<a class="link" href="http://localhost:1313/zh-cn/dev/ip-mac-address/" ><strong>快速理解网络协议（一） IP 地址、MAC 地址</strong></a></p>
+<p>IP 地址 CIDR 详解查看：<a class="link" href="https://boxtsecond.github.io/zh-cn/dev/ip-mac-address/" ><strong>快速理解网络协议（一） IP 地址、MAC 地址</strong></a></p>
 <h2 id="ipv4"><strong>IPv4</strong></h2>
 <p>IPv4（Internet Protocol version 4）是 IP 协议的第四个版本。IP 数据包由包头部分和数据部分组成。</p>
 <h3 id="ipv4-数据包格式"><strong>IPv4 数据包格式</strong></h3>
@@ -910,7 +910,7 @@
             2023 - 
         
         2026 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
-        共书写了90.1k字·共 48篇文章</br><span><p>
+        共书写了90.8k字·共 48篇文章</br><span><p>
     </section>
     
     <section class="powerby">
@@ -1104,13 +1104,13 @@ document.getElementById('days').innerHTML = number_of_days;
     <h3 class="widget-title"> </h3>
     <div class="widget-body">
         <div class="category-list">
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">CUDA 编程<span class="category-list-count">3</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">CUDA 编程<span class="category-list-count">3</a>
             </span></div>
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
             </span></div>
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
             </span></div>
-            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            <div class="category-list-item"><a href="https://boxtsecond.github.io/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
             </span></div>
         </div>
     </div>

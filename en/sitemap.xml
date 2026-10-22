@@ -2,92 +2,92 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/en/p/about-me/</loc>
+    <loc>https://boxtsecond.github.io/en/p/about-me/</loc>
     <lastmod>2023-08-23T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/about-me/"
+                href="https://boxtsecond.github.io/en/p/about-me/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/%E5%85%B3%E4%BA%8E/"
+                href="https://boxtsecond.github.io/zh-cn/p/%E5%85%B3%E4%BA%8E/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/</loc>
+    <loc>https://boxtsecond.github.io/en/</loc>
     <lastmod>2023-08-23T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/"
+                href="https://boxtsecond.github.io/zh-cn/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/"
+                href="https://boxtsecond.github.io/en/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/page/</loc>
+    <loc>https://boxtsecond.github.io/en/page/</loc>
     <lastmod>2023-08-23T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/page/"
+                href="https://boxtsecond.github.io/en/page/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/page/"
+                href="https://boxtsecond.github.io/zh-cn/page/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/p/archives/</loc>
+    <loc>https://boxtsecond.github.io/en/p/archives/</loc>
     <lastmod>2023-05-28T00:00:00+00:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/archives/"
+                href="https://boxtsecond.github.io/en/p/archives/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/archives/"
+                href="https://boxtsecond.github.io/zh-cn/p/archives/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/categories/</loc>
+    <loc>https://boxtsecond.github.io/en/categories/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/categories/"
+                href="https://boxtsecond.github.io/zh-cn/categories/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/categories/"
+                href="https://boxtsecond.github.io/en/categories/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/p/search/</loc>
+    <loc>https://boxtsecond.github.io/en/p/search/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/p/search/"
+                href="https://boxtsecond.github.io/en/p/search/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/p/search/"
+                href="https://boxtsecond.github.io/zh-cn/p/search/"
                 />
   </url><url>
-    <loc>http://localhost:1313/en/tags/</loc>
+    <loc>https://boxtsecond.github.io/en/tags/</loc>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
-                href="http://localhost:1313/zh-cn/tags/"
+                href="https://boxtsecond.github.io/zh-cn/tags/"
                 />
     <xhtml:link
                 rel="alternate"
                 hreflang="en"
-                href="http://localhost:1313/en/tags/"
+                href="https://boxtsecond.github.io/en/tags/"
                 />
   </url>
 </urlset>
