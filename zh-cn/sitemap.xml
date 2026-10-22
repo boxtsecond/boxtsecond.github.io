@@ -6,7 +6,7 @@
     <lastmod>2023-08-24T13:28:17+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/zh-cn/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -19,7 +19,7 @@
                 />
   </url><url>
     <loc>http://localhost:1313/zh-cn/categories/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -32,22 +32,22 @@
                 />
   </url><url>
     <loc>http://localhost:1313/zh-cn/tags/cuda/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <loc>http://localhost:1313/zh-cn/dev/cuda-%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/</loc>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/zh-cn/dev/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/zh-cn/tags/gpu/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/zh-cn/tags/</loc>
-    <lastmod>2026-09-23T11:12:04+08:00</lastmod>
+    <lastmod>2026-10-22T19:13:16+08:00</lastmod>
     <xhtml:link
                 rel="alternate"
                 hreflang="zh-cn"
@@ -58,6 +58,9 @@
                 hreflang="en"
                 href="http://localhost:1313/en/tags/"
                 />
+  </url><url>
+    <loc>http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/</loc>
+    <lastmod>2026-10-22T15:58:30+08:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E7%BB%84%E7%BB%87/</loc>
     <lastmod>2026-09-16T11:37:07+08:00</lastmod>

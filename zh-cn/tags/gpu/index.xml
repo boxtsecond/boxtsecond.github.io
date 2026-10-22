@@ -6,7 +6,7 @@
         <description>Recent content in GPU on Bo&#39;s Blog</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>zh-cn</language>
-        <lastBuildDate>Wed, 23 Sep 2026 11:12:04 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/gpu/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Thu, 22 Oct 2026 19:13:16 +0800</lastBuildDate><atom:link href="http://localhost:1313/zh-cn/tags/gpu/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>数据结构与算法总览</title>
         <link>http://localhost:1313/zh-cn/dev/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E6%80%BB%E8%A7%88/</link>
         <pubDate>Thu, 24 Aug 2023 13:28:17 +0800</pubDate>
@@ -92,6 +92,836 @@
         &lt;td &gt;&lt;center&gt;&lt;img src=&#34;http://localhost:1313/zh-cn/dev/payment_img/alipay.jpg&#34; width=&#34;300&#34; height=&#34;240&#34; &gt;&lt;/center&gt;&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/table&gt;
+</description>
+        </item>
+        <item>
+        <title>CUDA 内存优化实践</title>
+        <link>http://localhost:1313/zh-cn/dev/cuda-%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/</link>
+        <pubDate>Thu, 22 Oct 2026 19:13:16 +0800</pubDate>
+        
+        <guid>http://localhost:1313/zh-cn/dev/cuda-%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/</guid>
+        <description>&lt;h2 id=&#34;前置说明&#34;&gt;&lt;strong&gt;前置说明&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;GPU 程序的性能问题可能出在不同层级，简要概括如下&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;序号&lt;/th&gt;
+					&lt;th&gt;层次&lt;/th&gt;
+					&lt;th&gt;典型问题&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;1&lt;/td&gt;
+					&lt;td&gt;host 与 device 之间&lt;/td&gt;
+					&lt;td&gt;H2D/D2H 拷贝、pinned memory、stream 重叠&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;2&lt;/td&gt;
+					&lt;td&gt;kernel 之间&lt;/td&gt;
+					&lt;td&gt;launch 开销、kernel 融合、CUDA Graph&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;3&lt;/td&gt;
+					&lt;td&gt;单个 kernel 内部的访存&lt;/td&gt;
+					&lt;td&gt;合并访存、内存事务粒度、bank conflict&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;4&lt;/td&gt;
+					&lt;td&gt;单个 kernel 内部的计算&lt;/td&gt;
+					&lt;td&gt;指令吞吐、occupancy、Tensor Core 利用率&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;5&lt;/td&gt;
+					&lt;td&gt;device 之间&lt;/td&gt;
+					&lt;td&gt;NVLink、P2P、NCCL&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;本次的所有内存优化实践，都是单个 kernel 内部的访存（memory access）行为，范围不超过一个 device。&lt;/p&gt;
+&lt;p&gt;理论知识参考：&lt;a class=&#34;link&#34; href=&#34;http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/&#34; &gt;CUDA 中的内存组织&lt;/a&gt; ，这里不再赘述，仅关注实验验证。&lt;/p&gt;
+&lt;h2 id=&#34;环境参数查询&#34;&gt;&lt;strong&gt;环境参数查询&lt;/strong&gt;&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;参数&lt;/th&gt;
+					&lt;th&gt;结果&lt;/th&gt;
+					&lt;th&gt;命令&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;GPU 型号&lt;/td&gt;
+					&lt;td&gt;NVIDIA H200&lt;/td&gt;
+					&lt;td&gt;nvidia-smi -q -i 0&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;NVIDIA 驱动&lt;/td&gt;
+					&lt;td&gt;550.127.08&lt;/td&gt;
+					&lt;td&gt;nvidia-smi -q -i 0&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;架构 / 计算能力&lt;/td&gt;
+					&lt;td&gt;Hopper / 9.0&lt;/td&gt;
+					&lt;td&gt;nvidia-smi -q -i 0&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;CUDA 可见显存&lt;/td&gt;
+					&lt;td&gt;143072 MB&lt;/td&gt;
+					&lt;td&gt;{CUDA 安装路径}/extras/demo_suite/deviceQuery&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;L2 cache&lt;/td&gt;
+					&lt;td&gt;60 MiB&lt;/td&gt;
+					&lt;td&gt;{CUDA 安装路径}/extras/demo_suite/deviceQuery&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;SM 数量&lt;/td&gt;
+					&lt;td&gt;132&lt;/td&gt;
+					&lt;td&gt;{CUDA 安装路径}/extras/demo_suite/deviceQuery&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Warp size&lt;/td&gt;
+					&lt;td&gt;32&lt;/td&gt;
+					&lt;td&gt;{CUDA 安装路径}/extras/demo_suite/deviceQuery&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;每 block 最大线程数&lt;/td&gt;
+					&lt;td&gt;1024&lt;/td&gt;
+					&lt;td&gt;{CUDA 安装路径}/extras/demo_suite/deviceQuery&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;每 block 默认 shared memory 上限&lt;/td&gt;
+					&lt;td&gt;48 KB&lt;/td&gt;
+					&lt;td&gt;{CUDA 安装路径}/extras/demo_suite/deviceQuery&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;操作系统&lt;/td&gt;
+					&lt;td&gt;Ubuntu 22.04.5 LTS&lt;/td&gt;
+					&lt;td&gt;grep &amp;lsquo;^PRETTY_NAME=&amp;rsquo; /etc/os-release&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;GCC / G++&lt;/td&gt;
+					&lt;td&gt;11.4.0&lt;/td&gt;
+					&lt;td&gt;g++ &amp;ndash;version&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;CUDA / NVCC&lt;/td&gt;
+					&lt;td&gt;12.4 / 12.4.131&lt;/td&gt;
+					&lt;td&gt;nvcc &amp;ndash;version&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Nsight Compute&lt;/td&gt;
+					&lt;td&gt;2024.1.1.0&lt;/td&gt;
+					&lt;td&gt;ncu &amp;ndash;version&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;Compute Sanitizer&lt;/td&gt;
+					&lt;td&gt;2024.1.1.0&lt;/td&gt;
+					&lt;td&gt;compute-sanitizer &amp;ndash;version&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;H200 官方规格详见：&lt;a class=&#34;link&#34; href=&#34;https://www.nvidia.com/en-us/data-center/h200/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://www.nvidia.com/en-us/data-center/h200/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;根据当前环境参数信息，我们可以计算出，理论上最多可同时驻留的 CUDA 线程数：2048 线程/SM × 132 SM = 270336，大约是 27 万。&lt;/p&gt;
+&lt;p&gt;实际驻留的 CUDA 线程数量取决于 kernel 的资源占用和启动配置，驻留线程不一定都在同一时刻执行指令。同时，一次 kernel 启动的总线程数可以远超过这个上限。&lt;/p&gt;
+&lt;h3 id=&#34;cuda-设备参数查询&#34;&gt;&lt;strong&gt;CUDA 设备参数查询&lt;/strong&gt;&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;/usr/local/cuda/extras/demo_suite/deviceQuery | awk &#39;
+  /^Device [0-9]+:/ { print }
+  /CUDA Driver Version|CUDA Capability|Total amount of global memory|L2 Cache Size|Total amount of shared memory per block|Warp size|Maximum number of threads per block|Result =/ {
+    print
+  }
+  /Multiprocessors/ {
+    gsub(/[()]/, &amp;quot;&amp;quot;, $1)
+    print &amp;quot;  SM count:&amp;quot;, $1
+  }
+&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_device_query.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_device_query.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;CUDA 设备参数查询结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;CUDA 设备参数查询结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&#34;检查占用时钟温度和功率上限&#34;&gt;&lt;strong&gt;检查占用、时钟、温度和功率上限&lt;/strong&gt;&lt;/h3&gt;
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;nvidia-smi \
+  --query-gpu=index,memory.used,utilization.gpu,pstate,clocks.current.sm,clocks.current.memory,temperature.gpu,power.limit \
+  --format=csv
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_gpu_status.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_gpu_status.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;GPU 占用、时钟、温度和功率上限&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;GPU 占用、时钟、温度和功率上限&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&#34;shared-memory-bank-conflict-相关命令&#34;&gt;&lt;strong&gt;shared memory bank conflict 相关命令&lt;/strong&gt;&lt;/h3&gt;
+&lt;h4 id=&#34;查询可用指标&#34;&gt;&lt;strong&gt;查询可用指标&lt;/strong&gt;&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;/usr/local/cuda/bin/ncu \
+  --query-metrics \
+  --query-metrics-mode suffix \
+  --metrics l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld,l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st \
+  | awk &#39;/^l1tex__.*\.sum[[:space:]]/ { print $1 }&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_metrics.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_metrics.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;共享内存 bank conflict 可用指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;共享内存 bank conflict 可用指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h4 id=&#34;数据采集&#34;&gt;&lt;strong&gt;数据采集&lt;/strong&gt;&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;/usr/local/cuda/bin/ncu \
+  --section MemoryWorkloadAnalysis_Tables \
+  --metrics l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum \
+  --page raw \
+  -o bank-conflicts \
+  ./cuda_program
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;计时方式&#34;&gt;&lt;strong&gt;计时方式&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;由于 kernel launch 相对 host 线程是异步的，若 host 侧的计时器不加同步，那么计算得出的时间是启动调用的返回时间，而不是真正设备完成的时间。但若在 host 侧加 cudaDeviceSynchronize 同步后计时，则会阻碍当前 host 线程，计算得出的时间混进了 host 侧的启动与同步开销。&lt;/p&gt;
+&lt;p&gt;好在 CUDA 提供了事件（CUDA event）。CUDA events 使用设备侧时间戳测量同一 stream 中两个事件之间的经过时间，避免把 host 等待同步返回的额外耗时直接计入结果。在没有明显提交空档及其他工作干扰时，这个间隔可用于近似测量被包围 kernel 的执行耗时。&lt;/p&gt;
+&lt;p&gt;因此，在后续的实验当中的时间测算，均采用 CUDA event 方式计算。伪代码如下&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;cudaEventRecord(evStart);
+launchKernel&amp;lt;&amp;lt;&amp;lt;grid, block&amp;gt;&amp;gt;&amp;gt;(g, b, n);
+cudaEventRecord(evStop);
+cudaEventSynchronize(evStop);
+cudaEventElapsedTime(&amp;amp;evTime, evStart, evStop);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h2 id=&#34;实验简介&#34;&gt;&lt;strong&gt;实验简介&lt;/strong&gt;&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;实验&lt;/th&gt;
+					&lt;th&gt;内存空间&lt;/th&gt;
+					&lt;th&gt;核心&lt;/th&gt;
+					&lt;th&gt;测试&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l0_copy&lt;/td&gt;
+					&lt;td&gt;全局内存&lt;/td&gt;
+					&lt;td&gt;-&lt;/td&gt;
+					&lt;td&gt;基线有效带宽&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l0_copy_vec&lt;/td&gt;
+					&lt;td&gt;全局内存&lt;/td&gt;
+					&lt;td&gt;-&lt;/td&gt;
+					&lt;td&gt;每线程访存宽度（float/float2/float4）&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l1_stride&lt;/td&gt;
+					&lt;td&gt;全局内存&lt;/td&gt;
+					&lt;td&gt;合并访存&lt;/td&gt;
+					&lt;td&gt;跨步访问&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l2_offset&lt;/td&gt;
+					&lt;td&gt;全局内存&lt;/td&gt;
+					&lt;td&gt;合并访存&lt;/td&gt;
+					&lt;td&gt;起始地址非对齐访问&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l3_layout&lt;/td&gt;
+					&lt;td&gt;全局内存&lt;/td&gt;
+					&lt;td&gt;合并访存&lt;/td&gt;
+					&lt;td&gt;AoS vs SoA&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l4_transpose&lt;/td&gt;
+					&lt;td&gt;全局内存 + 共享内存&lt;/td&gt;
+					&lt;td&gt;bank conflict&lt;/td&gt;
+					&lt;td&gt;矩阵转置&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;l5_bank&lt;/td&gt;
+					&lt;td&gt;共享内存&lt;/td&gt;
+					&lt;td&gt;bank conflict&lt;/td&gt;
+					&lt;td&gt;bank 冲突&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;合并访存省的是字节：一个 warp 的 32 个地址尽可能挤进少数 sector，让搬运的每个字节都有用。bank conflict 省的是周期：一个 warp 的 32 个地址尽可能散在不同 bank，让 32 个访问一个周期就服务完。&lt;/p&gt;
+&lt;h2 id=&#34;基线数据连续访存&#34;&gt;&lt;strong&gt;基线数据：连续访存&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;连续访存是访问最快的方式，因此将纯拷贝 kernel 的有效带宽作为基线数据，与后续的实验做对比。&lt;/p&gt;
+&lt;p&gt;在测算有效带宽前，需要先知道理论带宽，以及他们的计算方式&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;理论带宽 = 显存时钟 * 2(DDR) * 位宽 / 8。&lt;a class=&#34;link&#34; href=&#34;https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#theoretical-bandwidth-calculation&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#theoretical-bandwidth-calculation&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;有效带宽 = (每 kernel 读的字节数 + 每 kernel 写的字节数) / 10^9 / 时间（秒）。 &lt;a class=&#34;link&#34; href=&#34;https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#effective-bandwidth-calculation&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#effective-bandwidth-calculation&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;核心代码就是拷贝赋值，如下所示，完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l0_copy.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;__global__ void copyKernel(const float* a, float* b, size_t n) {
+    size_t i = (size_t)blockIdx.x * blockDim.x + threadIdx.x;
+    if (i &amp;lt; n) b[i] = a[i];
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;固定实验所使用参数，与后续实验需保持一致&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;配置&lt;/th&gt;
+					&lt;th&gt;数值&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;GPU&lt;/td&gt;
+					&lt;td&gt;当前机器的 GPU 0&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;每 block 线程数&lt;/td&gt;
+					&lt;td&gt;256&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;数据类型&lt;/td&gt;
+					&lt;td&gt;float，4 bytes&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;数据量&lt;/td&gt;
+					&lt;td&gt;1 GB&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;计时方式&lt;/td&gt;
+					&lt;td&gt;CUDA events&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;预热次数（不计入统计）&lt;/td&gt;
+					&lt;td&gt;3 次&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;统计次数&lt;/td&gt;
+					&lt;td&gt;10 次&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;执行结果如下&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_baseline.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_baseline.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;连续拷贝基线实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;连续拷贝基线实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;从实验执行和结果来看，有两点需要详细说明&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数组 /  L2 为什么需要 17.1 倍&lt;/li&gt;
+&lt;li&gt;理论带宽 4916.7 GB/s，为什么实测只能达到约 2667 GB/s，有效带宽仅为理论带宽的 54%&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;数组---l2-为什么需要-171-倍&#34;&gt;&lt;strong&gt;数组 /  L2 为什么需要 17.1 倍&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;每次 kernel 虽然只读每个元素一次，但连续运行的多个 kernel，会反复读取同一批地址。 前一次访问留下的缓存数据，可能被后一次直接使用。&lt;/p&gt;
+&lt;p&gt;如果对应数据已经在 L2 中，数据直接由 L2 提供；如果未命中 L2，才需要继续向设备显存请求。假设把数组缩小到每个 16 MiB，输入和输出合计 32 MiB，小于这张卡的 60 MiB L2，那么可能发生以下情况&lt;/p&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;执行阶段&lt;/th&gt;
+					&lt;th&gt;可能发生的情况&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;初始化、预热&lt;/td&gt;
+					&lt;td&gt;数据进入缓存&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;后续计时拷贝&lt;/td&gt;
+					&lt;td&gt;输入数据仍在 L2，大量读取可以命中缓存&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;连续重复运行&lt;/td&gt;
+					&lt;td&gt;持续复用相同地址，缓存带来的收益可能一直存在&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;这为什么影响带宽解释？从有效带宽的计算公式看&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt;有效带宽 =（逻辑读取字节数 + 逻辑写入字节数）/ 时间
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;无论读取由 HBM 还是 L2 提供，分子都照样计入。缓存命中可能缩短时间，而分子保持不变，因此有效带宽会提高。&lt;/p&gt;
+&lt;p&gt;写入也类似，缓存采用写回（write-back）机制时，执行一次全局内存写入，并不意味着对应数据当时就已经写到 HBM。所以“逻辑读写了多少字节”和“实际经过 HBM 多少字节”需要分别看。&lt;/p&gt;
+&lt;p&gt;因此，实验使用每数组 1 GB，两个数组合计 2 GB，明显超过 60 MiB L2。对当前全量扫描的拷贝而言，处理后续数据会不断替换此前的缓存行，下一轮再次读取数组时，大量数据需要重新从 HBM 获取。这样可以减少整个数据集留在缓存中、被后续样本反复利用的机会。&lt;/p&gt;
+&lt;h3 id=&#34;为什么有效带宽只有理论带宽的-54&#34;&gt;&lt;strong&gt;为什么有效带宽只有理论带宽的 54%&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;要回答这个问题，需要采集 GPU 运行 copyKernel 的实际指标并分析。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&#34;language-cpp&#34;&gt;CUDA_VISIBLE_DEVICES=0 ncu --clock-control none --set full --import-source yes \
+    -k copyKernel --launch-skip 3 -c 1 -f \
+    -o ~/memory-lab-reports/L0_copy_full \
+    ./bin/l0_copy 512 1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;ncu 运行后，得到采集文件 L0_copy_full.ncu-rep，使用 Nsight Compute 打开分析。可以看到两个明显与预期不符的指标。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;DRAM Throughput 占用 53.69%，显存占用只有一半。纯拷贝 kernel 只做访存，正常应该能够把显存跑满。&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_dram_throughput.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_dram_throughput.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;copyKernel 的 DRAM Throughput&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;copyKernel 的 DRAM Throughput&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Stall Long Scoreboard 42.63 周期，Warp Cycles Per Issued Instruction 50.41 周期，等待从显存数据读取占比 84.6%&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Warp Cycles Per Issued Instruction，表示同一个 warp 连续两次发射指令之间，平均隔多少个周期&lt;/li&gt;
+&lt;li&gt;Stall Long Scoreboard，warp 的下一条指令要用某个 L1TEX 访存操作（global、local、surface、texture）的结果，而结果还没返回，warp 处于等待状态。它表示平均每发射一条指令，warp 有多少个周期处在这种状态。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_long_scoreboard.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_long_scoreboard.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;copyKernel 的 Stall Long Scoreboard&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;copyKernel 的 Stall Long Scoreboard&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;以上两个指标，再加上 L1/TEX、L2、SM 都没有饱和（18.41%、65.06%、24.10%），说明在同一时刻已经发出、数据还没返回的读请求字节（bytes in flight）太少，显存约有一半时间没有请求可处理，所以带宽只有 54%。&lt;/p&gt;
+&lt;p&gt;想要提高实际的有效带宽，核心在于发送给显存的读写请求字节数变高，可以通过提高 warp 数量或者增大每个 warp 读取的字节数。而 warp 数量收到硬件的约束，每个 SM 最多 64 个。&lt;/p&gt;
+&lt;p&gt;下面用实验验证每个 warp 读取的字节数，对带宽的影响。参考：&lt;a class=&#34;link&#34; href=&#34;https://developer.nvidia.com/blog/cuda-pro-tip-increase-performance-with-vectorized-memory-access/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://developer.nvidia.com/blog/cuda-pro-tip-increase-performance-with-vectorized-memory-access/&lt;/a&gt;&lt;/p&gt;
+&lt;h4 id=&#34;每线程访存宽度对带宽的影响&#34;&gt;&lt;strong&gt;每线程访存宽度对带宽的影响&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;拷贝同样多的数据，只改变每个线程一次读写的字节数，对应数据类型为 float、float2、float4，每个 warp 一次读的量分别为 128 B、256 B、512 B。完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l0_copy_vec.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_vectorized.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_copy_vectorized.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;float、float2、float4 向量化访存实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;float、float2、float4 向量化访存实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;实验测量结果和预测一致，float、float2、float4 的有效带宽分别为理论带宽的 54.5%、78.3%、86.6%。&lt;strong&gt;在当前场景下&lt;/strong&gt;，验证了有效带宽随着每线程访存宽度的增大而增大。&lt;/p&gt;
+&lt;h2 id=&#34;跨步访问相邻线程的地址间距对带宽的影响&#34;&gt;&lt;strong&gt;跨步访问：相邻线程的地址间距对带宽的影响&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;跨步访问会降低有效带宽，分别测试 stride 1、2、3、4、8、16、32，验证并回答以下两个问题。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;sector、cache line 在当前环境的字节数为 32 字节、128 字节，此数值参考 &lt;a class=&#34;link&#34; href=&#34;https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#quantities&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#quantities&lt;/a&gt;
+&lt;ul&gt;
+&lt;li&gt;sector：访存路径上搬运的最小单位，32 字节。一个 warp 的一条访存指令，L1TEX 先算出 32 条 lane 的地址覆盖了哪些 sector，再按 sector 整块搬运。不管一条 lane 要的是 1 字节还是 16 字节，包含它的那 32 字节都得整块搬过来。&lt;/li&gt;
+&lt;li&gt;cache line：缓存登记和查找的单位，L1/L2 cache line = 4 * sector&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;stride ≤ 8 时，有效带宽约等于 1/stride
+&lt;ul&gt;
+&lt;li&gt;实验使用的数据类型是 float 4 字节，sector 是 32 字节，因此当 stride &amp;gt; 8 时，再加大 stride，sector 数无处可增。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l1_stride.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_strided_bandwidth.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_strided_bandwidth.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;跨步访问有效带宽实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;跨步访问有效带宽实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h3 id=&#34;l1tex-cache-指标分析&#34;&gt;&lt;strong&gt;L1/TEX Cache 指标分析&lt;/strong&gt;&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;stride = 1&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride1_l1tex.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride1_l1tex.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride = 1 的 L1/TEX Cache 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride = 1 的 L1/TEX Cache 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;stride = 4&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride4_l1tex.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride4_l1tex.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride = 4 的 L1/TEX Cache 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride = 4 的 L1/TEX Cache 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;stride = 8&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride8_l1tex.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride8_l1tex.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride = 8 的 L1/TEX Cache 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride = 8 的 L1/TEX Cache 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;stride = 16&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride16_l1tex.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride16_l1tex.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride = 16 的 L1/TEX Cache 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride = 16 的 L1/TEX Cache 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;从当前实验的数据，可以得到以下结论&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;stride = 1 时，Sectors/Req 指标 = 4，说明一个 warp 的 32 线程在连续访存时，每个线程读取 4B（float） 数据，一次读取 4B * 32 = 128B 数据，占用的 sector 为4，因此每个 sector 的大小为 32B，cache line = 4 * 32B = 128B&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;stride = 1、2、3、4、8、16 时，Sectors/Req 指标 = 4、8、12、16、32、32&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_strided_sector_counts.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_strided_sector_counts.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;不同 stride 的 Sectors/Req 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;不同 stride 的 Sectors/Req 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在 2 ≤ stride ≤ 8 时，有效带宽约等于 1/stride。原因如图所示，当 stride × 4 B &amp;lt; sector 容量 32B 时，多条 lane 可以共用一个 sector，有效带宽随着 stride 的上升而下降。&lt;/li&gt;
+&lt;li&gt;在 stride = 8 时，每个 lane 独占一个 sector，Sectors/Req 指标，不会再随着 stride 的增大而增大&lt;/li&gt;
+&lt;li&gt;在 stride &amp;gt; 8 时，Sectors/Req 恒为 32，但有效带宽继续下降：369.9 → 264.8 → 172.2 GB/s。此时原因不再是 sector 限制，而是和「为什么有效带宽只有理论带宽的 54%」 一致。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;非对齐访问读端起始地址偏移对带宽的影响&#34;&gt;&lt;strong&gt;非对齐访问：读端起始地址偏移对带宽的影响&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset_memory_access.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset_memory_access.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;非对齐访问的 cache line 与 sector 示意图&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;非对齐访问的 cache line 与 sector 示意图&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;1 ≤ offset ≤ 31 时，存在两个原因会导致有效带宽降低&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;offset 对齐 sector 时，一个 warp 访存时，会额外多读一个 cache line&lt;/li&gt;
+&lt;li&gt;offset 没对齐 sector 时，除了额外多读一个 cache line，还需要额外多获取一个 sector 的数据&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l2_offset.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset_bandwidth.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset_bandwidth.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;起始地址偏移对有效带宽的影响&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;起始地址偏移对有效带宽的影响&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;offset = 1，sector = 5&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset1_l1tex.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset1_l1tex.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;offset = 1 的 L1/TEX Cache 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;offset = 1 的 L1/TEX Cache 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;offset = 0、8、16、32，sector = 4。以 offset = 8 举例&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset8_l1tex.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_offset8_l1tex.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;offset = 8 的 L1/TEX Cache 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;offset = 8 的 L1/TEX Cache 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;aos-与-soa-两种内存布局的读带宽&#34;&gt;&lt;strong&gt;AoS 与 SoA 两种内存布局的读带宽&lt;/strong&gt;&lt;/h2&gt;
+&lt;pre&gt;&lt;code class=&#34;language-text&#34;&gt; // AoS (Array of Structures) —— 线程 i 读 arr[i].x，实际 stride = 3
+ struct Vec { float x, y, z; };
+ Vec arr[N];
+ 
+ // SoA (Structure of Arrays) —— 线程 i 读 x[i]，stride = 1
+ float x[N], y[N], z[N];
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l3_layout.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_aos_soa_bandwidth.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_aos_soa_bandwidth.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;AoS 与 SoA 读带宽实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;AoS 与 SoA 读带宽实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;之前在「跨步访问：相邻线程的地址间距对带宽的影响」的实验中，读写都跨步，而当前实验只有读跨步，因此需要对跨步访问的实验做些改造，获取出仅对读跨步的有效带宽，并验证 stride = 3 时，有效带宽是否和 AoS 一致。&lt;/p&gt;
+&lt;p&gt;跨步访问的改造代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l1_diag.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride3_read_only.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_stride3_read_only.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride = 3 的仅读跨步实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride = 3 的仅读跨步实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;可以看到，实际 stride = 3 的仅读跨步，约等于 AoS 有效带宽。&lt;/p&gt;
+&lt;h2 id=&#34;矩阵转置&#34;&gt;&lt;strong&gt;矩阵转置&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;矩阵转置最佳优化方式参考：&lt;a class=&#34;link&#34; href=&#34;https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aat&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aat&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l4_transpose.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_transpose_bandwidth.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_transpose_bandwidth.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;矩阵转置实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;矩阵转置实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;共享内存-bank-conflict&#34;&gt;&lt;strong&gt;共享内存 bank conflict&lt;/strong&gt;&lt;/h2&gt;
+&lt;p&gt;之前的实验都是在验证**合并访存，**不同的操作对带宽的实际利用率。共享内存 bank conflict 不同，它验证的是访问数据用多少个周期，也就是耗时。&lt;/p&gt;
+&lt;p&gt;完整代码参见：&lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l5_bank.cu&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_timings.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_timings.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;共享内存 bank conflict 耗时实验结果&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;共享内存 bank conflict 耗时实验结果&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;6 个 launch，对应 stride 1/2/4/8/16/32&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_launches.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_launches.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride 1、2、4、8、16、32 对应的六次 launch&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride 1、2、4、8、16、32 对应的六次 launch&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;p&gt;以 stride 32 为例，应该有 32 次串行执行，L1 Conflicts Shared N-Way 指标 = 32&lt;/p&gt;
+&lt;p&gt;&lt;figure 
+	&gt;
+	&lt;a href=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_32way.png&#34; &gt;
+		&lt;img src=&#34;http://localhost:1313/zh-cn/dev/cuda/img/memory_practice_bank_conflict_32way.png&#34;
+			
+			
+			
+			loading=&#34;lazy&#34;
+			alt=&#34;stride = 32 的 L1 Conflicts Shared N-Way 指标&#34;
+			width=&#34;85%&#34;&gt;
+	&lt;/a&gt;
+	
+	&lt;figcaption&gt;stride = 32 的 L1 Conflicts Shared N-Way 指标&lt;/figcaption&gt;
+	
+&lt;/figure&gt;&lt;/p&gt;
+&lt;h2 id=&#34;总结&#34;&gt;&lt;strong&gt;总结&lt;/strong&gt;&lt;/h2&gt;
+&lt;table&gt;
+	&lt;thead&gt;
+			&lt;tr&gt;
+					&lt;th&gt;&lt;/th&gt;
+					&lt;th&gt;合并访存&lt;/th&gt;
+					&lt;th&gt;bank conflict&lt;/th&gt;
+			&lt;/tr&gt;
+	&lt;/thead&gt;
+	&lt;tbody&gt;
+			&lt;tr&gt;
+					&lt;td&gt;发生位置&lt;/td&gt;
+					&lt;td&gt;全局内存（L1TEX → L2 → HBM）&lt;/td&gt;
+					&lt;td&gt;共享内存（片上 SRAM）&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;硬件单元&lt;/td&gt;
+					&lt;td&gt;32 字节 sector&lt;/td&gt;
+					&lt;td&gt;4 字节宽的 bank，共 32 个&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;看地址的什么&lt;/td&gt;
+					&lt;td&gt;是否连续（落在几个 sector）&lt;/td&gt;
+					&lt;td&gt;地址 mod 32（落在哪个 bank）&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;理想情况&lt;/td&gt;
+					&lt;td&gt;32 个地址挤进 4 个 sector&lt;/td&gt;
+					&lt;td&gt;32 个地址散到 32 个 bank&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;最坏情况&lt;/td&gt;
+					&lt;td&gt;32 个 sector，一人一个&lt;/td&gt;
+					&lt;td&gt;全挤在 1 个 bank，32 路冲突&lt;/td&gt;
+			&lt;/tr&gt;
+			&lt;tr&gt;
+					&lt;td&gt;代价&lt;/td&gt;
+					&lt;td&gt;搬了没用的字节，浪费带宽&lt;/td&gt;
+					&lt;td&gt;串行化，多花周期，字节不浪费&lt;/td&gt;
+			&lt;/tr&gt;
+	&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;实验涉及到的数据采集都开源在 &lt;a class=&#34;link&#34; href=&#34;https://github.com/boxtsecond/ai-infra-learn/tree/main/cuda/memory-lab-reports&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;link&lt;/a&gt;，感兴趣的可以使用 Nsight Compute 自行查看实验结果&lt;/p&gt;
 </description>
         </item>
         <item>

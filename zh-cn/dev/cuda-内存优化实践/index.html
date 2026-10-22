@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+    <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='基于 NVIDIA H200 的 CUDA 内存实验，验证连续拷贝、向量化访存、跨步与非对齐访问、AoS/SoA、矩阵转置及共享内存 bank conflict 对带宽和耗时的影响。'><title>CUDA 内存优化实践</title>
+
+<link rel='canonical' href='http://localhost:1313/zh-cn/dev/cuda-%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/'>
+
+<link rel="stylesheet" href="/scss/style.min.88c42b700e80a7b6552d5cf00c9d07979233c285b9340c0684c1b25525e6cd01.css"><meta property='og:title' content='CUDA 内存优化实践'>
+<meta property='og:description' content='基于 NVIDIA H200 的 CUDA 内存实验，验证连续拷贝、向量化访存、跨步与非对齐访问、AoS/SoA、矩阵转置及共享内存 bank conflict 对带宽和耗时的影响。'>
+<meta property='og:url' content='http://localhost:1313/zh-cn/dev/cuda-%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/'>
+<meta property='og:site_name' content='Bo&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Dev' /><meta property='article:tag' content='CUDA' /><meta property='article:tag' content='GPU' /><meta property='article:published_time' content='2026-10-22T19:13:16&#43;08:00'/><meta property='article:modified_time' content='2026-10-22T19:13:16&#43;08:00'/>
+<meta name="twitter:title" content="CUDA 内存优化实践">
+<meta name="twitter:description" content="基于 NVIDIA H200 的 CUDA 内存实验，验证连续拷贝、向量化访存、跨步与非对齐访问、AoS/SoA、矩阵转置及共享内存 bank conflict 对带宽和耗时的影响。">
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-3KS241LCYK"></script>
+      <script>
+        var doNotTrack = false;
+        if ( true ) {
+          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
+          var doNotTrack = (dnt == "1" || dnt == "yes");
+        }
+        if (!doNotTrack) {
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-3KS241LCYK');
+        }
+      </script><style>
+    :root {
+        --article-font-family: var(--base-font-family);
+    }
+</style>
+
+<script> 
+		(function () {
+		    const customFont = document.createElement('link');
+		    customFont.href = "https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;700&display=swap"; 
+		    customFont.type = "text/css";
+		    customFont.rel = "stylesheet";
+		
+		    document.head.appendChild(customFont);
+		}());
+</script>
+
+    </head>
+    <body class="
+    article-page
+">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex 
+    <!-- 
+        extended
+     -->
+    on-phone--column extended
+">
+    
+<div id="article-toolbar">
+    <a href="http://localhost:1313/" class="back-home">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chevron-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="15 6 9 12 15 18" />
+</svg>
+
+
+
+        <span>返回</span>
+    </a>
+</div>
+    <aside class="sidebar left-sidebar sticky">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="切换菜单">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header class="site-info">
+        
+            
+            <figure class="site-avatar">
+                <a href="/zh-cn/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/avatar_hu_e942ccd7f8095bd0.jpg" width="300"
+                            height="478" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <h1 class="site-name"><a href="/zh-cn">Bo&#39;s Blog</a></h1>
+        <h2 class="site-description">可乐只喝百事的</h2><ol class="social-menu">
+                
+                    <li>
+                        <a 
+                            href='mailto:boxtsecond@yahoo.com'
+                            target="_blank"
+                            title="Email"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-messages" width="26" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://github.com/boxtsecond'
+                            target="_blank"
+                            title="GitHub"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a 
+                            href='https://www.zhihu.com/people/bo-xue-ting-56'
+                            target="_blank"
+                            title="Zhihu"
+                        >
+                            
+                            
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                            
+                        </a>
+                    </li>
+                
+            </ol></header>
+
+    <ol class="menu" id="main-menu">
+            
+            
+            
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+                
+                <span>数据结构与算法</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>快速理解网络协议</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-keyboard" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <rect x="2" y="6" width="20" height="12" rx="2" />
+  <line x1="6" y1="10" x2="6" y2="10" />
+  <line x1="10" y1="10" x2="10" y2="10" />
+  <line x1="14" y1="10" x2="14" y2="10" />
+  <line x1="18" y1="10" x2="18" y2="10" />
+  <line x1="6" y1="14" x2="6" y2="14.01" />
+  <line x1="18" y1="14" x2="18" y2="14.01" />
+  <line x1="10" y1="14" x2="14" y2="14" />
+</svg>
+                
+                <span>CUDA 编程</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/%E5%85%B3%E4%BA%8E/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="7" r="4" />
+  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+</svg>
+
+
+
+                
+                <span>关于</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>分类</span>
+            </a>
+        </li>
+        
+            
+              
+
+
+        <li >
+            <a href='/zh-cn/p/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Links</span>
+            </a>
+        </li>
+        
+
+        
+            <li id="dark-mode-toggle">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                <span>暗色模式</span>
+            </li>
+        
+        
+            
+            
+                
+            
+        
+
+    </ol>
+</aside>
+
+<main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" >
+                CUDA 编程
+            </a>
+        
+    </header>
+    
+
+    <h2 class="article-title">
+        <a href="/zh-cn/dev/cuda-%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5/">CUDA 内存优化实践</a>
+    </h2>
+
+    
+    <h3 class="article-subtitle">
+        基于 NVIDIA H200 的 CUDA 内存实验，验证连续拷贝、向量化访存、跨步与非对齐访问、AoS/SoA、矩阵转置及共享内存 bank conflict 对带宽和耗时的影响。
+    </h3>
+    
+
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 22, 2026</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-words">
+                    5690字
+                </time>
+            </div>
+        
+    </footer>
+    
+</div>
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="前置说明"><strong>前置说明</strong></h2>
+<p>GPU 程序的性能问题可能出在不同层级，简要概括如下</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>序号</th>
+					<th>层次</th>
+					<th>典型问题</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>1</td>
+					<td>host 与 device 之间</td>
+					<td>H2D/D2H 拷贝、pinned memory、stream 重叠</td>
+			</tr>
+			<tr>
+					<td>2</td>
+					<td>kernel 之间</td>
+					<td>launch 开销、kernel 融合、CUDA Graph</td>
+			</tr>
+			<tr>
+					<td>3</td>
+					<td>单个 kernel 内部的访存</td>
+					<td>合并访存、内存事务粒度、bank conflict</td>
+			</tr>
+			<tr>
+					<td>4</td>
+					<td>单个 kernel 内部的计算</td>
+					<td>指令吞吐、occupancy、Tensor Core 利用率</td>
+			</tr>
+			<tr>
+					<td>5</td>
+					<td>device 之间</td>
+					<td>NVLink、P2P、NCCL</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>本次的所有内存优化实践，都是单个 kernel 内部的访存（memory access）行为，范围不超过一个 device。</p>
+<p>理论知识参考：<a class="link" href="http://localhost:1313/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/" >CUDA 中的内存组织</a> ，这里不再赘述，仅关注实验验证。</p>
+<h2 id="环境参数查询"><strong>环境参数查询</strong></h2>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>参数</th>
+					<th>结果</th>
+					<th>命令</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>GPU 型号</td>
+					<td>NVIDIA H200</td>
+					<td>nvidia-smi -q -i 0</td>
+			</tr>
+			<tr>
+					<td>NVIDIA 驱动</td>
+					<td>550.127.08</td>
+					<td>nvidia-smi -q -i 0</td>
+			</tr>
+			<tr>
+					<td>架构 / 计算能力</td>
+					<td>Hopper / 9.0</td>
+					<td>nvidia-smi -q -i 0</td>
+			</tr>
+			<tr>
+					<td>CUDA 可见显存</td>
+					<td>143072 MB</td>
+					<td>{CUDA 安装路径}/extras/demo_suite/deviceQuery</td>
+			</tr>
+			<tr>
+					<td>L2 cache</td>
+					<td>60 MiB</td>
+					<td>{CUDA 安装路径}/extras/demo_suite/deviceQuery</td>
+			</tr>
+			<tr>
+					<td>SM 数量</td>
+					<td>132</td>
+					<td>{CUDA 安装路径}/extras/demo_suite/deviceQuery</td>
+			</tr>
+			<tr>
+					<td>Warp size</td>
+					<td>32</td>
+					<td>{CUDA 安装路径}/extras/demo_suite/deviceQuery</td>
+			</tr>
+			<tr>
+					<td>每 block 最大线程数</td>
+					<td>1024</td>
+					<td>{CUDA 安装路径}/extras/demo_suite/deviceQuery</td>
+			</tr>
+			<tr>
+					<td>每 block 默认 shared memory 上限</td>
+					<td>48 KB</td>
+					<td>{CUDA 安装路径}/extras/demo_suite/deviceQuery</td>
+			</tr>
+			<tr>
+					<td>操作系统</td>
+					<td>Ubuntu 22.04.5 LTS</td>
+					<td>grep &lsquo;^PRETTY_NAME=&rsquo; /etc/os-release</td>
+			</tr>
+			<tr>
+					<td>GCC / G++</td>
+					<td>11.4.0</td>
+					<td>g++ &ndash;version</td>
+			</tr>
+			<tr>
+					<td>CUDA / NVCC</td>
+					<td>12.4 / 12.4.131</td>
+					<td>nvcc &ndash;version</td>
+			</tr>
+			<tr>
+					<td>Nsight Compute</td>
+					<td>2024.1.1.0</td>
+					<td>ncu &ndash;version</td>
+			</tr>
+			<tr>
+					<td>Compute Sanitizer</td>
+					<td>2024.1.1.0</td>
+					<td>compute-sanitizer &ndash;version</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>H200 官方规格详见：<a class="link" href="https://www.nvidia.com/en-us/data-center/h200/"  target="_blank" rel="noopener"
+    >https://www.nvidia.com/en-us/data-center/h200/</a></p>
+<p>根据当前环境参数信息，我们可以计算出，理论上最多可同时驻留的 CUDA 线程数：2048 线程/SM × 132 SM = 270336，大约是 27 万。</p>
+<p>实际驻留的 CUDA 线程数量取决于 kernel 的资源占用和启动配置，驻留线程不一定都在同一时刻执行指令。同时，一次 kernel 启动的总线程数可以远超过这个上限。</p>
+<h3 id="cuda-设备参数查询"><strong>CUDA 设备参数查询</strong></h3>
+<pre><code class="language-text">/usr/local/cuda/extras/demo_suite/deviceQuery | awk '
+  /^Device [0-9]+:/ { print }
+  /CUDA Driver Version|CUDA Capability|Total amount of global memory|L2 Cache Size|Total amount of shared memory per block|Warp size|Maximum number of threads per block|Result =/ {
+    print
+  }
+  /Multiprocessors/ {
+    gsub(/[()]/, &quot;&quot;, $1)
+    print &quot;  SM count:&quot;, $1
+  }
+'
+</code></pre>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_device_query.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_device_query.png"
+			
+			
+			
+			loading="lazy"
+			alt="CUDA 设备参数查询结果"
+			width="85%">
+	</a>
+	
+	<figcaption>CUDA 设备参数查询结果</figcaption>
+	
+</figure></p>
+<h3 id="检查占用时钟温度和功率上限"><strong>检查占用、时钟、温度和功率上限</strong></h3>
+<pre><code class="language-text">nvidia-smi \
+  --query-gpu=index,memory.used,utilization.gpu,pstate,clocks.current.sm,clocks.current.memory,temperature.gpu,power.limit \
+  --format=csv
+</code></pre>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_gpu_status.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_gpu_status.png"
+			
+			
+			
+			loading="lazy"
+			alt="GPU 占用、时钟、温度和功率上限"
+			width="85%">
+	</a>
+	
+	<figcaption>GPU 占用、时钟、温度和功率上限</figcaption>
+	
+</figure></p>
+<h3 id="shared-memory-bank-conflict-相关命令"><strong>shared memory bank conflict 相关命令</strong></h3>
+<h4 id="查询可用指标"><strong>查询可用指标</strong></h4>
+<pre><code class="language-text">/usr/local/cuda/bin/ncu \
+  --query-metrics \
+  --query-metrics-mode suffix \
+  --metrics l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld,l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_st \
+  | awk '/^l1tex__.*\.sum[[:space:]]/ { print $1 }'
+</code></pre>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_metrics.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_metrics.png"
+			
+			
+			
+			loading="lazy"
+			alt="共享内存 bank conflict 可用指标"
+			width="85%">
+	</a>
+	
+	<figcaption>共享内存 bank conflict 可用指标</figcaption>
+	
+</figure></p>
+<h4 id="数据采集"><strong>数据采集</strong></h4>
+<pre><code class="language-python">/usr/local/cuda/bin/ncu \
+  --section MemoryWorkloadAnalysis_Tables \
+  --metrics l1tex__data_bank_conflicts_pipe_lsu_mem_shared_op_ld.sum \
+  --page raw \
+  -o bank-conflicts \
+  ./cuda_program
+</code></pre>
+<h2 id="计时方式"><strong>计时方式</strong></h2>
+<p>由于 kernel launch 相对 host 线程是异步的，若 host 侧的计时器不加同步，那么计算得出的时间是启动调用的返回时间，而不是真正设备完成的时间。但若在 host 侧加 cudaDeviceSynchronize 同步后计时，则会阻碍当前 host 线程，计算得出的时间混进了 host 侧的启动与同步开销。</p>
+<p>好在 CUDA 提供了事件（CUDA event）。CUDA events 使用设备侧时间戳测量同一 stream 中两个事件之间的经过时间，避免把 host 等待同步返回的额外耗时直接计入结果。在没有明显提交空档及其他工作干扰时，这个间隔可用于近似测量被包围 kernel 的执行耗时。</p>
+<p>因此，在后续的实验当中的时间测算，均采用 CUDA event 方式计算。伪代码如下</p>
+<pre><code class="language-cpp">cudaEventRecord(evStart);
+launchKernel&lt;&lt;&lt;grid, block&gt;&gt;&gt;(g, b, n);
+cudaEventRecord(evStop);
+cudaEventSynchronize(evStop);
+cudaEventElapsedTime(&amp;evTime, evStart, evStop);
+</code></pre>
+<h2 id="实验简介"><strong>实验简介</strong></h2>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>实验</th>
+					<th>内存空间</th>
+					<th>核心</th>
+					<th>测试</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>l0_copy</td>
+					<td>全局内存</td>
+					<td>-</td>
+					<td>基线有效带宽</td>
+			</tr>
+			<tr>
+					<td>l0_copy_vec</td>
+					<td>全局内存</td>
+					<td>-</td>
+					<td>每线程访存宽度（float/float2/float4）</td>
+			</tr>
+			<tr>
+					<td>l1_stride</td>
+					<td>全局内存</td>
+					<td>合并访存</td>
+					<td>跨步访问</td>
+			</tr>
+			<tr>
+					<td>l2_offset</td>
+					<td>全局内存</td>
+					<td>合并访存</td>
+					<td>起始地址非对齐访问</td>
+			</tr>
+			<tr>
+					<td>l3_layout</td>
+					<td>全局内存</td>
+					<td>合并访存</td>
+					<td>AoS vs SoA</td>
+			</tr>
+			<tr>
+					<td>l4_transpose</td>
+					<td>全局内存 + 共享内存</td>
+					<td>bank conflict</td>
+					<td>矩阵转置</td>
+			</tr>
+			<tr>
+					<td>l5_bank</td>
+					<td>共享内存</td>
+					<td>bank conflict</td>
+					<td>bank 冲突</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>合并访存省的是字节：一个 warp 的 32 个地址尽可能挤进少数 sector，让搬运的每个字节都有用。bank conflict 省的是周期：一个 warp 的 32 个地址尽可能散在不同 bank，让 32 个访问一个周期就服务完。</p>
+<h2 id="基线数据连续访存"><strong>基线数据：连续访存</strong></h2>
+<p>连续访存是访问最快的方式，因此将纯拷贝 kernel 的有效带宽作为基线数据，与后续的实验做对比。</p>
+<p>在测算有效带宽前，需要先知道理论带宽，以及他们的计算方式</p>
+<ol>
+<li>理论带宽 = 显存时钟 * 2(DDR) * 位宽 / 8。<a class="link" href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#theoretical-bandwidth-calculation"  target="_blank" rel="noopener"
+    >https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#theoretical-bandwidth-calculation</a></li>
+<li>有效带宽 = (每 kernel 读的字节数 + 每 kernel 写的字节数) / 10^9 / 时间（秒）。 <a class="link" href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#effective-bandwidth-calculation"  target="_blank" rel="noopener"
+    >https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#effective-bandwidth-calculation</a></li>
+</ol>
+<p>核心代码就是拷贝赋值，如下所示，完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l0_copy.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l0_copy.cu</a></p>
+<pre><code class="language-cpp">__global__ void copyKernel(const float* a, float* b, size_t n) {
+    size_t i = (size_t)blockIdx.x * blockDim.x + threadIdx.x;
+    if (i &lt; n) b[i] = a[i];
+}
+</code></pre>
+<p>固定实验所使用参数，与后续实验需保持一致</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>配置</th>
+					<th>数值</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>GPU</td>
+					<td>当前机器的 GPU 0</td>
+			</tr>
+			<tr>
+					<td>每 block 线程数</td>
+					<td>256</td>
+			</tr>
+			<tr>
+					<td>数据类型</td>
+					<td>float，4 bytes</td>
+			</tr>
+			<tr>
+					<td>数据量</td>
+					<td>1 GB</td>
+			</tr>
+			<tr>
+					<td>计时方式</td>
+					<td>CUDA events</td>
+			</tr>
+			<tr>
+					<td>预热次数（不计入统计）</td>
+					<td>3 次</td>
+			</tr>
+			<tr>
+					<td>统计次数</td>
+					<td>10 次</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>执行结果如下</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_copy_baseline.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_copy_baseline.png"
+			
+			
+			
+			loading="lazy"
+			alt="连续拷贝基线实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>连续拷贝基线实验结果</figcaption>
+	
+</figure></p>
+<p>从实验执行和结果来看，有两点需要详细说明</p>
+<ol>
+<li>数组 /  L2 为什么需要 17.1 倍</li>
+<li>理论带宽 4916.7 GB/s，为什么实测只能达到约 2667 GB/s，有效带宽仅为理论带宽的 54%</li>
+</ol>
+<h3 id="数组---l2-为什么需要-171-倍"><strong>数组 /  L2 为什么需要 17.1 倍</strong></h3>
+<p>每次 kernel 虽然只读每个元素一次，但连续运行的多个 kernel，会反复读取同一批地址。 前一次访问留下的缓存数据，可能被后一次直接使用。</p>
+<p>如果对应数据已经在 L2 中，数据直接由 L2 提供；如果未命中 L2，才需要继续向设备显存请求。假设把数组缩小到每个 16 MiB，输入和输出合计 32 MiB，小于这张卡的 60 MiB L2，那么可能发生以下情况</p>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th>执行阶段</th>
+					<th>可能发生的情况</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>初始化、预热</td>
+					<td>数据进入缓存</td>
+			</tr>
+			<tr>
+					<td>后续计时拷贝</td>
+					<td>输入数据仍在 L2，大量读取可以命中缓存</td>
+			</tr>
+			<tr>
+					<td>连续重复运行</td>
+					<td>持续复用相同地址，缓存带来的收益可能一直存在</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>这为什么影响带宽解释？从有效带宽的计算公式看</p>
+<pre><code class="language-text">有效带宽 =（逻辑读取字节数 + 逻辑写入字节数）/ 时间
+</code></pre>
+<p>无论读取由 HBM 还是 L2 提供，分子都照样计入。缓存命中可能缩短时间，而分子保持不变，因此有效带宽会提高。</p>
+<p>写入也类似，缓存采用写回（write-back）机制时，执行一次全局内存写入，并不意味着对应数据当时就已经写到 HBM。所以“逻辑读写了多少字节”和“实际经过 HBM 多少字节”需要分别看。</p>
+<p>因此，实验使用每数组 1 GB，两个数组合计 2 GB，明显超过 60 MiB L2。对当前全量扫描的拷贝而言，处理后续数据会不断替换此前的缓存行，下一轮再次读取数组时，大量数据需要重新从 HBM 获取。这样可以减少整个数据集留在缓存中、被后续样本反复利用的机会。</p>
+<h3 id="为什么有效带宽只有理论带宽的-54"><strong>为什么有效带宽只有理论带宽的 54%</strong></h3>
+<p>要回答这个问题，需要采集 GPU 运行 copyKernel 的实际指标并分析。</p>
+<pre><code class="language-cpp">CUDA_VISIBLE_DEVICES=0 ncu --clock-control none --set full --import-source yes \
+    -k copyKernel --launch-skip 3 -c 1 -f \
+    -o ~/memory-lab-reports/L0_copy_full \
+    ./bin/l0_copy 512 1
+</code></pre>
+<p>ncu 运行后，得到采集文件 L0_copy_full.ncu-rep，使用 Nsight Compute 打开分析。可以看到两个明显与预期不符的指标。</p>
+<ol>
+<li>
+<p>DRAM Throughput 占用 53.69%，显存占用只有一半。纯拷贝 kernel 只做访存，正常应该能够把显存跑满。</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_copy_dram_throughput.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_copy_dram_throughput.png"
+			
+			
+			
+			loading="lazy"
+			alt="copyKernel 的 DRAM Throughput"
+			width="85%">
+	</a>
+	
+	<figcaption>copyKernel 的 DRAM Throughput</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>Stall Long Scoreboard 42.63 周期，Warp Cycles Per Issued Instruction 50.41 周期，等待从显存数据读取占比 84.6%</p>
+<ul>
+<li>Warp Cycles Per Issued Instruction，表示同一个 warp 连续两次发射指令之间，平均隔多少个周期</li>
+<li>Stall Long Scoreboard，warp 的下一条指令要用某个 L1TEX 访存操作（global、local、surface、texture）的结果，而结果还没返回，warp 处于等待状态。它表示平均每发射一条指令，warp 有多少个周期处在这种状态。</li>
+</ul>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_copy_long_scoreboard.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_copy_long_scoreboard.png"
+			
+			
+			
+			loading="lazy"
+			alt="copyKernel 的 Stall Long Scoreboard"
+			width="85%">
+	</a>
+	
+	<figcaption>copyKernel 的 Stall Long Scoreboard</figcaption>
+	
+</figure></p>
+</li>
+</ol>
+<p>以上两个指标，再加上 L1/TEX、L2、SM 都没有饱和（18.41%、65.06%、24.10%），说明在同一时刻已经发出、数据还没返回的读请求字节（bytes in flight）太少，显存约有一半时间没有请求可处理，所以带宽只有 54%。</p>
+<p>想要提高实际的有效带宽，核心在于发送给显存的读写请求字节数变高，可以通过提高 warp 数量或者增大每个 warp 读取的字节数。而 warp 数量收到硬件的约束，每个 SM 最多 64 个。</p>
+<p>下面用实验验证每个 warp 读取的字节数，对带宽的影响。参考：<a class="link" href="https://developer.nvidia.com/blog/cuda-pro-tip-increase-performance-with-vectorized-memory-access/"  target="_blank" rel="noopener"
+    >https://developer.nvidia.com/blog/cuda-pro-tip-increase-performance-with-vectorized-memory-access/</a></p>
+<h4 id="每线程访存宽度对带宽的影响"><strong>每线程访存宽度对带宽的影响</strong></h4>
+<p>拷贝同样多的数据，只改变每个线程一次读写的字节数，对应数据类型为 float、float2、float4，每个 warp 一次读的量分别为 128 B、256 B、512 B。完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l0_copy_vec.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l0_copy_vec.cu</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_copy_vectorized.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_copy_vectorized.png"
+			
+			
+			
+			loading="lazy"
+			alt="float、float2、float4 向量化访存实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>float、float2、float4 向量化访存实验结果</figcaption>
+	
+</figure></p>
+<p>实验测量结果和预测一致，float、float2、float4 的有效带宽分别为理论带宽的 54.5%、78.3%、86.6%。<strong>在当前场景下</strong>，验证了有效带宽随着每线程访存宽度的增大而增大。</p>
+<h2 id="跨步访问相邻线程的地址间距对带宽的影响"><strong>跨步访问：相邻线程的地址间距对带宽的影响</strong></h2>
+<p>跨步访问会降低有效带宽，分别测试 stride 1、2、3、4、8、16、32，验证并回答以下两个问题。</p>
+<ol>
+<li>sector、cache line 在当前环境的字节数为 32 字节、128 字节，此数值参考 <a class="link" href="https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#quantities"  target="_blank" rel="noopener"
+    >https://docs.nvidia.com/nsight-compute/ProfilingGuide/index.html#quantities</a>
+<ul>
+<li>sector：访存路径上搬运的最小单位，32 字节。一个 warp 的一条访存指令，L1TEX 先算出 32 条 lane 的地址覆盖了哪些 sector，再按 sector 整块搬运。不管一条 lane 要的是 1 字节还是 16 字节，包含它的那 32 字节都得整块搬过来。</li>
+<li>cache line：缓存登记和查找的单位，L1/L2 cache line = 4 * sector</li>
+</ul>
+</li>
+<li>stride ≤ 8 时，有效带宽约等于 1/stride
+<ul>
+<li>实验使用的数据类型是 float 4 字节，sector 是 32 字节，因此当 stride &gt; 8 时，再加大 stride，sector 数无处可增。</li>
+</ul>
+</li>
+</ol>
+<p>完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l1_stride.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l1_stride.cu</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_strided_bandwidth.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_strided_bandwidth.png"
+			
+			
+			
+			loading="lazy"
+			alt="跨步访问有效带宽实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>跨步访问有效带宽实验结果</figcaption>
+	
+</figure></p>
+<h3 id="l1tex-cache-指标分析"><strong>L1/TEX Cache 指标分析</strong></h3>
+<ol>
+<li>
+<p>stride = 1</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_stride1_l1tex.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_stride1_l1tex.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride = 1 的 L1/TEX Cache 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>stride = 1 的 L1/TEX Cache 指标</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>stride = 4</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_stride4_l1tex.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_stride4_l1tex.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride = 4 的 L1/TEX Cache 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>stride = 4 的 L1/TEX Cache 指标</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>stride = 8</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_stride8_l1tex.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_stride8_l1tex.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride = 8 的 L1/TEX Cache 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>stride = 8 的 L1/TEX Cache 指标</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>stride = 16</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_stride16_l1tex.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_stride16_l1tex.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride = 16 的 L1/TEX Cache 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>stride = 16 的 L1/TEX Cache 指标</figcaption>
+	
+</figure></p>
+</li>
+</ol>
+<p>从当前实验的数据，可以得到以下结论</p>
+<ul>
+<li>
+<p>stride = 1 时，Sectors/Req 指标 = 4，说明一个 warp 的 32 线程在连续访存时，每个线程读取 4B（float） 数据，一次读取 4B * 32 = 128B 数据，占用的 sector 为4，因此每个 sector 的大小为 32B，cache line = 4 * 32B = 128B</p>
+</li>
+<li>
+<p>stride = 1、2、3、4、8、16 时，Sectors/Req 指标 = 4、8、12、16、32、32</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_strided_sector_counts.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_strided_sector_counts.png"
+			
+			
+			
+			loading="lazy"
+			alt="不同 stride 的 Sectors/Req 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>不同 stride 的 Sectors/Req 指标</figcaption>
+	
+</figure></p>
+<ul>
+<li>在 2 ≤ stride ≤ 8 时，有效带宽约等于 1/stride。原因如图所示，当 stride × 4 B &lt; sector 容量 32B 时，多条 lane 可以共用一个 sector，有效带宽随着 stride 的上升而下降。</li>
+<li>在 stride = 8 时，每个 lane 独占一个 sector，Sectors/Req 指标，不会再随着 stride 的增大而增大</li>
+<li>在 stride &gt; 8 时，Sectors/Req 恒为 32，但有效带宽继续下降：369.9 → 264.8 → 172.2 GB/s。此时原因不再是 sector 限制，而是和「为什么有效带宽只有理论带宽的 54%」 一致。</li>
+</ul>
+</li>
+</ul>
+<h2 id="非对齐访问读端起始地址偏移对带宽的影响"><strong>非对齐访问：读端起始地址偏移对带宽的影响</strong></h2>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_offset_memory_access.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_offset_memory_access.png"
+			
+			
+			
+			loading="lazy"
+			alt="非对齐访问的 cache line 与 sector 示意图"
+			width="85%">
+	</a>
+	
+	<figcaption>非对齐访问的 cache line 与 sector 示意图</figcaption>
+	
+</figure></p>
+<p>1 ≤ offset ≤ 31 时，存在两个原因会导致有效带宽降低</p>
+<ol>
+<li>offset 对齐 sector 时，一个 warp 访存时，会额外多读一个 cache line</li>
+<li>offset 没对齐 sector 时，除了额外多读一个 cache line，还需要额外多获取一个 sector 的数据</li>
+</ol>
+<p>完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l2_offset.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l2_offset.cu</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_offset_bandwidth.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_offset_bandwidth.png"
+			
+			
+			
+			loading="lazy"
+			alt="起始地址偏移对有效带宽的影响"
+			width="85%">
+	</a>
+	
+	<figcaption>起始地址偏移对有效带宽的影响</figcaption>
+	
+</figure></p>
+<ol>
+<li>
+<p>offset = 1，sector = 5</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_offset1_l1tex.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_offset1_l1tex.png"
+			
+			
+			
+			loading="lazy"
+			alt="offset = 1 的 L1/TEX Cache 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>offset = 1 的 L1/TEX Cache 指标</figcaption>
+	
+</figure></p>
+</li>
+<li>
+<p>offset = 0、8、16、32，sector = 4。以 offset = 8 举例</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_offset8_l1tex.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_offset8_l1tex.png"
+			
+			
+			
+			loading="lazy"
+			alt="offset = 8 的 L1/TEX Cache 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>offset = 8 的 L1/TEX Cache 指标</figcaption>
+	
+</figure></p>
+</li>
+</ol>
+<h2 id="aos-与-soa-两种内存布局的读带宽"><strong>AoS 与 SoA 两种内存布局的读带宽</strong></h2>
+<pre><code class="language-text"> // AoS (Array of Structures) —— 线程 i 读 arr[i].x，实际 stride = 3
+ struct Vec { float x, y, z; };
+ Vec arr[N];
+ 
+ // SoA (Structure of Arrays) —— 线程 i 读 x[i]，stride = 1
+ float x[N], y[N], z[N];
+</code></pre>
+<p>完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l3_layout.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l3_layout.cu</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_aos_soa_bandwidth.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_aos_soa_bandwidth.png"
+			
+			
+			
+			loading="lazy"
+			alt="AoS 与 SoA 读带宽实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>AoS 与 SoA 读带宽实验结果</figcaption>
+	
+</figure></p>
+<p>之前在「跨步访问：相邻线程的地址间距对带宽的影响」的实验中，读写都跨步，而当前实验只有读跨步，因此需要对跨步访问的实验做些改造，获取出仅对读跨步的有效带宽，并验证 stride = 3 时，有效带宽是否和 AoS 一致。</p>
+<p>跨步访问的改造代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l1_diag.cu"  target="_blank" rel="noopener"
+    >link</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_stride3_read_only.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_stride3_read_only.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride = 3 的仅读跨步实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>stride = 3 的仅读跨步实验结果</figcaption>
+	
+</figure></p>
+<p>可以看到，实际 stride = 3 的仅读跨步，约等于 AoS 有效带宽。</p>
+<h2 id="矩阵转置"><strong>矩阵转置</strong></h2>
+<p>矩阵转置最佳优化方式参考：<a class="link" href="https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aat"  target="_blank" rel="noopener"
+    >https://docs.nvidia.com/cuda/cuda-c-best-practices-guide/index.html#shared-memory-in-matrix-multiplication-c-aat</a></p>
+<p>完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l4_transpose.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l4_transpose.cu</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_transpose_bandwidth.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_transpose_bandwidth.png"
+			
+			
+			
+			loading="lazy"
+			alt="矩阵转置实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>矩阵转置实验结果</figcaption>
+	
+</figure></p>
+<h2 id="共享内存-bank-conflict"><strong>共享内存 bank conflict</strong></h2>
+<p>之前的实验都是在验证**合并访存，**不同的操作对带宽的实际利用率。共享内存 bank conflict 不同，它验证的是访问数据用多少个周期，也就是耗时。</p>
+<p>完整代码参见：<a class="link" href="https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l5_bank.cu"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/blob/main/cuda/memory-lab-code/src/l5_bank.cu</a></p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_timings.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_timings.png"
+			
+			
+			
+			loading="lazy"
+			alt="共享内存 bank conflict 耗时实验结果"
+			width="85%">
+	</a>
+	
+	<figcaption>共享内存 bank conflict 耗时实验结果</figcaption>
+	
+</figure></p>
+<p>6 个 launch，对应 stride 1/2/4/8/16/32</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_launches.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_launches.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride 1、2、4、8、16、32 对应的六次 launch"
+			width="85%">
+	</a>
+	
+	<figcaption>stride 1、2、4、8、16、32 对应的六次 launch</figcaption>
+	
+</figure></p>
+<p>以 stride 32 为例，应该有 32 次串行执行，L1 Conflicts Shared N-Way 指标 = 32</p>
+<p><figure 
+	>
+	<a href="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_32way.png" >
+		<img src="/zh-cn/dev/cuda/img/memory_practice_bank_conflict_32way.png"
+			
+			
+			
+			loading="lazy"
+			alt="stride = 32 的 L1 Conflicts Shared N-Way 指标"
+			width="85%">
+	</a>
+	
+	<figcaption>stride = 32 的 L1 Conflicts Shared N-Way 指标</figcaption>
+	
+</figure></p>
+<h2 id="总结"><strong>总结</strong></h2>
+<div class="table-wrapper"><table>
+	<thead>
+			<tr>
+					<th></th>
+					<th>合并访存</th>
+					<th>bank conflict</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td>发生位置</td>
+					<td>全局内存（L1TEX → L2 → HBM）</td>
+					<td>共享内存（片上 SRAM）</td>
+			</tr>
+			<tr>
+					<td>硬件单元</td>
+					<td>32 字节 sector</td>
+					<td>4 字节宽的 bank，共 32 个</td>
+			</tr>
+			<tr>
+					<td>看地址的什么</td>
+					<td>是否连续（落在几个 sector）</td>
+					<td>地址 mod 32（落在哪个 bank）</td>
+			</tr>
+			<tr>
+					<td>理想情况</td>
+					<td>32 个地址挤进 4 个 sector</td>
+					<td>32 个地址散到 32 个 bank</td>
+			</tr>
+			<tr>
+					<td>最坏情况</td>
+					<td>32 个 sector，一人一个</td>
+					<td>全挤在 1 个 bank，32 路冲突</td>
+			</tr>
+			<tr>
+					<td>代价</td>
+					<td>搬了没用的字节，浪费带宽</td>
+					<td>串行化，多花周期，字节不浪费</td>
+			</tr>
+	</tbody>
+</table></div>
+<p>实验涉及到的数据采集都开源在 <a class="link" href="https://github.com/boxtsecond/ai-infra-learn/tree/main/cuda/memory-lab-reports"  target="_blank" rel="noopener"
+    >https://github.com/boxtsecond/ai-infra-learn/tree/main/cuda/memory-lab-reports</a>，感兴趣的可以使用 Nsight Compute 自行查看实验结果</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/zh-cn/tags/cuda/">CUDA</a>
+        
+            <a href="/zh-cn/tags/gpu/">GPU</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.css"integrity="sha384-RZU/ijkSsFbcmivfdRBQDtwuwVqK7GMOw6IMvKyeWL2K5UAlyp6WonmB8m7Jd0Hn"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/katex.min.js"integrity="sha384-pK1WpvzWVBQiP0/GjnvRxV4mOb0oxFuyRxJlk6vVw146n3egcN5C925NCP7a7BY8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.13.13/dist/contrib/auto-render.min.js"integrity="sha384-vZTG03m&#43;2yp6N6BNi5iM4rW4oIwk5DfcNdFfxkk9ZWpDriOkXX8voJBFrAO7MpVl"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.querySelector(`.article-content`), {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ]
+        });})
+</script>
+    
+</article>
+
+    <aside class="related-contents--wrapper">
+    
+    
+        <h2 class="section-title"></h2>
+        <div class="related-contents">
+            <div class="flex article-list--tile">
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E7%BB%84%E7%BB%87/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CUDA 中的内存组织</h2>
+        </div>
+    </a>
+</article>
+                
+                    
+<article class="">
+    <a href="/zh-cn/dev/cuda-%E4%B8%AD%E7%9A%84%E7%BA%BF%E7%A8%8B%E7%BB%84%E7%BB%87/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">CUDA 中的线程组织</h2>
+        </div>
+    </a>
+</article>
+                
+            </div>
+        </div>
+    
+</aside>
+
+     
+    
+
+    <footer class="site-footer">
+  
+
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+<script>
+(function(u, c) {
+  var d = document, t = 'script', o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+  o.src = u;
+  if (c) { o.addEventListener('load', function(e) { c(e); }); }
+  s.parentNode.insertBefore(o, s);
+})('//cdn.bootcss.com/pangu/3.3.0/pangu.min.js', function() {
+  pangu.spacingPage();
+});
+</script>
+
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2026 <a href="https://stack-theme-mod.vercel.app/">Example Site</a>·<i class="fas fa-bell"></i> <a id="days">0</a>Days<br>
+        共书写了90.8k字·共 48篇文章</br><span><p>
+    </section>
+    
+    <section class="powerby">
+        
+         <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">© Licensed Under CC BY-NC-SA 4.0</a>
+    </section>
+
+<script>
+
+var s1 = '2023-04-12';
+s1 = new Date(s1.replace(/-/g, "/"));
+s2 = new Date();
+var days = s2.getTime() - s1.getTime();
+var number_of_days = parseInt(days / (1000 * 60 * 60 * 24));
+document.getElementById('days').innerHTML = number_of_days;
+</script>
+    
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.css"integrity="sha256-c0uckgykQ9v5k&#43;IqViZOZKc47Jn7KQil4/MP3ySA3F8="crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.css"integrity="sha256-SBLU4vv6CA6lHsZ1XyTdhyjJxCjPif/TRkjnsyGAGnE="crossorigin="anonymous"
+            >
+
+            </main>
+    
+    
+        
+        
+            
+        
+    
+    
+    
+    <aside class="sidebar right-sidebar sticky">
+        
+            <form action="/zh-cn/p/search/" class="search-form widget" >
+        <p>
+            <label>搜索</label>
+            <input name="keyword" required placeholder="输入关键词..." />
+        
+            <button title="搜索">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+            </button>
+        </p>
+    </form>
+        
+            
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目录</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#前置说明"><strong>前置说明</strong></a></li>
+    <li><a href="#环境参数查询"><strong>环境参数查询</strong></a>
+      <ol>
+        <li><a href="#cuda-设备参数查询"><strong>CUDA 设备参数查询</strong></a></li>
+        <li><a href="#检查占用时钟温度和功率上限"><strong>检查占用、时钟、温度和功率上限</strong></a></li>
+        <li><a href="#shared-memory-bank-conflict-相关命令"><strong>shared memory bank conflict 相关命令</strong></a>
+          <ol>
+            <li><a href="#查询可用指标"><strong>查询可用指标</strong></a></li>
+            <li><a href="#数据采集"><strong>数据采集</strong></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#计时方式"><strong>计时方式</strong></a></li>
+    <li><a href="#实验简介"><strong>实验简介</strong></a></li>
+    <li><a href="#基线数据连续访存"><strong>基线数据：连续访存</strong></a>
+      <ol>
+        <li><a href="#数组---l2-为什么需要-171-倍"><strong>数组 / L2 为什么需要 17.1 倍</strong></a></li>
+        <li><a href="#为什么有效带宽只有理论带宽的-54"><strong>为什么有效带宽只有理论带宽的 54%</strong></a>
+          <ol>
+            <li><a href="#每线程访存宽度对带宽的影响"><strong>每线程访存宽度对带宽的影响</strong></a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#跨步访问相邻线程的地址间距对带宽的影响"><strong>跨步访问：相邻线程的地址间距对带宽的影响</strong></a>
+      <ol>
+        <li><a href="#l1tex-cache-指标分析"><strong>L1/TEX Cache 指标分析</strong></a></li>
+      </ol>
+    </li>
+    <li><a href="#非对齐访问读端起始地址偏移对带宽的影响"><strong>非对齐访问：读端起始地址偏移对带宽的影响</strong></a></li>
+    <li><a href="#aos-与-soa-两种内存布局的读带宽"><strong>AoS 与 SoA 两种内存布局的读带宽</strong></a></li>
+    <li><a href="#矩阵转置"><strong>矩阵转置</strong></a></li>
+    <li><a href="#共享内存-bank-conflict"><strong>共享内存 bank conflict</strong></a></li>
+    <li><a href="#总结"><strong>总结</strong></a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+        
+            <section class="widget categories">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+  
+        </div> 
+        <h2 class="widget-title section-title">Categories</h2>
+    <div class="widget-categories--list">
+<div class="widget">
+    <h3 class="widget-title"> </h3>
+    <div class="widget-body">
+        <div class="category-list">
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/cuda-%E7%BC%96%E7%A8%8B/" class="category-list-link">CUDA 编程<span class="category-list-count">3</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="category-list-link">四层负载均衡<span class="category-list-count">4</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E5%BF%AB%E9%80%9F%E7%90%86%E8%A7%A3%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="category-list-link">快速理解网络协议<span class="category-list-count">9</a>
+            </span></div>
+            <div class="category-list-item"><a href="http://localhost:1313/zh-cn/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/" class="category-list-link">数据结构与算法<span class="category-list-count">27</a>
+            </span></div>
+        </div>
+    </div>
+</div>
+    </div>
+    </section>
+        
+            <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">归档</h2>
+
+        
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2026">
+                        
+                            <span class="year">2026</span>
+                            <span class="count">3</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2024">
+                        
+                            <span class="year">2024</span>
+                            <span class="count">2</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/zh-cn/p/archives/#2023">
+                        
+                            <span class="year">2023</span>
+                            <span class="count">38</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+        
+            <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">标签云</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/zh-cn/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="font_size_11">
+                数据结构
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95%E7%B1%BB%E5%9E%8B/" class="font_size_9">
+                常见算法类型
+            </a>
+        
+            <a href="/zh-cn/tags/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/" class="font_size_9">
+                网络协议
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%B8%B8%E8%A7%81%E5%BA%94%E7%94%A8/" class="font_size_6">
+                常见应用
+            </a>
+        
+            <a href="/zh-cn/tags/%E6%8E%92%E5%BA%8F/" class="font_size_5">
+                排序
+            </a>
+        
+            <a href="/zh-cn/tags/lvs/" class="font_size_4">
+                LVS
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%9B%E5%B1%82%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" class="font_size_4">
+                四层负载均衡
+            </a>
+        
+            <a href="/zh-cn/tags/cuda/" class="font_size_3">
+                CUDA
+            </a>
+        
+            <a href="/zh-cn/tags/gpu/" class="font_size_3">
+                GPU
+            </a>
+        
+            <a href="/zh-cn/tags/%E5%9B%BE/" class="font_size_3">
+                图
+            </a>
+        
+    </div>
+</section>
+        
+    </aside>
+
+
+
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.5/dist/vibrant.min.js"integrity="sha256-5NovOZc4iwiAWTYIFiIM7DxKUXKWvpVEuMEPLzcm5/g="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script><script type="text/javascript" src="/ts/custom.js" defer></script><script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
